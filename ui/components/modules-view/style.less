@@ -1,0 +1,136 @@
+@import '../icons/style.less';
+
+.screeps-modules {
+
+    &__controls {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 5px;
+
+        line-height: 20px;
+    }
+}
+
+.screeps-modules-view {
+    color: rgba(234, 237, 255, 0.7);
+    font-family: 'Segoe UI';
+    font-size: 12px;
+}
+
+.screeps-modules-view ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.screeps-modules-view ul li {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.screeps-modules-view ul li > * {
+    flex-basis: 100%;
+}
+
+.screeps-modules-view ul li > *:nth-child(1) {
+    order: 1;
+}
+
+.screeps-modules-view ul li > *:nth-child(2) {
+    position: absolute;
+    right: 0;
+
+    min-width: 34px;
+    flex-basis: 34px;
+    justify-content: center;
+    order: 2;
+}
+
+.screeps-modules-view ul li > *:nth-child(3) {
+    position: absolute;
+    right: 34px;
+
+    min-width: 34px;
+    flex-basis: 34px;
+    justify-content: center;
+    order: 3;
+}
+
+.screeps-modules-view ul button {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+
+    padding: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+
+    border: none;
+    background: none;
+
+    cursor: pointer;
+    color: rgba(234, 237, 255, 0.7);
+    line-height: 32px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.screeps-modules-view ul button:hover {
+    box-shadow: inset 1px 1px 100px rgba(255, 255, 255, .5)
+}
+
+.screeps-modules-view ul button:focus {
+    outline: none;
+}
+
+.screeps-modules-view__header {
+    padding-left: 5px;
+    padding-right: 5px;
+
+    line-height: 32px;
+}
+
+.screeps-modules-view__header span {
+    text-transform: uppercase;
+}
+
+.screeps-modules-view__header button {
+    border: none;
+    background: none;
+
+    cursor: pointer;
+    color: #4A5FD2;
+    font-weight: bold;
+}
+
+.screeps-modules-view__header button:focus {
+    outline: none;
+}
+
+.screeps-modules-view__item {
+}
+
+.screeps-modules-view__new {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.screeps-modules-view__branch {
+    line-height: 32px;
+}
+
+.screeps-modules-view__active {
+    display: inline-block;
+    margin-left: 10px;
+
+    color: #6C82FF;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.screeps-modules-view__branch:hover {
+    /* box-shadow: inset 1px 1px 100px rgba(255, 255, 255, .5) */
+}

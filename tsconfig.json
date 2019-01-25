@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "jsx": "react",
+        "lib": ["es7", "dom", "ES2017.object"],
+        "module": "commonjs",
+        "noLib": false,
+        "outDir": "./dist",
+        "rootDirs": [
+            "./examples",
+        ],
+        "preserveConstEnums": true,
+        "skipLibCheck": false,
+        "sourceMap": true,
+        "strict": true,
+        "target": "es2017",
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "includes": [
+    ]
+}

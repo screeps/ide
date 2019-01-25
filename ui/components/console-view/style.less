@@ -1,0 +1,96 @@
+@import '../icons/style.less';
+
+.screeps-console {
+    &__view {
+        position: relative;
+        height: 100%;
+        min-height: 100px;
+
+        color: rgba(234, 237, 255, 0.7);
+        font-family: 'Segoe UI';
+        font-size: 12px;
+    }
+
+    &__messages {
+        position: absolute;
+        top: 38px;
+        bottom: 35px;
+        left: 0;
+        right: 0;
+
+        overflow: hidden;
+        overflow-y: auto;
+
+        & + hr {
+            position: absolute;
+            bottom: 35px;
+
+            width: 100%;
+        }
+    }
+
+    &__controls {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 5px;
+
+        line-height: 20px;
+    }
+
+    &__input {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        padding: 5px;
+
+        line-height: 20px;
+    }
+
+    &__message {
+        padding: 0 5px;
+
+        line-height: 20px;
+    }
+
+    .--error {
+        color: #e79da7;
+    }
+
+    .--input {
+        color: #82a1d6;
+
+        &:before {
+            content: '';
+
+            position: relative;
+            top: 3px;
+
+            float: left;
+            display: block;
+            width: 16px;
+            height: 16px;
+            margin-left: -5px;
+
+            background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z' fill='%2382a1d6'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100%;
+        }
+    }
+
+    .brackets {
+        color: rgba(234, 237, 255, .3);
+
+        &:before {
+            content: '[';
+        }
+
+        &:after {
+            content: ']';
+        }
+    }
+
+}
