@@ -40,6 +40,7 @@ class ConsoleView extends React.Component {
             this.props.onResizeStart && this.props.onResizeStart(event);
         };
         this.state = {
+            shard: props.shard,
             shards: [],
             paused: true,
             messages: []
@@ -47,6 +48,7 @@ class ConsoleView extends React.Component {
     }
     componentDidMount() {
         this._subscribe();
+        this.setState(Object.assign({}, this.state, { shard: this.props.shard }));
         this._shards$ = this.props.shards.subscribe((shards) => {
             this.setState(Object.assign({}, this.state, { shards }));
         });
@@ -81,7 +83,7 @@ class ConsoleView extends React.Component {
     render() {
         return (React.createElement("div", { className: 'screeps-ide screeps-console screeps-console__view' },
             React.createElement("div", { className: 'panel-divider', onMouseDown: this.onResizeStart }),
-            React.createElement(controls_1.default, { shards: this.state.shards, paused: this.state.paused, onShard: this.onShard, onStart: this.onStart, onPause: this.onPause, onClose: this.onClose, onDelete: this.onDelete }),
+            React.createElement(controls_1.default, { shard: this.state.shard, shards: this.state.shards, paused: this.state.paused, onShard: this.onShard, onStart: this.onStart, onPause: this.onPause, onClose: this.onClose, onDelete: this.onDelete }),
             React.createElement("hr", { className: 'screeps-hr' }),
             React.createElement(messages_list_1.default, { messages: this.state.messages || [] }),
             React.createElement("hr", { className: 'screeps-hr' }),

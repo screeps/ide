@@ -4,6 +4,9 @@ const React = require("react");
 class MemoryControlsView extends React.Component {
     constructor(props) {
         super(props);
+        this.onShard = (event) => {
+            this.props.onShard && this.props.onShard(event.target.value);
+        };
         this.onClose = () => {
             this.props.onClose && this.props.onClose();
         };
@@ -17,7 +20,7 @@ class MemoryControlsView extends React.Component {
     render() {
         return (React.createElement("div", { className: 'screeps-memory__controls' },
             React.createElement("div", { className: '' },
-                React.createElement("select", { className: 'btn' }, this.props.shards.map(({ name }) => {
+                React.createElement("select", { className: 'btn', onChange: this.onShard, value: this.props.shard }, this.props.shards.map(({ name }) => {
                     return (React.createElement("option", { key: name, value: name }, name));
                 }))),
             React.createElement("div", { className: 'btn-group' },

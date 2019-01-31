@@ -6,7 +6,7 @@ import { getApi } from '../utils';
 import { configGetter } from '../config';
 
 export async function commitCommand(branch: string) {
-    const api = getApi();
+    const api = await getApi();
 
     let srcDir = configGetter('src');
 

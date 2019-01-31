@@ -13,6 +13,15 @@ function consumeStatusBar(statusBar) {
         priority: 10000
     });
     subscriptions.add(atom.tooltips.add(consoleElementRef, { title: 'Show Console ' }));
+    const modulesElementRef = document.createElement('div');
+    modulesElementRef.innerText = 'Modules';
+    modulesElementRef.classList.add('screeps-ide__status-bar', 'inline-block');
+    modulesElementRef.addEventListener('click', () => commands_1.showModulesPaneCommand());
+    statusBar.addLeftTile({
+        item: modulesElementRef,
+        priority: 10000
+    });
+    subscriptions.add(atom.tooltips.add(modulesElementRef, { title: 'Show Modules ' }));
     const memoryElementRef = document.createElement('div');
     memoryElementRef.innerText = 'Memory';
     memoryElementRef.classList.add('screeps-ide__status-bar', 'inline-block');

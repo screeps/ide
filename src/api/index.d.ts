@@ -1,3 +1,8 @@
+interface IResponse {
+    ok?: string;
+    error?: string;
+}
+
 interface IApiSettings {
     url: string;
     token?: string;
@@ -8,18 +13,22 @@ interface ICredentials {
     password: string;
 }
 
-interface IUserCode {
+interface IModules {
+    [key: string]: String;
+}
+
+interface IUserCodeRequest {
     branch: string;
     modules: IModules;
 }
 
-interface IAuthResponse {
-    ok: number;
-    token: string;
+interface IUserCodeResponse extends IResponse {
+    branch: string;
+    modules: IModules;
 }
 
-interface IUserCodeReponse extends IUserCode {
-    ok: number;
+interface IAuthResponse extends IResponse {
+    token: string;
 }
 
 interface IBranches {
@@ -29,12 +38,7 @@ interface IBranches {
     activeSim: boolean;
 }
 
-interface IModules {
-    [key: string]: String;
-}
-
-interface IUserBranches {
-    ok: number;
+interface IUserBranchesResponse extends IResponse {
     list: IBranches[];
 }
 
@@ -52,7 +56,59 @@ interface IGameShardInfo {
     users: number;
 }
 
-interface IGameShardInfoResponse {
-    ok: number;
+interface IGameShardInfoResponse extends IResponse {
     shards: IGameShardInfo[];
+}
+
+interface IUserMemoryResponse extends IResponse {
+    data: string;
+}
+
+interface IAuthTokenRequest {
+    description: string;
+
+    endpoints: {
+        [key: string]: boolean;
+    };
+
+    memorySegments: string;
+
+    type: string;
+
+    websockets: {
+        console: boolean;
+        rooms: boolean;
+    }
+}
+
+interface IAuthTokenResponse extends IResponse {
+    token: string;
+}
+
+interface IAuthMeResponse extends IResponse {
+    _id: string;
+    badge: any;
+    cpu: number;
+    cpuShard: {
+        [key: string]: number;
+    };
+    cpuShardUpdatedTime: number;
+    credits: number;
+    email: string;
+    gcl: number;
+    lastRespawnDate: number;
+    money: number;
+    notifyPrefs: {
+        [key: string]: boolean;
+    };
+    password: boolean;
+    promoPeriodUntil: number;
+    runtime: {
+        [key: string]: boolean;
+    }
+    steam: {
+        [key: string]: any;
+    }
+    subscriptionTokens: 0;
+    username: string;
 }

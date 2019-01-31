@@ -2,6 +2,15 @@
 /// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 // const fetch = require('node-fetch');
+function generateAuthTokenRequest() {
+    return {
+        description: `atom-${new Date().getTime()}`,
+        endpoints: {},
+        memorySegments: '',
+        type: 'full',
+        websockets: { console: false, rooms: false }
+    };
+}
 class Api {
     constructor({ url, token }) {
         this.__token = null;
@@ -12,11 +21,9 @@ class Api {
     }
     get _token() {
         return this.__token;
-        // return localStorage.getItem('auth') as string;
     }
     set _token(token) {
         this.__token = token;
-        // localStorage.setItem('auth', token);
     }
     get headers() {
         return {
@@ -39,7 +46,40 @@ class Api {
             this._token = data.token;
         }
         catch (err) {
-            return err;
+            throw err;
+        }
+        return data;
+    }
+    async getAuhtMe() {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/auth/me`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+            if (!response.ok) {
+                throw data.error;
+            }
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
+    async createAuthToken(body = generateAuthTokenRequest()) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/auth-token`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+            data = await response.json();
+            this._token = data.token;
+        }
+        catch (err) {
+            throw err;
         }
         return data;
     }
@@ -53,25 +93,51 @@ class Api {
             data = await response.json();
         }
         catch (err) {
-            return err;
+            throw err;
         }
         return data;
     }
-    getUserCode(branch = '$activeWorld') {
-        const promise = fetch(`${this.url}/user/code?branch=${branch}`, {
-            method: 'GET',
-            headers: this.headers
-        })
-            .then((response) => response.json());
-        return promise;
+    async getUserMemory({ path, shard }) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/memory?path=${path}&shard=${shard}`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
     }
-    getUserBranches() {
-        const promise = fetch(`${this.url}/user/branches`, {
-            method: 'GET',
-            headers: this.headers
-        })
-            .then((response) => response.json());
-        return promise;
+    async getUserCode(branch = '$activeWorld') {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/code?branch=${branch}`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
+    async getUserBranches() {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/branches`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
     }
     async sendUserConsole(body) {
         let data;
@@ -84,7 +150,7 @@ class Api {
             data = await response.json();
         }
         catch (err) {
-            return err;
+            throw err;
         }
         return data;
     }

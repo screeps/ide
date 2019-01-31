@@ -4,12 +4,13 @@ const React = require("react");
 const ReactDOM = require("react-dom");
 const ui_1 = require("../../../ui");
 let clientY;
-const userId = '5a58af97d870324d18b43f02';
 class ConsolePane {
-    constructor(_api, _socket, _service) {
+    constructor(_user, _api, _socket, _service) {
+        this._user = _user;
         this._api = _api;
         this._socket = _socket;
         this._service = _service;
+        // Private component actions.
         this.onInput = async ({ expression }) => {
             try {
                 const data = await this._api.sendUserConsole({
@@ -23,7 +24,6 @@ class ConsolePane {
             }
         };
         this.onShard = (shard) => {
-            console.log(123, shard);
             this.shard = shard;
         };
         this.onClose = () => {
@@ -47,7 +47,8 @@ class ConsolePane {
         };
         this.element = document.createElement('div');
         this.element.style.height = '300px';
-        this.consolePipe$ = this._socket.on(`user:${userId}/console`);
+        this.shard = this._user.shard;
+        this.consolePipe$ = this._socket.on(`user:${this._user.id}/console`);
         this.render({});
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
@@ -55,8 +56,9 @@ class ConsolePane {
         });
     }
     render({}) {
-        ReactDOM.render(React.createElement(ui_1.ConsoleView, { output: this.consolePipe$, shards: this._service.shards$, onShard: this.onShard, onInput: this.onInput, onClose: this.onClose, onResizeStart: this.onResizeStart }), this.element);
+        ReactDOM.render(React.createElement(ui_1.ConsoleView, { output: this.consolePipe$, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, onInput: this.onInput, onClose: this.onClose, onResizeStart: this.onResizeStart }), this.element);
     }
+    // Atom pane required interface's methods
     getURI() {
         return 'atom://screeps-ide-console-view';
     }

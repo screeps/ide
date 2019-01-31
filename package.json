@@ -39,6 +39,8 @@
     "method": "handleURI"
   },
   "dependencies": {
+    "jsoneditor": "^5.28.2",
+    "pako": "^1.0.8",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "rxjs": "^6.3.3",

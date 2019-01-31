@@ -6,4 +6,5 @@ tslib_1.__exportStar(require("./auth"), exports);
 tslib_1.__exportStar(require("./commit"), exports);
 tslib_1.__exportStar(require("./show-console-pane"), exports);
 tslib_1.__exportStar(require("./show-memory-pane"), exports);
+tslib_1.__exportStar(require("./show-modules-pane"), exports);
 //# sourceMappingURL=index.js.map

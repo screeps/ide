@@ -109,6 +109,14 @@ const _global = {
             type: 'string',
             default: 'https://screeps.com/socket',
             order: 1
+        },
+
+        src: {
+            title: 'Project folder',
+            description: '',
+            type: 'string',
+            default: './dist',
+            order: 1
         }
     }
 };
@@ -132,4 +140,8 @@ export function configGetter(name: string): string {
     }
 
     return value;
+}
+
+export function configSetter(name: string, value: string) {
+    atom.config.set(`${ PACKAGE_NAME }.${ name }`, value);
 }

@@ -1,8 +1,13 @@
 @import '../icons/style.less';
+// @import '../../../node_modules/jsoneditor/dist/jsoneditor.min.css';
+@import './components/json-editor.less';
 
 .screeps-memory {
     &__view {
         position: relative;
+
+        display: flex;
+        flex-direction: column;
         height: 100%;
         min-height: 100px;
 
@@ -12,10 +17,79 @@
     }
 
     &__controls {
+        box-sizing: content-box;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         padding: 5px;
+        min-height: 26px;
+
+        line-height: 20px;
+    }
+
+    &__main {
+        overflow: hidden;
+        overflow-y: auto;
+        overflow-y: overlay;
+
+        height: 100%;
+    }
+
+    &__item {
+        padding: 0 5px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+
+        line-height: 20px;
+    }
+
+    &__expression {
+        position: sticky;
+        top: 0px;
+
+        float: left;
+        display: flex;
+        width: 50%;
+        height: 26px;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        line-height: 26px;
+
+        button.btn--clear {
+            display: none;
+        }
+
+        &:hover {
+            button.btn--clear {
+                display: inherit;
+            }
+        }
+    }
+
+    &__value {
+        display: flex;
+        width: 50%;
+        margin-left: 50%;
+
+        border: 0;
+        background: transparent;
+
+        color: rgba(234, 237, 255, 0.7);
+
+        &:hover {
+            
+        }
+    }
+
+    &__json-editor {
+        width: 50%;
+        margin-left: 50%;
+    }
+
+    &__input {
+        padding: 5px;
+        margin-top: auto;
 
         line-height: 20px;
     }

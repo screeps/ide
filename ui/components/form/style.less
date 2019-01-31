@@ -23,6 +23,20 @@
     .screeps-field input:focus {
         outline: none;
     }
+    .screeps-field legend {
+        position: absolute;
+        top: -1.42em;
+
+        padding: 0;
+
+        border: none;
+
+        color: #d9dfff;
+        font-size: 1.14em;
+        pointer-events: none;
+        transition: top 0.3s ease, font-size 0.3s ease;
+    }
+
     .screeps-field label {
         position: absolute;
         top: 0;
@@ -37,6 +51,10 @@
         font-size: 1em;
     }
     .screeps-field input:valid ~ label {
+        top: -1.42em;
+        font-size: 1em;
+    }
+    .screeps-field input:disabled ~ label {
         top: -1.42em;
         font-size: 1em;
     }
@@ -97,63 +115,14 @@
 
     hr.screeps-hr {
         height: 1px;
+        min-height: 1px;
         margin: 0;
 
         border: 0;
         background: rgba(74, 95, 210, 0.65);
     }
 
-    .btn {
-        display: inline-flex;
-        min-height: 26px;
-        padding: 0px 5px;
-
-        border: 1px solid #181a1f;
-        border-radius: 3px;
-        background-color: #353b45;
-        background-image: linear-gradient(#3a3f4b, #353b45);
-
-        cursor: pointer;
-        color: #9da5b4;
-        text-shadow: none;
-
-        &:focus,
-        &:hover {
-            outline: none;
-
-            background-image: linear-gradient(#3e4451, #3a3f4b);
-            color: #d7dae0;
-        }
-
-        &:active {
-            background: #2c313a;
-            box-shadow: none;
-        }
-    }
-
-    .btn-group > .btn {
-        position: relative;
-        float: left;
-    }
-
-    .btn-group > .btn:first-child:not(:last-child) {
-        border-bottom-right-radius: 0;
-        border-top-right-radius: 0;
-    }
-
-    .btn-group > .btn:last-child:not(:first-child) {
-        border-bottom-left-radius: 0;
-        border-top-left-radius: 0;
-    }
-
-    .btn-group > .btn:not(:first-child):not(:last-child) {
-        border-radius: 0;
-    }
-
-    .btn-group .btn + .btn,
-    .btn-group .btn + .btn-group,
-    .btn-group .btn-group + .btn,
-    .btn-group .btn-group + .btn-group {
-        margin-left: -1px;
+    .--italic {
+        font-style: italic;
     }
 }

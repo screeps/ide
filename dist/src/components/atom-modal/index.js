@@ -4,23 +4,29 @@ const React = require("react");
 const ReactDOM = require("react-dom");
 const rxjs_1 = require("rxjs");
 class AtomModal {
-    constructor(Component) {
+    constructor(Component, props = {}) {
         this._eventsSbj = new rxjs_1.Subject();
+        this.ref = React.createRef();
         this.onCancel = () => {
-            this._eventsSbj.next({ type: 'AUTH_CANCEL ' });
-            this._atomModalPanelRef.hide();
+            this._eventsSbj.next({ type: 'MODAL_CANCEL ' });
+            this.hide();
         };
         this.onSubmit = (payload) => {
-            console.log(1, 'onSubmit', payload);
-            this._eventsSbj.next({ type: 'AUTH_SUBMIT', payload });
+            this._eventsSbj.next({ type: 'MODAL_SUBMIT', payload });
         };
         this._element = document.createElement('div');
         this.events$ = this._eventsSbj.asObservable();
-        ReactDOM.render(React.createElement(Component, { onCancel: this.onCancel, onSubmit: this.onSubmit }), this._element);
+        ReactDOM.render(React.createElement(Component, Object.assign({ ref: this.ref }, props, { onCancel: this.onCancel, onSubmit: this.onSubmit })), this._element);
         this._atomModalPanelRef = atom.workspace.addModalPanel({
             item: this._element,
             visible: true
         });
+    }
+    hide() {
+        this._atomModalPanelRef.hide();
+    }
+    setState(state) {
+        this.ref.current.setState(state);
     }
 }
 exports.AtomModal = AtomModal;

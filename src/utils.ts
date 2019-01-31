@@ -1,17 +1,26 @@
 import { Api } from './api';
 import { Socket } from './socket';
 import { configGetter } from './config';
+import { User } from './services/user';
+
+import { authCommand } from './commands/auth';
 
 let api: Api;
 let socket: Socket;
 
-export function getApi() {
+export async function getApi(): Promise<any> {
     if (api) {
         return api;
     }
 
-    const apiUrl = configGetter('apiUrl');
     const token = configGetter('authToken');
+
+    if (!token) {
+        api = await authCommand();
+        return api;
+    }
+
+    const apiUrl = configGetter('apiUrl');
 
     api = new Api({
         url: apiUrl,
@@ -37,4 +46,49 @@ export function getSocket() {
     return socket;
 }
 
+const _watches: any = [
+    {path: '', value: '[object Object]'},
+    {path: 'creeps'},
+    {path: 'spawns'},
+    {path: 'rooms'},
+    {path: 'flags'}
+];
+export function getWatches() {
+    let watches;
+    
+    try {
+        watches = localStorage.getItem('memory-watches');
 
+        if (!watches) {
+            throw new Error('empty');
+        }
+
+        watches = JSON.parse(watches);
+    } catch(err) {
+        localStorage.setItem('memory-watches', JSON.stringify(_watches));
+        watches = _watches;
+    }
+
+    return watches;
+}
+
+let user: User;
+export async function getUser(): Promise<User> {
+    if (user) {
+        return user;
+    }
+
+    try {
+        const data = await api.getAuhtMe();
+        user = new User(data);
+    } catch(err) {
+        if (err !== 'unauthorized') {
+            throw err;
+        }
+
+        api = await authCommand();
+        user = await getUser();
+    }
+
+    return user;
+}

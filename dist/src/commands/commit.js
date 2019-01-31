@@ -5,7 +5,7 @@ const atom_1 = require("atom");
 const utils_1 = require("../utils");
 const config_1 = require("../config");
 async function commitCommand(branch) {
-    const api = utils_1.getApi();
+    const api = await utils_1.getApi();
     let srcDir = config_1.configGetter('src');
     const modules = await readUserCode(srcDir);
     return api.updateUserCode({ branch, modules });

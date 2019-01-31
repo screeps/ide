@@ -32,7 +32,7 @@ class ConsoleControlsView extends React.Component {
         }
         return (React.createElement("div", { className: 'screeps-console__controls' },
             React.createElement("div", { className: '' },
-                React.createElement("select", { className: 'btn', onChange: this.onShard }, this.props.shards.map(({ name }) => {
+                React.createElement("select", { className: 'btn', onChange: this.onShard, value: this.props.shard }, this.props.shards.map(({ name }) => {
                     return (React.createElement("option", { key: name, value: name }, name));
                 }))),
             React.createElement("div", { className: 'btn-group' },

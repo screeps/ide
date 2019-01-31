@@ -1,8 +1,10 @@
 import * as React from 'react';
 
 interface IMemoryControlsViewProps {
+    shard: string;
     shards: any;
 
+    onShard?: Function;
     onClose?: Function;
     onToggleView?: Function;
 }
@@ -13,6 +15,10 @@ export default class MemoryControlsView extends React.Component<IMemoryControlsV
 
     constructor(props: IMemoryControlsViewProps) {
         super(props);
+    }
+
+    onShard = (event: any) => {
+        this.props.onShard && this.props.onShard(event.target.value);
     }
 
     onClose = () => {
@@ -31,7 +37,7 @@ export default class MemoryControlsView extends React.Component<IMemoryControlsV
         return (
             <div className='screeps-memory__controls'>
                 <div className=''>
-                    <select className='btn'>
+                    <select className='btn' onChange={ this.onShard } value={ this.props.shard }>
                         { this.props.shards.map(({ name }: { name: string }) => {
                             return (<option key={ name } value={ name }>{ name }</option>);
                         })}

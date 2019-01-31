@@ -2,18 +2,27 @@
 
 // const fetch = require('node-fetch');
 
+function generateAuthTokenRequest(): IAuthTokenRequest {
+    return {
+        description: `atom-${ new Date() .getTime() }`,
+        endpoints: { },
+        memorySegments: '',
+        type: 'full',
+        websockets: {console: false, rooms: false}
+    }
+}
+
 export class Api {
     public url: string;
 
     private __token: string | null = null;
     private get _token():string | null {
         return this.__token;
-        // return localStorage.getItem('auth') as string;
     }
     private set _token(token: string | null) {
         this.__token = token;
-        // localStorage.setItem('auth', token);
     }
+
 
     private get headers(): any {
         return {
@@ -46,7 +55,48 @@ export class Api {
 
             this._token = data.token;
         } catch(err) {
-            return err;
+            throw err;
+        }
+
+        return data;
+    }
+
+    async getAuhtMe(): Promise<IAuthMeResponse> {
+        let data: IAuthMeResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/auth/me`, {
+                method: 'GET',
+                headers: this.headers
+            });
+
+            data = await response.json();
+
+            if (!response.ok) {
+                throw data.error;
+            }
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
+    async createAuthToken(body: IAuthTokenRequest = generateAuthTokenRequest()): Promise<IAuthTokenResponse> {
+        let data: IAuthTokenResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/auth-token`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+
+            data = await response.json();
+
+            this._token = data.token;
+        } catch(err) {
+            throw err;
         }
 
         return data;
@@ -62,30 +112,59 @@ export class Api {
             });
             data = await response.json();
         } catch(err) {
-            return err;
+            throw err;
         }
 
         return data;
     }
-    
-    getUserCode(branch = '$activeWorld'): Promise<IUserCodeReponse> {
-        const promise = fetch(`${ this.url }/user/code?branch=${ branch }`, {
-            method: 'GET',
-            headers: this.headers
-        })
-            .then((response: any) => response.json());
 
-        return promise;
+    async getUserMemory({ path, shard }: { path: string, shard: string }): Promise<IUserMemoryResponse> {
+        let data: IUserMemoryResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/memory?path=${ path }&shard=${ shard }`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
     }
 
-    getUserBranches() {
-        const promise = fetch(`${ this.url }/user/branches`, {
-            method: 'GET',
-            headers: this.headers
-        })
-            .then((response: any) => response.json());
+    async getUserCode(branch = '$activeWorld'): Promise<IUserCodeResponse> {
+        let data: IUserCodeResponse;
 
-        return promise;
+        try {
+            const response = await fetch(`${ this.url }/user/code?branch=${ branch }`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
+    async getUserBranches(): Promise<IUserBranchesResponse> {
+        let data: IUserBranchesResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/branches`, {
+                method: 'GET',
+                headers: this.headers
+            });
+
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
     }
 
     async sendUserConsole(body: IUserConsoleParams) {
@@ -99,13 +178,13 @@ export class Api {
             });
             data = await response.json();
         } catch(err) {
-            return err;
+            throw err;
         }
 
         return data;
     }
 
-    updateUserCode(data: IUserCode) {
+    updateUserCode(data: IUserCodeRequest) {
         const headers: any = {
             'Content-Type': 'application/json',
             'X-Token': this._token

@@ -1,17 +1,16 @@
+import { Panel } from 'atom';
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Observable } from 'rxjs';
 
 import { ConsoleView } from '../../../ui';
 import { Api } from '../../api';
 import { Socket } from '../../socket';
-
-import { Observable } from 'rxjs';
-import { Panel } from 'atom';
-
 import { Service } from '../../service';
+import { User } from '../../services/user';
 
 let clientY: number;
-const userId = '5a58af97d870324d18b43f02';
 
 export class ConsolePane {
     public element: HTMLElement;
@@ -21,6 +20,7 @@ export class ConsolePane {
     public consolePipe$: Observable<any>;
 
     constructor(
+        private _user: User,
         private _api: Api,
         private _socket: Socket,
         private _service: Service
@@ -28,7 +28,8 @@ export class ConsolePane {
         this.element = document.createElement('div');
         this.element.style.height = '300px';
 
-        this.consolePipe$ = this._socket.on(`user:${ userId }/console`);
+        this.shard = this._user.shard;
+        this.consolePipe$ = this._socket.on(`user:${ this._user.id }/console`);
 
         this.render({});
 
@@ -38,7 +39,24 @@ export class ConsolePane {
         });
     }
 
-    onInput = async ({ expression }: { expression: string }) => {
+    render({ }) {
+        ReactDOM.render(
+            <ConsoleView
+                output={ this.consolePipe$ }
+                shard={ this.shard }
+                shards={ this._service.shards$ }
+
+                onShard={ this.onShard }
+                onInput={ this.onInput }
+                onClose={ this.onClose }
+                onResizeStart={ this.onResizeStart }
+            />,
+            this.element as HTMLElement
+        )
+    }
+
+    // Private component actions.
+    private onInput = async ({ expression }: { expression: string }) => {
         try {
             const data = await this._api.sendUserConsole({
                 expression,
@@ -51,23 +69,22 @@ export class ConsolePane {
         }
     }
 
-    onShard = (shard: string) => {
-        console.log(123, shard);
+    private onShard = (shard: string) => {
         this.shard = shard;
     }
 
-    onClose = () => {
+    private onClose = () => {
         this._panel.destroy();
     }
 
-    onResizeStart = (event: any) => {
+    private onResizeStart = (event: any) => {
         clientY = event.clientY;
 
         document.addEventListener('mousemove', this.onResize);
         document.addEventListener('mouseup', this.onResizeStop);
     }
 
-    onResize = (event: any) => {
+    private onResize = (event: any) => {
         const offsetY = event.clientY - clientY;
         clientY = event.clientY;
 
@@ -77,26 +94,13 @@ export class ConsolePane {
         this.element.style.height = `${ height - offsetY }px`
     }
 
-    onResizeStop = () => {
+    private onResizeStop = () => {
         document.removeEventListener('mousemove', this.onResize);
         document.removeEventListener('mouseup', this.onResizeStop);
     }
 
-    render({ }) {
-        ReactDOM.render(
-            <ConsoleView
-                output={ this.consolePipe$ }
-                shards={ this._service.shards$ }
 
-                onShard={ this.onShard }
-                onInput={ this.onInput }
-                onClose={ this.onClose }
-                onResizeStart={ this.onResizeStart }
-            />,
-            this.element as HTMLElement
-        )
-    }
-
+    // Atom pane required interface's methods
     getURI() {
         return 'atom://screeps-ide-console-view';
     }

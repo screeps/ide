@@ -21,6 +21,7 @@ class ConsoleView extends React.Component<IConsoleViewProps> {
         super(props);
 
         this.state = {
+            shard: props.shard,
             shards: [],
             paused: true,
             messages: []
@@ -29,6 +30,11 @@ class ConsoleView extends React.Component<IConsoleViewProps> {
 
     componentDidMount() {
         this._subscribe();
+
+        this.setState({
+            ...this.state,
+            shard: this.props.shard
+        });
 
         this._shards$ = this.props.shards.subscribe((shards: any) => {
             this.setState({
@@ -126,6 +132,7 @@ class ConsoleView extends React.Component<IConsoleViewProps> {
             <div className='screeps-ide screeps-console screeps-console__view'>
                 <div className='panel-divider' onMouseDown={ this.onResizeStart }/>
                 <ConsoleControlsView
+                    shard={ this.state.shard }
                     shards={ this.state.shards }
                     paused={ this.state.paused }
 

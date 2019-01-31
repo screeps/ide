@@ -16,5 +16,11 @@ module.exports = (env, argv) => merge(commonCfg(env, {
   plugins: [
     new MiniCssExtractPlugin({filename: '[name].css'}),
 
-  ]
+  ],
+
+  devServer: {
+    port: 3000,
+    host: '0.0.0.0',
+    disableHostCheck: true
+  }
 });

@@ -13,7 +13,6 @@ class Service {
         this.state$ = this.state.asObservable();
         this.shards = new rxjs_1.BehaviorSubject([]);
         this.shards$ = this.shards.asObservable();
-        this._api = utils_1.getApi();
         this.getGameShardsInfo();
     }
     getUserBranches() {
@@ -33,11 +32,10 @@ class Service {
                 modules }));
         });
     }
-    getGameShardsInfo() {
-        this._api.getGameShardsInfo()
-            .then(({ shards }) => {
-            this.shards.next(shards);
-        });
+    async getGameShardsInfo() {
+        const api = await utils_1.getApi();
+        const { shards } = await api.getGameShardsInfo();
+        this.shards.next(shards);
     }
 }
 exports.Service = Service;

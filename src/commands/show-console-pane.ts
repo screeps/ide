@@ -1,11 +1,16 @@
-import { getSocket, getApi } from '../utils';
+import { getApi, getSocket, getUser } from '../utils';
 
 import { Service } from '../service';
 import { ConsolePane } from '../components/console-pane';
 
 export async function showConsolePaneCommand() {
-    const api = getApi();
-    const socket = getSocket();
+    try {
+        const api = await getApi();
+        const user = await getUser();
+        const socket = getSocket();
 
-    new ConsolePane(api, socket, new Service());
+        new ConsolePane(user, api, socket, new Service());
+    } catch(err) {
+        // Ignore.
+    }
 }

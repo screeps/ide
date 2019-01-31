@@ -17,7 +17,6 @@ export class Service {
     private _api: any;
 
     constructor() {
-        this._api = getApi();
         this.getGameShardsInfo();
     }
 
@@ -51,10 +50,10 @@ export class Service {
             });
     }
 
-    getGameShardsInfo() {
-        this._api.getGameShardsInfo()
-            .then(({ shards }: { shards: any }) => {
-                this.shards.next(shards);
-            });
+    async getGameShardsInfo() {
+        const api = await getApi();
+        const { shards } = await api.getGameShardsInfo();
+
+        this.shards.next(shards);
     }
 }
