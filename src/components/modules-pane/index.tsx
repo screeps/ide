@@ -19,7 +19,16 @@ export class ModulesPane {
             activateItem: true,
             split: 'down',
             location: 'left'
-        });
+        })
+            .then(() => {
+                const pane = atom.workspace.paneForItem(this);
+
+                // @ts-ignore
+                const insetPanel = pane.element.firstChild;
+                insetPanel.style.position = 'absolute';
+                insetPanel.style.right = 0;
+                insetPanel.style.zIndex = 1;
+            });
 
         this._service.state$.subscribe((state) => {
             this.render(state);
@@ -73,6 +82,7 @@ export class ModulesPane {
         });
     }
 
+    // Atom pane required interface's methods
     getURI() {
         return 'atom://screeps-ide-modules-view';
     }
@@ -82,7 +92,7 @@ export class ModulesPane {
     }
 
     isPermanentDockItem() {
-        return true;
+        return false;
     }
 
     getAllowedLocations() {

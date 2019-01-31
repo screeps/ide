@@ -33,6 +33,14 @@ class ModulesPane {
             activateItem: true,
             split: 'down',
             location: 'left'
+        })
+            .then(() => {
+            const pane = atom.workspace.paneForItem(this);
+            // @ts-ignore
+            const insetPanel = pane.element.firstChild;
+            insetPanel.style.position = 'absolute';
+            insetPanel.style.right = 0;
+            insetPanel.style.zIndex = 1;
         });
         this._service.state$.subscribe((state) => {
             this.render(state);
@@ -42,6 +50,7 @@ class ModulesPane {
         ReactDOM.render(React.createElement("div", null,
             React.createElement(ui_1.ModulesView, { branch: branch, branches: branches, modules: modules, onChooseModules: this.onChooseModules, onChooseBranches: this.onChooseBranches, onSelectBranch: this.onSelectBranch, onSelectModule: this.onSelectModule })), this.element);
     }
+    // Atom pane required interface's methods
     getURI() {
         return 'atom://screeps-ide-modules-view';
     }
@@ -49,7 +58,7 @@ class ModulesPane {
         return '';
     }
     isPermanentDockItem() {
-        return true;
+        return false;
     }
     getAllowedLocations() {
         return ['left'];
