@@ -99,7 +99,6 @@ export class ConsolePane {
         document.removeEventListener('mouseup', this.onResizeStop);
     }
 
-
     // Atom pane required interface's methods
     getURI() {
         return 'atom://screeps-ide-console-view';

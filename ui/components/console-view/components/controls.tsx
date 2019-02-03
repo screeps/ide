@@ -12,12 +12,21 @@ interface IConsoleControlsViewProps {
     onDelete?: Function;
 }
 
+interface IConsoleControlsViewState {
+    paused: boolean;
+}
+
 class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
     //@ts-ignore
     props: IConsoleControlsViewProps;
+    state: IConsoleControlsViewState;
 
     constructor(props: IConsoleControlsViewProps) {
         super(props);
+
+        this.state = {
+            paused: props.paused
+        };
     }
 
     onShard = (event: any) => {
@@ -25,10 +34,18 @@ class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
     }
 
     onStart = () => {
+        this.setState({
+            ...this.state,
+            paused: true
+        });
         this.props.onStart && this.props.onStart();
     }
 
     onPause = () => {
+        this.setState({
+            ...this.state,
+            paused: false
+        });
         this.props.onPause && this.props.onPause();
     }
 
@@ -43,7 +60,7 @@ class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
     public render() {
         let toggle;
 
-        if (this.props.paused) {
+        if (!this.state.paused) {
             toggle = (<button className='btn icon' onClick={ this.onStart }><i className='sc-icon-play' /></button>);
         } else {
             toggle = (<button className='btn icon' onClick={ this.onPause }><i className='sc-icon-pause' /></button>);

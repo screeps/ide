@@ -8,9 +8,11 @@ class ConsoleControlsView extends React.Component {
             this.props.onShard && this.props.onShard(event.target.value);
         };
         this.onStart = () => {
+            this.setState(Object.assign({}, this.state, { paused: true }));
             this.props.onStart && this.props.onStart();
         };
         this.onPause = () => {
+            this.setState(Object.assign({}, this.state, { paused: false }));
             this.props.onPause && this.props.onPause();
         };
         this.onClose = () => {
@@ -19,10 +21,13 @@ class ConsoleControlsView extends React.Component {
         this.onDelete = () => {
             this.props.onDelete && this.props.onDelete();
         };
+        this.state = {
+            paused: props.paused
+        };
     }
     render() {
         let toggle;
-        if (this.props.paused) {
+        if (!this.state.paused) {
             toggle = (React.createElement("button", { className: 'btn icon', onClick: this.onStart },
                 React.createElement("i", { className: 'sc-icon-play' })));
         }
