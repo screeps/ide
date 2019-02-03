@@ -2,11 +2,10 @@ const path = require('path');
 
 import { Directory } from 'atom';
 
-import { Service } from '../../service';
+// import { Service } from '../../service';
 import { configGetter } from '../../config';
-import {
-    commitCommand
-} from '../../commands';
+import { commitCommand } from '../../commands';
+import { ModulesPane } from '../modules-pane';
 
 export class TreeViewDir {
     private _dir: Directory;
@@ -15,7 +14,7 @@ export class TreeViewDir {
     private _btnRef: HTMLButtonElement | null = null;
 
     constructor(
-        private _service: Service
+        private _modulesPane: ModulesPane
     ) {
         const srcDir = configGetter('src');
         const projectPath = atom.project.getPaths()[0];
@@ -33,7 +32,7 @@ export class TreeViewDir {
                 e.preventDefault();
                 e.stopPropagation();
 
-                commitCommand(this._service.state.getValue().branch);
+                commitCommand(this._modulesPane.state.branch);
 
                 if (this._btnRef) {
                     this._btnRef.disabled = true;
@@ -56,7 +55,7 @@ export class TreeViewDir {
     }
 
     _diff() {
-        Object.entries(this._service.state.getValue().modules).forEach(async ([moduleName, moduleContent]) => {
+        Object.entries(this._modulesPane.state.modules).forEach(async ([moduleName, moduleContent]) => {
             const file = this._dir.getFile(`${ moduleName }.js`);
             const content = await file.read(true) as String;
 

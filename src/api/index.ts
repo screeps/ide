@@ -167,6 +167,42 @@ export class Api {
         return data;
     }
 
+    async deleteUserBranch(branch: string): Promise<IResponse> {
+        let data: IResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/delete-branch`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({ branch })
+            });
+
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
+    async cloneUserBranch(body: { [key: string]: string }): Promise<IResponse> {
+        let data: IResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/clone-branch`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
     async sendUserConsole(body: IUserConsoleParams) {
         let data: IAuthResponse;
 

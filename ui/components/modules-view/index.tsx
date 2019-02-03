@@ -1,31 +1,7 @@
+/// <reference path='./index.d.ts' />
+/// <reference path='./index.d.ts' />
+
 import * as React from 'react';
-
-interface IBranches {
-    _id: string;
-    branch: string;
-    activeWorld?: boolean;
-    activeSim: boolean;
-}
-
-interface IModules {
-    [key: string]: string;
-}
-
-interface IModulesViewProps {
-    modules: IModules;
-
-    branch: string;
-    branches: IBranches[];
-
-    onChooseModules?: Function;
-    onChooseBranches?: Function;
-    onSelectBranch?: Function;
-    onSelectModule?: Function;
-}
-
-interface IModulesViewState {
-    isShowingBranches: boolean;
-}
 
 class ModulesView extends React.Component<IModulesViewProps> {
     //@ts-ignore
@@ -35,7 +11,15 @@ class ModulesView extends React.Component<IModulesViewProps> {
 
     constructor(props: IModulesViewProps) {
         super(props);
-        this.state = { isShowingBranches: false }
+
+        this.state = {
+            modules: props.modules,
+
+            branch: props.branch,
+            branches: props.branches,
+
+            isShowingBranches: false
+        }
     }
 
     onChooseModules = () => {
@@ -48,14 +32,21 @@ class ModulesView extends React.Component<IModulesViewProps> {
         this.props.onChooseBranches && this.props.onChooseBranches();
     }
 
-    onSelectBranch = (branchName: string) => {
-        this.setState({ isShowingBranches: false });
-        this.props.onSelectBranch && this.props.onSelectBranch(branchName);
+    onCopyBranch = (branch: string) => {
+        this.props.onCopyBranch && this.props.onCopyBranch(branch);
     }
 
-    onSelectModule = (moduleName: string) => {
-        // this.setState({ isShowingBranches: true });
-        this.props.onSelectModule && this.props.onSelectModule(moduleName);
+    onSelectBranch = (branch: string) => {
+        this.setState({ isShowingBranches: false });
+        this.props.onSelectBranch && this.props.onSelectBranch(branch);
+    }
+
+    onDeleteBranch = (branch: string) => {
+        this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
+    }
+
+    onSelectModule = (module: string) => {
+        this.props.onSelectModule && this.props.onSelectModule(module);
     }
 
     public render() {
@@ -66,21 +57,19 @@ class ModulesView extends React.Component<IModulesViewProps> {
             header = (
                 <div className='screeps-modules-view__header'>
                     <span>Choose active branch:</span>
-                    <button className='btn icon' onClick={this.onChooseModules}>
-                        <i className='sc-icon-clear' />
-                    </button>
                 </div>
             );
 
             view = (
-                <ul className='screeps-modules-view__branches'>
-                {this.props.branches.map(({ _id, branch, activeSim, activeWorld }) => {
+                <ul className='tab-bar screeps-modules-view__items'>
+                {this.state.branches.map(({ _id, branch, activeSim, activeWorld }) => {
                     let deleteButton;
                     let sim;
                     let world;
 
                     if (!activeSim && !activeWorld) {
-                        deleteButton = <button><i className='sc-icon-delete' /></button>;
+                        // deleteButton = <button><i className='sc-icon-delete' /></button>;
+                        deleteButton = <div className='close-icon' onClick={() => this.onDeleteBranch(branch)}></div>;
                     }
 
                     if (activeWorld) {
@@ -93,9 +82,12 @@ class ModulesView extends React.Component<IModulesViewProps> {
 
 
                     return (
-                        <li className='screeps-modules-view__branch' key={_id}>
-                            <button onClick={() => this.onSelectBranch(branch)}>{ branch } { world } { sim }</button>
-                            <button><i className='sc-icon-copy' /></button>
+                        <li className='tab screeps-modules-view__item' key={_id}>
+                            <button className='btn btn--clear' onClick={() => this.onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
+                            <button className='btn btn--clear' onClick={() => this.onSelectBranch(branch)}>{ branch }</button>
+                            { world } { sim }
+                            {/* <div className='close-icon'></div> */}
+                            
                             { deleteButton }
                         </li>
                     )
@@ -106,34 +98,33 @@ class ModulesView extends React.Component<IModulesViewProps> {
             header = (
                 <div className='screeps-modules-view__header'>
                     <span>Branch</span>
-                    <button onClick={this.onChooseBranches}>{ this.props.branch }</button>
+                    <button className='btn btn--clear' onClick={this.onChooseBranches}>{ this.state.branch }</button>
                 </div>
             )
 
             view = (
                 <div>
-                    <ul className='screeps-modules-view__items'>
-                        <li className='screeps-modules-view__item'>
-                            <button onClick={() => this.onSelectModule('main')}>main</button>
-                            <button><i className='sc-icon-clear' /></button>
+                    <ul className='tab-bar screeps-modules-view__items'>
+                        <li className='tab screeps-modules-view__item'>
+                            <button className='btn btn--clear' onClick={() => this.onSelectModule('main')}>main</button>
                         </li>
-                        {this._getAdditionalModules(this.props.modules).map((moduleName) => {
+                        {this._getAdditionalModules(this.state.modules).map((moduleName) => {
                             return (
-                                <li className='screeps-modules-view__item' key={moduleName}>
-                                    <button onClick={() => this.onSelectModule(moduleName)}>{ moduleName }</button>
-                                    <button><i className='sc-icon-clear' /></button>
+                                <li className='tab screeps-modules-view__item' key={moduleName}>
+                                    <button className='btn btn--clear' onClick={() => this.onSelectModule(moduleName)}>{ moduleName }</button>
+                                    <div className='close-icon'></div>
                                 </li>
                             );
                         })}
                     </ul>
-                    <div className='screeps-modules-view__new'>
+                    {/* <div className='screeps-modules-view__new'>
                         <form>
                             <fieldset className='screeps-field'>
                                 <input className='native-key-bindings' placeholder='New module name...' type='text' autoComplete='' required={ true } onChange={() => {}} />
                                 <div className='underline' />
                             </fieldset>
                         </form>
-                    </div>
+                    </div> */}
                 </div>
             );
         }

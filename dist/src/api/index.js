@@ -139,6 +139,36 @@ class Api {
         }
         return data;
     }
+    async deleteUserBranch(branch) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/delete-branch`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({ branch })
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
+    async cloneUserBranch(body) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/clone-branch`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
     async sendUserConsole(body) {
         let data;
         try {

@@ -3,14 +3,31 @@ import * as ReactDOM from 'react-dom';
 
 import { ModulesView } from '../../../ui';
 
-import { Service } from '../../service';
+import { default as prompt } from '../prompt-modal';
+import { default as confirm } from '../confirm-modal';
+import { Api } from '../../api';
 
 export class ModulesPane {
     public element: HTMLElement;
 
     public data: any = {};
 
-    constructor(private _service: Service) {
+    modulesViewRef = React.createRef<ModulesView>();
+
+    public get state() {
+        if (!this.modulesViewRef.current) {
+            return {
+                branch: 'default',
+                modules: []
+            };
+        }
+
+        return this.modulesViewRef.current.state;
+    }
+
+    constructor(
+        private _api: Api
+    ) {
         this.element = document.createElement('div');
 
         atom.workspace.open(this, {
@@ -30,45 +47,38 @@ export class ModulesPane {
                 insetPanel.style.zIndex = 1;
             });
 
-        this._service.state$.subscribe((state) => {
-            this.render(state);
-        });
+        this.onSelectBranch('default');
     }
 
     render({ modules = {}, branch = '', branches = [] }) {
         ReactDOM.render(
             <div>
-                <ModulesView
+                <ModulesView ref={ this.modulesViewRef }
                     branch={ branch }
                     branches={ branches }
 
                     modules={ modules }
 
-                    onChooseModules={ this.onChooseModules }
-                    onChooseBranches={ this.onChooseBranches }
-                    onSelectBranch={ this.onSelectBranch }
                     onSelectModule={ this.onSelectModule }
+                    onChooseModules={ this.onChooseModules }
+
+                    onCopyBranch={ this.onCopyBranch }
+                    onSelectBranch={ this.onSelectBranch }
+                    onDeleteBranch={ this.onDeleteBranch }
+                    onChooseBranches={ this.onChooseBranches }
                 />
             </div>,
             this.element as HTMLElement
         )
     }
 
-    onChooseModules = () => {
-    }
-
-    onChooseBranches = () => {
-        this._service.getUserBranches();
-    }
-
-    onSelectBranch = (branch?: string) => {
-        this._service.getUserCode(branch);
-    }
-
     onSelectModule = (module: any) => {
-        const textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
+        if (!this.modulesViewRef.current) {
+            return;
+        }
 
-        const { branch, modules } = this._service.state.getValue();
+        const textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
+        const { branch, modules } = this.modulesViewRef.current.state;
 
         textEditor.setText(modules[module]);
         textEditor.getTitle = () => `@${ branch }/${ module }.js`;
@@ -79,6 +89,62 @@ export class ModulesPane {
         }
 
         atom.workspace.open(textEditor, {
+        });
+    }
+
+    onChooseModules = () => {
+    }
+
+
+    onCopyBranch = async (branch: string) => {
+        try {
+            const newName = await prompt({
+                legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
+            });
+
+            await this._api.cloneUserBranch({ branch, newName });
+
+            this.onChooseBranches();
+        } catch(err) {
+            // Ignore.
+        }
+    }
+
+    onSelectBranch = async (_branch?: string) => {
+        const { branch, modules } = await this._api.getUserCode(_branch);
+
+        //@ts-ignore
+        this.render({ branch, modules });
+    }
+
+    onDeleteBranch = async (branch: string) => {
+        try {
+            await confirm({
+                submitBtn: 'Delete',
+                legend: 'This action cannot be undone! Are you sure?'
+            });
+
+            await this._api.deleteUserBranch(branch);
+
+            this.onChooseBranches();
+        } catch(err) {
+            // Ignore.
+        }
+    }
+
+    onChooseBranches = async () => {
+        if (!this.modulesViewRef.current) {
+            return;
+        }
+
+        console.log(1);
+        const { list: branches } = await this._api.getUserBranches();
+        console.log(1.1, branches );
+
+        //@ts-ignore
+        this.modulesViewRef.current.setState({
+            ...this.modulesViewRef.current.state,
+            branches
         });
     }
 

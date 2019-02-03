@@ -19,8 +19,11 @@
 }
 
 .screeps-modules-view ul {
+    flex-direction: column;
+    height: auto;
     margin: 0;
     padding: 0;
+
     list-style: none;
 }
 
@@ -29,64 +32,69 @@
 
     display: flex;
     flex-direction: row;
+    flex: 1 0 auto !important;
+    min-height: 30px;
 }
 
 .screeps-modules-view ul li > * {
-    flex-basis: 100%;
+    // flex-basis: 100%;
 }
 
 .screeps-modules-view ul li > *:nth-child(1) {
-    order: 1;
+    // order: 1;
 }
 
 .screeps-modules-view ul li > *:nth-child(2) {
-    position: absolute;
-    right: 0;
+    // position: absolute;
+    // right: 0;
 
-    min-width: 34px;
-    flex-basis: 34px;
-    justify-content: center;
-    order: 2;
+    // min-width: 34px;
+    // flex-basis: 34px;
+    // justify-content: center;
+    // order: 2;
 }
 
 .screeps-modules-view ul li > *:nth-child(3) {
-    position: absolute;
-    right: 34px;
+    // position: absolute;
+    // right: 34px;
 
-    min-width: 34px;
-    flex-basis: 34px;
-    justify-content: center;
-    order: 3;
+    // min-width: 34px;
+    // flex-basis: 34px;
+    // justify-content: center;
+    // order: 3;
 }
 
-.screeps-modules-view ul button {
-    display: inline-flex;
-    align-items: center;
-    height: 32px;
+// .screeps-modules-view ul button:first-child {
+//     display: inline-flex;
+//     align-items: center;
+//     height: 32px;
 
-    padding: 0;
-    padding-left: 5px;
-    padding-right: 5px;
+//     padding: 0;
+//     padding-left: 5px;
+//     padding-right: 5px;
 
-    border: none;
-    background: none;
+//     border: none;
+//     background: none;
 
-    cursor: pointer;
-    color: rgba(234, 237, 255, 0.7);
-    line-height: 32px;
-    text-align: left;
-    white-space: nowrap;
-}
+//     cursor: pointer;
+//     color: rgba(234, 237, 255, 0.7);
+//     line-height: 32px;
+//     text-align: left;
+//     white-space: nowrap;
+// }
 
-.screeps-modules-view ul button:hover {
-    box-shadow: inset 1px 1px 100px rgba(255, 255, 255, .5)
-}
+// .screeps-modules-view ul button:first-child:hover {
+//     box-shadow: inset 1px 1px 100px rgba(255, 255, 255, .5)
+// }
 
-.screeps-modules-view ul button:focus {
-    outline: none;
-}
+// .screeps-modules-view ul button:first-child:focus {
+//     outline: none;
+// }
 
 .screeps-modules-view__header {
+    display: flex;
+    align-items: center;
+
     padding-left: 5px;
     padding-right: 5px;
 
@@ -98,11 +106,8 @@
 }
 
 .screeps-modules-view__header button {
-    border: none;
-    background: none;
-
     cursor: pointer;
-    color: #4A5FD2;
+    color: #4A5FD2 !important;
     font-weight: bold;
 }
 
