@@ -60,6 +60,14 @@ function getWatches() {
     return watches;
 }
 exports.getWatches = getWatches;
+function putWatches(watches) {
+    try {
+        localStorage.setItem('memory-wacthes', JSON.stringify(watches));
+    }
+    catch (err) {
+    }
+}
+exports.putWatches = putWatches;
 let user;
 async function getUser() {
     if (user) {

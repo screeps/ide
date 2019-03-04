@@ -22,7 +22,8 @@ class MemoryControlsView extends React.Component {
             React.createElement("div", { className: '' },
                 React.createElement("select", { className: 'btn', onChange: this.onShard, value: this.props.shard }, this.props.shards.map(({ name }) => {
                     return (React.createElement("option", { key: name, value: name }, name));
-                }))),
+                })),
+                this.props.children),
             React.createElement("div", { className: 'btn-group' },
                 React.createElement("button", { className: 'btn icon', onClick: this.onMainMemory },
                     React.createElement("i", { className: 'sc-icon-dehaze' })),

@@ -13,6 +13,10 @@
         color: #9da5b4;
         text-shadow: none;
 
+        &[disabled] {
+            pointer-events: none;
+        }
+
         &:focus,
         &:hover {
             outline: none;
@@ -78,4 +82,50 @@
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
     }
 
+    .close-icon {
+        z-index: 2;
+        position: absolute;
+        top: 0.5em;
+        right: 0.5em;
+
+        overflow: hidden;
+        width: 1.5em;
+        height: 1.5em;
+
+        border-radius: 3px;
+        background-color: inherit;
+
+        cursor: default;
+        font-size: 1em;
+        line-height: 1.5;
+        text-align: center;
+
+        transform: scale(0);
+        transition: transform .08s;
+
+        &::before {
+            content: "\f081";
+
+            z-index: 1;
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+
+            font-family: 'Octicons Regular';
+            font-size: 12px;
+            font-weight: normal;
+            font-style: normal;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+            text-decoration: none;
+            vertical-align: -0.05em;
+            pointer-events: none;
+        }
+
+        &:hover {
+            background-color: #568af2;
+
+            color: #001133;
+        }
+    }
 }

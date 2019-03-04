@@ -20,8 +20,8 @@ class MemoryItemView extends React.Component {
             this.setState(Object.assign({}, this.state, { isEdit: false }));
             console.log('onCancel');
         };
-        this.onDelete = () => {
-            console.log('onDelete');
+        this.onDelete = (data) => {
+            this.props.onDelete && this.props.onDelete(data);
         };
         this.state = { isEdit: false };
     }
@@ -36,19 +36,19 @@ class MemoryItemView extends React.Component {
         }
         if (this.state.isEdit && this.props.item.data) {
             jsonEditor = (React.createElement("div", { className: 'screeps-memory__json-editor' },
-                React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onSave },
-                    React.createElement("i", { className: 'sc-icon-done' })),
-                React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onReload },
-                    React.createElement("i", { className: 'sc-icon-cached' })),
-                React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onCancel },
-                    React.createElement("i", { className: 'sc-icon-clear' })),
-                React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onDelete },
-                    React.createElement("i", { className: 'sc-icon-delete' })),
+                React.createElement("div", { className: 'screeps-memory__json-editor-controlls' },
+                    React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onSave },
+                        React.createElement("i", { className: 'sc-icon-done' })),
+                    React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onReload },
+                        React.createElement("i", { className: 'sc-icon-cached' })),
+                    React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onCancel },
+                        React.createElement("i", { className: 'sc-icon-clear' })),
+                    React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onDelete },
+                        React.createElement("i", { className: 'sc-icon-delete' }))),
                 React.createElement(json_editor_1.default, { data: this.props.item.data })));
         }
         if (this.props.item.path) {
-            deleteBtn = (React.createElement("button", { className: 'btn btn--clear' },
-                React.createElement("i", { className: 'sc-icon-clear' })));
+            deleteBtn = (React.createElement("div", { className: 'close-icon', onClick: () => this.onDelete(this.props.item.path) }));
         }
         return (React.createElement("div", { className: 'screeps-memory__item' },
             React.createElement("div", { className: 'screeps-memory__expression' },

@@ -55,7 +55,7 @@ const _watches: any = [
 ];
 export function getWatches() {
     let watches;
-    
+
     try {
         watches = localStorage.getItem('memory-watches');
 
@@ -70,6 +70,14 @@ export function getWatches() {
     }
 
     return watches;
+}
+
+export function putWatches(watches: any) {
+    try {
+        localStorage.setItem('memory-wacthes', JSON.stringify(watches));
+    } catch(err) {
+
+    }
 }
 
 let user: User;

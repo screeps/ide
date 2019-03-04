@@ -3,6 +3,11 @@ interface IMemoryViewState {
     shards: any;
     view: string;
     watches: any;
+
+    segment: string;
+    segmentData: string;
+    _segmentData: string;
+    segmentHasChange: boolean;
 }
 
 interface IMemoryViewProps {
@@ -10,9 +15,16 @@ interface IMemoryViewProps {
     shard: string;
     shards: any;
     watches: any;
+    segment: string;
 
+    onInput?: Function;
+    onDelete?: Function;
     onShard?: Function;
     onClick?: Function;
     onClose?: Function;
     onResizeStart?:Function;
+
+    onSegment?: Function;
+    onSegmentRefresh?: Function;
+    onSegmentUpdate?: Function;
 }

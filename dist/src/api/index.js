@@ -97,20 +97,6 @@ class Api {
         }
         return data;
     }
-    async getUserMemory({ path, shard }) {
-        let data;
-        try {
-            const response = await fetch(`${this.url}/user/memory?path=${path}&shard=${shard}`, {
-                method: 'GET',
-                headers: this.headers
-            });
-            data = await response.json();
-        }
-        catch (err) {
-            throw err;
-        }
-        return data;
-    }
     async getUserCode(branch = '$activeWorld') {
         let data;
         try {
@@ -196,6 +182,49 @@ class Api {
         })
             .then((response) => response.json());
         return promise;
+    }
+    async getUserMemory({ path, shard }) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/memory?path=${path}&shard=${shard}`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
+    async getUserMemorySegment({ segment, shard }) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/memory-segment?segment=${segment}&shard=${shard}`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
+    async setUserMemorySegment(body) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/memory-segment`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
     }
 }
 exports.Api = Api;

@@ -3,13 +3,13 @@ import { Panel } from 'atom';
 const pako = require('pako');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { merge } from 'rxjs';
+import { Subscription, merge } from 'rxjs';
 
 import { MemoryView } from '../../../ui';
 import { Service } from '../../service';
 import { Api } from '../../api';
 import { Socket } from '../../socket';
-import { getWatches } from '../../utils';
+import { getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
 
 let clientY: number;
@@ -22,8 +22,10 @@ export class MemoryPane {
 
     watches: any;
     pipe$: any;
+    _pipe$: Subscription | null = null;
 
     shard: string;
+    segment: string = '0';
 
     constructor(
         private _user: User,
@@ -37,19 +39,110 @@ export class MemoryPane {
         this.shard = this._user.shard;
 
         this.watches = getWatches();
-        const watches$: any = [];
-        this.watches.forEach((item: any) => {
-            const pipe = this._socket.on(`user:${ this._user.id }/memory/${ this.shard }/${ item.path }`);
-            watches$.push(pipe);
-        })
-        this.pipe$ = merge(...watches$);
+        this.initMemoryPipeSubscription();
 
         this.render({});
+
+        this.onSegment(this.segment);
 
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
             visible: true
         });
+    }
+
+    initMemoryPipeSubscription() {
+        if (this._pipe$) {
+            this._pipe$.unsubscribe();
+        }
+
+        const watches$: any = [];
+        this.watches.forEach((item: any) => {
+            const pipe = this._socket.on(`user:${ this._user.id }/memory/${ this.shard }/${ item.path }`);
+            watches$.push(pipe);
+        });
+        this.pipe$ = merge(...watches$);
+
+        this._pipe$ = this.pipe$.subscribe(({ data: [channel, value] }: { data: any }) => {
+            const [, , , path] = channel.match(/user\:(.+)\/memory\/(.+)\/(.+)/i);
+
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+
+            const watches = this.memoryViewRef.current.state.watches;
+            const watch = watches.find((item: any) => item.path === path);
+            const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
+            watches[idx] =  Object.assign({}, { ...watch, value })
+
+            this.memoryViewRef.current.setState({
+                ...this.memoryViewRef.current.state,
+                watches: [...watches]
+            });
+        });
+    }
+
+    render({ }) {
+        ReactDOM.render(
+            <MemoryView ref={ this.memoryViewRef }
+                pipe={ this.pipe$ }
+                shard={ this.shard }
+                shards={ this._service.shards$ }
+                watches={ this.watches }
+
+                onInput={ this.onInput }
+                onDelete={ this.onDelete }
+                onClick={ this.getUserMemory }
+                onClose={ this.onClose }
+                onResizeStart={ this.onResizeStart }
+
+                onShard={ this.onShard }
+
+                segment={ this.segment }
+                onSegment={ this.onSegment }
+                onSegmentRefresh={ this.onSegment }
+                onSegmentUpdate={ this.onSegmentUpdate }
+            />,
+            this.element as HTMLElement
+        )
+    }
+
+    // Private component actions.
+    onInput = ({ expression: path }: { expression: string }) => {
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        const watches = [...this.memoryViewRef.current.state.watches, { path }];
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            watches
+        });
+
+        putWatches(watches);
+        this.watches = watches;
+        this.initMemoryPipeSubscription();
+    }
+
+    onDelete = (path: string) => {
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        const watches = this.memoryViewRef.current.state.watches;
+        const watch = watches.find((item: any) => item.path === path);
+        const idx = watches.indexOf(watch);
+        watches.splice(idx, 1);
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            watches: [...watches]
+        });
+
+        putWatches(watches);
+        this.watches = watches;
+        this.initMemoryPipeSubscription();
     }
 
     onClose = () => {
@@ -78,20 +171,32 @@ export class MemoryPane {
         document.removeEventListener('mouseup', this.onResizeStop);
     }
 
-    render({ }) {
-        ReactDOM.render(
-            <MemoryView ref={ this.memoryViewRef }
-                pipe={ this.pipe$ }
-                shard={ this.shard }
-                shards={ this._service.shards$ }
-                watches={ this.watches }
+    onShard = (shard: string) => {
+        this.shard = shard;
 
-                onClick={ this.getUserMemory }
-                onClose={ this.onClose }
-                onResizeStart={ this.onResizeStart }
-            />,
-            this.element as HTMLElement
-        )
+        this.onSegment(this.segment);
+    }
+
+    onSegment = (segment: string) => {
+        this.segment = segment;
+
+        this._api.getUserMemorySegment({ segment, shard: this.shard })
+            .then(({ data }) => {
+                if (!this.memoryViewRef.current) {
+                    return;
+                }
+
+                this.memoryViewRef.current.setState({
+                    ...this.memoryViewRef.current.state,
+                    segmentData: data,
+                    _segmentData: data,
+                    segmentHasChange: false
+                });
+            })
+    }
+
+    onSegmentUpdate = (data: string) => {
+        this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
     }
 
     getUserMemory = ({ path }: { path: string }) => {
@@ -115,6 +220,7 @@ export class MemoryPane {
             });
     }
 
+    // Atom pane required interface's methods
     getURI() {
         return 'atom://screeps-ide-memory-view';
     }

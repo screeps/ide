@@ -6,8 +6,11 @@ const modules_pane_1 = require("../components/modules-pane");
 const tree_view_dir_1 = require("../components/tree-view-dir");
 async function showModulesPaneCommand() {
     try {
+        // TODO: need to fix connection to right set token
         const api = await utils_1.getApi();
-        // const src = new Service();
+        // const user = 
+        await utils_1.getUser();
+        // const socket = getSocket();
         const modulesPane = new modules_pane_1.ModulesPane(api);
         new tree_view_dir_1.TreeViewDir(modulesPane);
     }

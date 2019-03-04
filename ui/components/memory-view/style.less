@@ -25,6 +25,20 @@
         min-height: 26px;
 
         line-height: 20px;
+
+        div:first-child > select {
+            float: left;
+        }
+    }
+
+    &__segment-controls {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 15px;
+
+        select {
+            margin-left: 5px;
+        }
     }
 
     &__main {
@@ -32,7 +46,34 @@
         overflow-y: auto;
         overflow-y: overlay;
 
+        display: flex;
+        flex-direction: column;
         height: 100%;
+
+        &-items {
+            height: 100%;
+        }
+    }
+
+    &__segment {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        textarea {
+            height: 100%;
+            padding: 5px;
+
+            border: none;
+            background: none;
+            resize: none;
+
+            color: inherit;
+
+            &:focus {
+                outline: none;
+            }
+        }
     }
 
     &__item {
@@ -41,6 +82,11 @@
         border-bottom: 1px solid rgba(255, 255, 255, .1);
 
         line-height: 20px;
+
+        &:hover .close-icon {
+            transform: scale(1);
+            transition-duration: .16s;
+        }
     }
 
     &__expression {
@@ -50,11 +96,11 @@
         float: left;
         display: flex;
         width: 50%;
-        height: 26px;
+        height: 30px;
         justify-content: space-between;
         align-items: flex-start;
 
-        line-height: 26px;
+        line-height: 30px;
 
         button.btn--clear {
             display: none;
@@ -70,6 +116,7 @@
     &__value {
         display: flex;
         width: 50%;
+        height: 30px;
         margin-left: 50%;
 
         border: 0;
@@ -85,6 +132,10 @@
     &__json-editor {
         width: 50%;
         margin-left: 50%;
+    }
+
+    &__json-editor-controlls {
+        padding: 3px 0;
     }
 
     &__input {

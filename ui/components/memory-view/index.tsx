@@ -5,8 +5,8 @@ import { Subscription } from 'rxjs';
 
 import { default as MemoryControlsView } from './components/controls';
 import { default as MemoryMainView } from './components/main';
-import { default as MemorySegmentsView } from './components/segments';
-import { default as MemoryInputView } from './components/input';
+import { default as MemorySegmentView } from './components/segment';
+import { default as MemorySegmentControlsView } from './components/segment-controls';
 
 export default class MemoryView extends React.Component<IMemoryViewProps> {
     //@ts-ignore
@@ -23,31 +23,49 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         this.state = {
             shard: props.shard,
             shards: [],
-            view: 'main',
+            view: 'segments',
+            segment: props.segment,
+            segmentData: '',
+            _segmentData: '',
+            segmentHasChange: false,
             //@ts-ignore
             watches: this.props.watches
         };
     }
 
     componentDidMount() {
-        if (this.props.pipe) {
-            this.initMemoryPipeSubscription();
-        }
-
         if (this.props.shards) {
             this.initShardsPipeSubscription();
         }
     }
 
     public render() {
-        let view;
+        let view, segmentControls;
 
         if (this.state.view === 'main') {
-            view = (<MemoryMainView watches={ this.state.watches } onClick={ this.onClick }/>);
+            view = (<MemoryMainView
+                watches={ this.state.watches }
+
+                onClick={ this.onClick }
+                onDelete={ this.onDelete }
+                onInput={ this.onInput }
+            />);
         }
 
         if (this.state.view === 'segments') {
-            view = (<MemorySegmentsView />);
+            view = (<MemorySegmentView 
+                segment={ this.state.segmentData }
+
+                onChange={ this.onSegmentChange }
+            />);
+            segmentControls = (<MemorySegmentControlsView
+                segment={ this.state.segment }
+                hasChange={ this.state.segmentHasChange }
+
+                onSegment={ this.onSegment }
+                onRefresh={ this.onSegmentRefresh }
+                onUpdate={ this.onSegmentUpdate }
+            />);
         }
 
         return (
@@ -60,30 +78,13 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
                     onShard={ this.onShard }
                     onClose={ this.onClose }
                     onToggleView={ this.onToggleView }
-                />
+                >
+                    { segmentControls }
+                </MemoryControlsView>
                 <hr className='screeps-hr' />
                 { view }
-                <hr className='screeps-hr' />
-                <MemoryInputView onInput={ this.onInput }/>
             </div>
         );
-    }
-
-    initMemoryPipeSubscription() {
-        this._pipe$ = this.props.pipe.subscribe(({ data: [channel, value] }: { data: any }) => {
-            //user:5a58af97d870324d18b43f02/memory/shard3/rooms
-            const [, , , path] = channel.match(/user\:(.+)\/memory\/(.+)\/(.+)/i);
-
-            const watches = this.state.watches;
-            const watch = watches.find((item: any) => item.path === path);
-            const idx = this.state.watches.indexOf(watch);
-            watches[idx] =  Object.assign({}, { ...watch, value })
-
-            this.setState({
-                ...this.state,
-                watches: [...watches]
-            });
-        });
     }
 
     initShardsPipeSubscription() {
@@ -99,11 +100,17 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         this.props.onClick && this.props.onClick(item);
     }
 
+    onDelete = (path: string) => {
+        this.props.onDelete && this.props.onDelete(path);
+    }
+
     onInput = (data: any) => {
-        console.log('input', data);
+        this.props.onInput && this.props.onInput(data);
     }
 
     onShard = (shard: string) => {
+        this.setState({ ...this.state, shard });
+
         this.props.onShard && this.props.onShard(shard);
     }
 
@@ -116,9 +123,28 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
     }
 
     onToggleView = ({ view }: { view: string }) => {
+        this.setState({ ...this.state, view });
+    }
+
+    onSegment = (segment: string) => {
+        this.setState({ ...this.state, segment });
+
+        this.props.onSegment && this.props.onSegment(segment);
+    }
+
+    onSegmentChange = (data: string) => {
         this.setState({
             ...this.state,
-            view
+            segmentData: data,
+            segmentHasChange: this.state._segmentData !== data
         });
+    }
+
+    onSegmentRefresh = () => {
+        this.props.onSegmentRefresh && this.props.onSegmentRefresh(this.state.segment);
+    }
+
+    onSegmentUpdate = () => {
+        this.props.onSegmentUpdate && this.props.onSegmentUpdate(this.state.segmentData);
     }
 }

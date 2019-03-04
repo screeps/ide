@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+// import { default as MemorySegmentVeiw } from '../components/segment';
+
 interface IMemoryControlsViewProps {
     shard: string;
     shards: any;
@@ -7,6 +9,8 @@ interface IMemoryControlsViewProps {
     onShard?: Function;
     onClose?: Function;
     onToggleView?: Function;
+
+    children?: any;
 }
 
 export default class MemoryControlsView extends React.Component<IMemoryControlsViewProps> {
@@ -42,6 +46,7 @@ export default class MemoryControlsView extends React.Component<IMemoryControlsV
                             return (<option key={ name } value={ name }>{ name }</option>);
                         })}
                     </select>
+                    { this.props.children }
                 </div>
                 <div className='btn-group'>
                     <button className='btn icon' onClick={ this.onMainMemory }>

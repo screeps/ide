@@ -118,22 +118,6 @@ export class Api {
         return data;
     }
 
-    async getUserMemory({ path, shard }: { path: string, shard: string }): Promise<IUserMemoryResponse> {
-        let data: IUserMemoryResponse;
-
-        try {
-            const response = await fetch(`${ this.url }/user/memory?path=${ path }&shard=${ shard }`, {
-                method: 'GET',
-                headers: this.headers
-            });
-            data = await response.json();
-        } catch(err) {
-            throw err;
-        }
-
-        return data;
-    }
-
     async getUserCode(branch = '$activeWorld'): Promise<IUserCodeResponse> {
         let data: IUserCodeResponse;
 
@@ -234,5 +218,55 @@ export class Api {
             .then((response: any) => response.json());
 
         return promise;
+    }
+
+    async getUserMemory({ path, shard }: IUserMemoryRequest): Promise<IUserMemoryResponse> {
+        let data: IUserMemoryResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/memory?path=${ path }&shard=${ shard }`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
+    async getUserMemorySegment({ segment, shard }: IUserMemorySegmentRequest): Promise<IUserMemorySegmentResponse> {
+        let data: IUserMemorySegmentResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/memory-segment?segment=${ segment }&shard=${ shard }`, {
+                method: 'GET',
+                headers: this.headers
+            });
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
+    async setUserMemorySegment(body: IUserMemorySegmentBodyRequest): Promise<IResponse> {
+        let data: IResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/memory-segment`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
     }
 }
