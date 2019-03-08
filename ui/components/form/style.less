@@ -122,7 +122,32 @@
         background: rgba(74, 95, 210, 0.65);
     }
 
+    hr.screeps-hr--inprogress {
+        &::after {
+            content: '';
+
+            position: relative;
+
+            display: block;
+            width: 33%;
+            height: 1px;
+
+            background: rgba(74, 95, 210, 1);
+
+            animation: screepsHrInprogressAnimation infinite 2s;
+        }
+    }
+
     .--italic {
         font-style: italic;
+    }
+}
+
+@keyframes screepsHrInprogressAnimation {
+    0% {
+        left: -33%;
+    }
+    100% {
+        left: 100%;
     }
 }
