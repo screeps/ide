@@ -18,6 +18,7 @@ class ConsoleView extends React.Component {
             this._unsubscribe();
         };
         this.onShard = (shard) => {
+            this.setState(Object.assign({}, this.state, { shard }));
             this.props.onShard && this.props.onShard(shard);
         };
         this.onClose = () => {

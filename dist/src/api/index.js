@@ -197,6 +197,21 @@ class Api {
         }
         return data;
     }
+    async setUserMemory(body) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/memory`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
     async getUserMemorySegment({ segment, shard }) {
         let data;
         try {

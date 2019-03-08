@@ -4,6 +4,7 @@ import * as React from 'react';
 import JSONEditor from 'jsoneditor';
 
 interface IMemoryJSONEditorViewProps {
+    name: string;
     data: any;
 }
 
@@ -11,7 +12,8 @@ export default class MemoryJSONEditorView extends React.Component<IMemoryJSONEdi
     //@ts-ignore
     props: IMemoryJSONEditorViewProps;
 
-    editorContainerRef: any;
+    editorRef: JSONEditor;
+    editorContainerRef: React.RefObject<any>;
 
     constructor(props: IMemoryJSONEditorViewProps) {
         super(props);
@@ -20,12 +22,28 @@ export default class MemoryJSONEditorView extends React.Component<IMemoryJSONEdi
     }
 
     componentDidMount() {
-        new JSONEditor(this.editorContainerRef.current, {}, this.props.data);
+        this.editorRef = new JSONEditor(this.editorContainerRef.current, {
+            name: this.props.name || 'Memory'
+        }, this.props.data || 'undefined');
+    }
+
+    componentWillReceiveProps(nextProps: IMemoryJSONEditorViewProps) {
+        if (nextProps.data) {
+            this.setValue(nextProps.data);
+        }
     }
 
     public render() {
         return (
-            <div ref={ this.editorContainerRef }></div>
+            <div className='native-key-bindings' ref={ this.editorContainerRef }></div>
         );
+    }
+
+    getValue(): any {
+        return this.editorRef.get();
+    }
+
+    setValue(value: any): any {
+        this.editorRef.set(value);
     }
 }

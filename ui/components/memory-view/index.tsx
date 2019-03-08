@@ -23,7 +23,7 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         this.state = {
             shard: props.shard,
             shards: [],
-            view: 'segments',
+            view: 'main',
             segment: props.segment,
             segmentData: '',
             _segmentData: '',
@@ -49,6 +49,8 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
                 onClick={ this.onClick }
                 onDelete={ this.onDelete }
                 onInput={ this.onInput }
+                onSave={ this.onMemoryUpdate }
+                onReload={ this.onMemoryRefresh }
             />);
         }
 
@@ -96,8 +98,8 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         });
     }
 
-    onClick = (item: any) => {
-        this.props.onClick && this.props.onClick(item);
+    onClick = (path: string) => {
+        this.props.onMemory && this.props.onMemory(path);
     }
 
     onDelete = (path: string) => {
@@ -124,6 +126,14 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
     onToggleView = ({ view }: { view: string }) => {
         this.setState({ ...this.state, view });
+    }
+
+    onMemoryUpdate = (path: string, value: string) => {
+        this.props.onMemoryUpdate && this.props.onMemoryUpdate(path, value);
+    }
+
+    onMemoryRefresh = (path: string) => {
+        this.props.onMemoryRefresh && this.props.onMemoryRefresh(path);
     }
 
     onSegment = (segment: string) => {

@@ -9,28 +9,51 @@ interface IMemoryMainViewProps {
     onClick?: Function;
     onDelete?: Function;
     onInput?: Function;
+    onSave?: Function;
+    onReload?: Function;
+}
+
+interface IMemoryMainViewState {
+    watches: any[];
 }
 
 export default class MemoryMainView extends React.Component<IMemoryMainViewProps> {
     //@ts-ignore
     props: IMemoryMainViewProps;
 
+    state: IMemoryMainViewState;
+
     constructor(props: IMemoryMainViewProps) {
         super(props);
+
+        this.state = {
+            watches: props.watches
+        }
+    }
+
+    componentWillReceiveProps(nextProps: IMemoryMainViewProps) {
+        if (nextProps.watches) {
+            this.setState({
+                watches: nextProps.watches
+            });
+        }
     }
 
     public render() {
         return (
             <div className='screeps-memory__main'>
                 <div className='screeps-memory__main-items'>
-                    { this.props.watches.map((item, index) => {
+                    { this.state.watches.map(({ path, data, value }, index) => {
                         // console.log(item);
-                        return (<MemoryItemView
-                            key={ index }
-                            item={ item }
+                        return (<MemoryItemView key={ index }
+                            path={ path }
+                            data={ data }
+                            value={ value }
 
-                            onClick={ this.onClick }
+                            onClick={ () => this.onClick(path) }
+                            onReload={ () => this.onReload(path) }
                             onDelete={ this.onDelete }
+                            onSave={ (value: any) => this.onSave(path, value) }
                         />)
                     })}
                 </div>
@@ -40,8 +63,16 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
         );
     }
 
-    onClick = (data: any) => {
-        this.props.onClick && this.props.onClick(data);
+    onClick = (path: string) => {
+        this.props.onClick && this.props.onClick(path);
+    }
+
+    onReload = (path: string) => {
+        this.props.onReload && this.props.onReload(path);
+    }
+
+    onSave = (path: string, value: any) => {
+        this.props.onSave && this.props.onSave(path, value);
     }
 
     onDelete = (data: any) => {

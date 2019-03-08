@@ -97,6 +97,8 @@ class ConsoleView extends React.Component<IConsoleViewProps> {
     }
 
     onShard = (shard: string) => {
+        this.setState({ ...this.state, shard });
+
         this.props.onShard && this.props.onShard(shard);
     }
 

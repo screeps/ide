@@ -60,15 +60,6 @@ interface IGameShardInfoResponse extends IResponse {
     shards: IGameShardInfo[];
 }
 
-interface IUserMemoryRequest {
-    path: string;
-    shard: string;
-}
-
-interface IUserMemoryResponse extends IResponse {
-    data: string;
-}
-
 interface IAuthTokenRequest {
     description: string;
 
@@ -116,6 +107,22 @@ interface IAuthMeResponse extends IResponse {
     }
     subscriptionTokens: 0;
     username: string;
+}
+
+
+interface IUserMemoryRequest {
+    path: string;
+    shard: string;
+}
+
+interface IUserMemoryBodyRequest {
+    path: string;
+    shard: string;
+    value: any;
+}
+
+interface IUserMemoryResponse extends IResponse {
+    data: string;
 }
 
 interface IUserMemorySegmentRequest {

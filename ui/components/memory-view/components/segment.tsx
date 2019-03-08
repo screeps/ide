@@ -24,7 +24,7 @@ export default class MemorySegmentView extends React.Component<IMemorySegmentVie
         }
     }
 
-    componentWillReceiveProps(nextProps: any) {
+    componentWillReceiveProps(nextProps: IMemorySegmentViewProps) {
         if (nextProps.segment !== this.state.segment) {
             this.setState({ segment: nextProps.segment ? nextProps.segment : '' });
         }

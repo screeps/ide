@@ -72,6 +72,11 @@ export class MemoryPane {
 
             const watches = this.memoryViewRef.current.state.watches;
             const watch = watches.find((item: any) => item.path === path);
+
+            if (watch.value === value) {
+                return;
+            }
+
             const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
             watches[idx] =  Object.assign({}, { ...watch, value })
 
@@ -86,16 +91,20 @@ export class MemoryPane {
         ReactDOM.render(
             <MemoryView ref={ this.memoryViewRef }
                 pipe={ this.pipe$ }
-                shard={ this.shard }
-                shards={ this._service.shards$ }
-                watches={ this.watches }
-
+                
                 onInput={ this.onInput }
                 onDelete={ this.onDelete }
-                onClick={ this.getUserMemory }
+                
                 onClose={ this.onClose }
                 onResizeStart={ this.onResizeStart }
 
+                watches={ this.watches }
+                onMemory={ this.onMemory }
+                onMemoryRefresh={ this.onMemory }
+                onMemoryUpdate={ this.onMemoryUpdate }
+
+                shard={ this.shard }
+                shards={ this._service.shards$ }
                 onShard={ this.onShard }
 
                 segment={ this.segment }
@@ -177,47 +186,80 @@ export class MemoryPane {
         this.onSegment(this.segment);
     }
 
-    onSegment = (segment: string) => {
+    onMemory = async (path: string): Promise<void> => {
+        let response: IUserMemoryResponse;
+        try {
+            response = await this._api.getUserMemory({ path, shard: this.shard });
+        } catch (err) {
+            return;
+        }
+
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        let data;
+        if (response.data) {
+            data = JSON.parse(pako.ungzip(atob(response.data.substring(3)), {to: 'string'}));
+        }
+
+        const watches = this.memoryViewRef.current.state.watches;
+        const watch: any = watches.find((item: any) => item.path === path);
+        const idx = watches.indexOf(watch);
+        watches[idx] = { ...watch, data };
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            watches: [...watches]
+        });
+    }
+
+    onMemoryUpdate = async (path: string, value: string): Promise<void> => {
+        try {
+            await this._api.setUserMemory({ path, value, shard: this.shard });
+        } catch (err) {
+            return;
+        }
+
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        const watches = this.memoryViewRef.current.state.watches;
+        const watch = watches.find((item: any) => item.path === path);
+        const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
+        watches[idx] =  { ...watch, data: value };
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            watches: [...watches]
+        });
+    }
+
+    onSegment = async (segment: string): Promise<void> => {
         this.segment = segment;
 
-        this._api.getUserMemorySegment({ segment, shard: this.shard })
-            .then(({ data }) => {
-                if (!this.memoryViewRef.current) {
-                    return;
-                }
+        let response: IUserMemorySegmentResponse;
+        try {
+            response = await this._api.getUserMemorySegment({ segment, shard: this.shard });
+        } catch (err) {
+            return;
+        }
 
-                this.memoryViewRef.current.setState({
-                    ...this.memoryViewRef.current.state,
-                    segmentData: data,
-                    _segmentData: data,
-                    segmentHasChange: false
-                });
-            })
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            segmentData: response.data,
+            _segmentData: response.data,
+            segmentHasChange: false
+        });
     }
 
     onSegmentUpdate = (data: string) => {
         this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
-    }
-
-    getUserMemory = ({ path }: { path: string }) => {
-        this._api.getUserMemory({ path, shard: this.shard })
-            .then(({ data }) => {
-                const __ = JSON.parse(pako.ungzip(atob(data.substring(3)), {to: 'string'}));
-
-                if (!this.memoryViewRef.current) {
-                    return;
-                }
-
-                const watches = this.memoryViewRef.current.state.watches;
-                const watch: any = watches.find((item: any) => item.path === path);
-                const idx = watches.indexOf(watch);
-                watches[idx] = Object.assign({}, { ...watch, data: __ });
-
-                this.memoryViewRef.current.setState({
-                    ...this.memoryViewRef.current.state,
-                    watches: [...watches]
-                });
-            });
     }
 
     // Atom pane required interface's methods

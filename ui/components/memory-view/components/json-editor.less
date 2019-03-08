@@ -177,11 +177,11 @@
         width: 100%;
     }
 
-    .jsoneditor-expandable > td:nth-child(3) {
+    td:last-child {
         width: 100%;
     }
 
-    .jsoneditor-button {
+    .jsoneditor-button:not(.jsoneditor-invisible) {
         display: inline-flex;
         min-height: 26px;
         padding: 0px 5px;
@@ -213,6 +213,12 @@
 
     .jsoneditor-append {
         display: none;
+    }
+
+    .jsoneditor-readonly {
+        opacity: .6;
+
+        font-style: italic;
     }
 
     table {

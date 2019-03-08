@@ -14,16 +14,19 @@ interface IMemoryViewProps {
     pipe?: any;
     shard: string;
     shards: any;
-    watches: any;
-    segment: string;
 
     onInput?: Function;
     onDelete?: Function;
     onShard?: Function;
-    onClick?: Function;
     onClose?: Function;
     onResizeStart?:Function;
 
+    watches: any;
+    onMemory?: Function;
+    onMemoryRefresh?: Function;
+    onMemoryUpdate?: Function;
+
+    segment: string;
     onSegment?: Function;
     onSegmentRefresh?: Function;
     onSegmentUpdate?: Function;

@@ -53,11 +53,12 @@ const _watches: any = [
     {path: 'rooms'},
     {path: 'flags'}
 ];
+const MEMORY_WATCHES = 'memory-watches';
 export function getWatches() {
     let watches;
 
     try {
-        watches = localStorage.getItem('memory-watches');
+        watches = localStorage.getItem(MEMORY_WATCHES);
 
         if (!watches) {
             throw new Error('empty');
@@ -65,7 +66,7 @@ export function getWatches() {
 
         watches = JSON.parse(watches);
     } catch(err) {
-        localStorage.setItem('memory-watches', JSON.stringify(_watches));
+        localStorage.setItem(MEMORY_WATCHES, JSON.stringify(_watches));
         watches = _watches;
     }
 
@@ -74,9 +75,9 @@ export function getWatches() {
 
 export function putWatches(watches: any) {
     try {
-        localStorage.setItem('memory-wacthes', JSON.stringify(watches));
+        localStorage.setItem(MEMORY_WATCHES, JSON.stringify(watches));
     } catch(err) {
-
+        // Noop.
     }
 }
 

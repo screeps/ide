@@ -3,14 +3,23 @@ import * as React from 'react';
 import { default as MemoryJSONEditorView } from './json-editor';
 
 interface IMemoryItemViewProps {
-    item: any;
+    path: string;
+    data: any;
+    value: any;
 
     onClick?: Function;
+
+    onSave?: Function;
+    onReload?: Function;
     onDelete?: Function;
 }
 
 interface IMemoryItemViewState {
     isEdit: boolean;
+
+    path: string;
+    data: any;
+    value: any;
 }
 
 export default class MemoryItemView extends React.Component<IMemoryItemViewProps> {
@@ -19,30 +28,62 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
 
     state: IMemoryItemViewState;
 
+    editorRef = React.createRef<MemoryJSONEditorView>();
+
     constructor(props: IMemoryItemViewProps) {
         super(props);
 
-        this.state = { isEdit: false };
+        this.state = {
+            isEdit: false,
+            path: props.path,
+            data: props.data,
+            value: props.value
+        };
+    }
+
+    componentWillReceiveProps(nextProps: IMemoryItemViewProps) {
+        if (nextProps.data !== this.state.data) {
+            this.setState({
+                ...this.state,
+                data: nextProps.data
+            });
+        }
+
+        if (nextProps.value !== this.state.value) {
+            this.setState({
+                ...this.state,
+                value: nextProps.value
+            });
+        }
     }
 
     public render() {
-        const path = this.props.item.path || 'Memory root';
+        const path = this.state.path || 'Memory root';
 
         let value;
         let jsonEditor;
         let deleteBtn;
 
-        if(!this.state.isEdit || !this.props.item.data) {
+        if(!this.state.isEdit) {
             value = (
                 <div className='screeps-memory__value'>
                     <button className='btn btn--clear' type='button' onClick={ this.onEdit }>
-                        { this.props.item.value }
+                        { this.state.value }
                     </button>
                 </div>
             );
         }
 
-        if (this.state.isEdit && this.props.item.data) {
+        if (this.state.isEdit) {
+            let deleteBtn;
+            if (this.state.path) {
+                deleteBtn = (
+                    <button type='button' className='btn btn--clear' onClick={ this.onDelete }>
+                        <i className='sc-icon-delete' />
+                    </button>
+                );
+            }
+
             jsonEditor = (
                 <div className='screeps-memory__json-editor'>
                     <div className='screeps-memory__json-editor-controlls'>
@@ -55,25 +96,26 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
                         <button type='button' className='btn btn--clear' onClick={ this.onCancel }>
                             <i className='sc-icon-clear' />
                         </button>
-                        <button type='button' className='btn btn--clear' onClick={ this.onDelete }>
-                            <i className='sc-icon-delete' />
-                        </button>
+                        { deleteBtn }
                     </div>
-                    <MemoryJSONEditorView data={ this.props.item.data }/>
+                    <MemoryJSONEditorView ref={ this.editorRef }
+                        name={ this.state.path }
+                        data={ this.state.data }
+                    />
                 </div>
             );
         }
 
-        if (this.props.item.path) {
+        if (this.state.path) {
             deleteBtn = (
-                <div className='close-icon' onClick={() => this.onDelete(this.props.item.path)}></div>
+                <div className='close-icon' onClick={() => this.onDelete(this.state.path)}></div>
             );
         }
 
         return (
             <div className='screeps-memory__item'>
                 <div className='screeps-memory__expression'>
-                    <label className={ this.props.item.path ? '' : '--italic' }>{ path }</label>
+                    <label className={ this.state.path ? '' : '--italic' }>{ path }</label>
                     { deleteBtn }
                 </div>
                 { value }
@@ -83,29 +125,35 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
     }
 
     onEdit = () => {
-        console.log(this.props.item);
-
         this.setState({
             ...this.state,
             isEdit: true
         });
 
-        this.props.onClick && this.props.onClick(this.props.item);
+        this.props.onClick && this.props.onClick(this.state.path);
     }
 
     onSave = () => {
-        console.log('onSave');
+        if (!this.editorRef.current) {
+            return;
+        }
+
+        this.onCancel();
+
+        this.props.onSave && this.props.onSave(this.editorRef.current.getValue());
     }
+
     onReload = () => {
-        console.log('onReload');
+        this.props.onReload && this.props.onReload();
     }
+
     onCancel = () => {
         this.setState({
             ...this.state,
             isEdit: false
-        })
-        console.log('onCancel');
+        });
     }
+
     onDelete = (data: any) => {
         this.props.onDelete && this.props.onDelete(data);
     }

@@ -63,32 +63,59 @@ class MemoryPane {
             this.shard = shard;
             this.onSegment(this.segment);
         };
-        this.onSegment = (segment) => {
+        this.onMemory = async (path) => {
+            let response;
+            try {
+                response = await this._api.getUserMemory({ path, shard: this.shard });
+            }
+            catch (err) {
+                return;
+            }
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            let data;
+            if (response.data) {
+                data = JSON.parse(pako.ungzip(atob(response.data.substring(3)), { to: 'string' }));
+            }
+            const watches = this.memoryViewRef.current.state.watches;
+            const watch = watches.find((item) => item.path === path);
+            const idx = watches.indexOf(watch);
+            watches[idx] = Object.assign({}, watch, { data });
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
+        };
+        this.onMemoryUpdate = async (path, value) => {
+            try {
+                await this._api.setUserMemory({ path, value, shard: this.shard });
+            }
+            catch (err) {
+                return;
+            }
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            const watches = this.memoryViewRef.current.state.watches;
+            const watch = watches.find((item) => item.path === path);
+            const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
+            watches[idx] = Object.assign({}, watch, { data: value });
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
+        };
+        this.onSegment = async (segment) => {
             this.segment = segment;
-            this._api.getUserMemorySegment({ segment, shard: this.shard })
-                .then(({ data }) => {
-                if (!this.memoryViewRef.current) {
-                    return;
-                }
-                this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segmentData: data, _segmentData: data, segmentHasChange: false }));
-            });
+            let response;
+            try {
+                response = await this._api.getUserMemorySegment({ segment, shard: this.shard });
+            }
+            catch (err) {
+                return;
+            }
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segmentData: response.data, _segmentData: response.data, segmentHasChange: false }));
         };
         this.onSegmentUpdate = (data) => {
             this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
-        };
-        this.getUserMemory = ({ path }) => {
-            this._api.getUserMemory({ path, shard: this.shard })
-                .then(({ data }) => {
-                const __ = JSON.parse(pako.ungzip(atob(data.substring(3)), { to: 'string' }));
-                if (!this.memoryViewRef.current) {
-                    return;
-                }
-                const watches = this.memoryViewRef.current.state.watches;
-                const watch = watches.find((item) => item.path === path);
-                const idx = watches.indexOf(watch);
-                watches[idx] = Object.assign({}, Object.assign({}, watch, { data: __ }));
-                this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
-            });
         };
         this.element = document.createElement('div');
         this.element.style.height = '300px';
@@ -119,13 +146,16 @@ class MemoryPane {
             }
             const watches = this.memoryViewRef.current.state.watches;
             const watch = watches.find((item) => item.path === path);
+            if (watch.value === value) {
+                return;
+            }
             const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
             watches[idx] = Object.assign({}, Object.assign({}, watch, { value }));
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
         });
     }
     render({}) {
-        ReactDOM.render(React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, shard: this.shard, shards: this._service.shards$, watches: this.watches, onInput: this.onInput, onDelete: this.onDelete, onClick: this.getUserMemory, onClose: this.onClose, onResizeStart: this.onResizeStart, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate }), this.element);
+        ReactDOM.render(React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, onInput: this.onInput, onDelete: this.onDelete, onClose: this.onClose, onResizeStart: this.onResizeStart, watches: this.watches, onMemory: this.onMemory, onMemoryRefresh: this.onMemory, onMemoryUpdate: this.onMemoryUpdate, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate }), this.element);
     }
     // Atom pane required interface's methods
     getURI() {

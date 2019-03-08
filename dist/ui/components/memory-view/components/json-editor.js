@@ -9,10 +9,23 @@ class MemoryJSONEditorView extends React.Component {
         this.editorContainerRef = React.createRef();
     }
     componentDidMount() {
-        new jsoneditor_1.default(this.editorContainerRef.current, {}, this.props.data);
+        this.editorRef = new jsoneditor_1.default(this.editorContainerRef.current, {
+            name: this.props.name || 'Memory'
+        }, this.props.data || 'undefined');
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.data) {
+            this.setValue(nextProps.data);
+        }
     }
     render() {
-        return (React.createElement("div", { ref: this.editorContainerRef }));
+        return (React.createElement("div", { className: 'native-key-bindings', ref: this.editorContainerRef }));
+    }
+    getValue() {
+        return this.editorRef.get();
+    }
+    setValue(value) {
+        this.editorRef.set(value);
     }
 }
 exports.default = MemoryJSONEditorView;

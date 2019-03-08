@@ -236,6 +236,24 @@ export class Api {
         return data;
     }
 
+    async setUserMemory(body: IUserMemoryBodyRequest): Promise<IResponse> {
+        let data: IResponse;
+
+        try {
+            const response = await fetch(`${ this.url }/user/memory`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify(body)
+            });
+
+            data = await response.json();
+        } catch(err) {
+            throw err;
+        }
+
+        return data;
+    }
+
     async getUserMemorySegment({ segment, shard }: IUserMemorySegmentRequest): Promise<IUserMemorySegmentResponse> {
         let data: IUserMemorySegmentResponse;
 

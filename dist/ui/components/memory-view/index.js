@@ -11,8 +11,8 @@ class MemoryView extends React.Component {
         super(props);
         this._shards$ = null;
         this._pipe$ = null;
-        this.onClick = (item) => {
-            this.props.onClick && this.props.onClick(item);
+        this.onClick = (path) => {
+            this.props.onMemory && this.props.onMemory(path);
         };
         this.onDelete = (path) => {
             this.props.onDelete && this.props.onDelete(path);
@@ -33,6 +33,12 @@ class MemoryView extends React.Component {
         this.onToggleView = ({ view }) => {
             this.setState(Object.assign({}, this.state, { view }));
         };
+        this.onMemoryUpdate = (path, value) => {
+            this.props.onMemoryUpdate && this.props.onMemoryUpdate(path, value);
+        };
+        this.onMemoryRefresh = (path) => {
+            this.props.onMemoryRefresh && this.props.onMemoryRefresh(path);
+        };
         this.onSegment = (segment) => {
             this.setState(Object.assign({}, this.state, { segment }));
             this.props.onSegment && this.props.onSegment(segment);
@@ -49,7 +55,7 @@ class MemoryView extends React.Component {
         this.state = {
             shard: props.shard,
             shards: [],
-            view: 'segments',
+            view: 'main',
             segment: props.segment,
             segmentData: '',
             _segmentData: '',
@@ -66,7 +72,7 @@ class MemoryView extends React.Component {
     render() {
         let view, segmentControls;
         if (this.state.view === 'main') {
-            view = (React.createElement(main_1.default, { watches: this.state.watches, onClick: this.onClick, onDelete: this.onDelete, onInput: this.onInput }));
+            view = (React.createElement(main_1.default, { watches: this.state.watches, onClick: this.onClick, onDelete: this.onDelete, onInput: this.onInput, onSave: this.onMemoryUpdate, onReload: this.onMemoryRefresh }));
         }
         if (this.state.view === 'segments') {
             view = (React.createElement(segment_1.default, { segment: this.state.segmentData, onChange: this.onSegmentChange }));
