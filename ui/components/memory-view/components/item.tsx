@@ -124,13 +124,13 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
         );
     }
 
-    onEdit = () => {
+    onEdit = async (): Promise<void> => {
+        this.props.onClick && await this.props.onClick(this.state.path);
+
         this.setState({
             ...this.state,
             isEdit: true
         });
-
-        this.props.onClick && this.props.onClick(this.state.path);
     }
 
     onSave = () => {

@@ -6,8 +6,8 @@ const input_1 = require("./input");
 class MemoryMainView extends React.Component {
     constructor(props) {
         super(props);
-        this.onClick = (path) => {
-            this.props.onClick && this.props.onClick(path);
+        this.onClick = async (path) => {
+            this.props.onClick && await this.props.onClick(path);
         };
         this.onReload = (path) => {
             this.props.onReload && this.props.onReload(path);

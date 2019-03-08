@@ -21,6 +21,7 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         super(props);
 
         this.state = {
+            isProgressing: false,
             shard: props.shard,
             shards: [],
             view: 'main',
@@ -28,8 +29,7 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
             segmentData: '',
             _segmentData: '',
             segmentHasChange: false,
-            //@ts-ignore
-            watches: this.props.watches
+            watches: props.watches
         };
     }
 
@@ -46,9 +46,9 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
             view = (<MemoryMainView
                 watches={ this.state.watches }
 
-                onClick={ this.onClick }
                 onDelete={ this.onDelete }
                 onInput={ this.onInput }
+                onClick={ this.onMemory }
                 onSave={ this.onMemoryUpdate }
                 onReload={ this.onMemoryRefresh }
             />);
@@ -83,7 +83,7 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
                 >
                     { segmentControls }
                 </MemoryControlsView>
-                <hr className='screeps-hr' />
+                <hr className={ 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') } />
                 { view }
             </div>
         );
@@ -96,10 +96,6 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
                 shards
             });
         });
-    }
-
-    onClick = (path: string) => {
-        this.props.onMemory && this.props.onMemory(path);
     }
 
     onDelete = (path: string) => {
@@ -126,6 +122,10 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
     onToggleView = ({ view }: { view: string }) => {
         this.setState({ ...this.state, view });
+    }
+
+    onMemory = async (path: string): Promise<void> => {
+        this.props.onMemory && await this.props.onMemory(path);
     }
 
     onMemoryUpdate = (path: string, value: string) => {

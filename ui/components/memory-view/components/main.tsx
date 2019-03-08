@@ -63,8 +63,8 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
         );
     }
 
-    onClick = (path: string) => {
-        this.props.onClick && this.props.onClick(path);
+    onClick = async (path: string): Promise<void> => {
+        this.props.onClick && await this.props.onClick(path);
     }
 
     onReload = (path: string) => {

@@ -1,4 +1,6 @@
 interface IMemoryViewState {
+    isProgressing: boolean;
+
     shard: any;
     shards: any;
     view: string;

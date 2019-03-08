@@ -6,9 +6,9 @@ class MemoryItemView extends React.Component {
     constructor(props) {
         super(props);
         this.editorRef = React.createRef();
-        this.onEdit = () => {
+        this.onEdit = async () => {
+            this.props.onClick && await this.props.onClick(this.state.path);
             this.setState(Object.assign({}, this.state, { isEdit: true }));
-            this.props.onClick && this.props.onClick(this.state.path);
         };
         this.onSave = () => {
             if (!this.editorRef.current) {

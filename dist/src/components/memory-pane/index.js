@@ -7,6 +7,8 @@ const rxjs_1 = require("rxjs");
 const ui_1 = require("../../../ui");
 const utils_1 = require("../../utils");
 let clientY;
+let animationStartTime = 0;
+const ANIMATION_MIN_TIME = 1500;
 class MemoryPane {
     constructor(_user, _api, _socket, _service) {
         this._user = _user;
@@ -64,9 +66,11 @@ class MemoryPane {
             this.onSegment(this.segment);
         };
         this.onMemory = async (path) => {
+            this.showProgress();
             let response;
             try {
                 response = await this._api.getUserMemory({ path, shard: this.shard });
+                this.hideProgress();
             }
             catch (err) {
                 return;
@@ -156,6 +160,23 @@ class MemoryPane {
     }
     render({}) {
         ReactDOM.render(React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, onInput: this.onInput, onDelete: this.onDelete, onClose: this.onClose, onResizeStart: this.onResizeStart, watches: this.watches, onMemory: this.onMemory, onMemoryRefresh: this.onMemory, onMemoryUpdate: this.onMemoryUpdate, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate }), this.element);
+    }
+    showProgress() {
+        animationStartTime = new Date().getTime();
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { isProgressing: true }));
+    }
+    hideProgress() {
+        const now = new Date().getTime();
+        const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
+        setTimeout(() => {
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { isProgressing: false }));
+        }, delay > 0 ? delay : 0);
     }
     // Atom pane required interface's methods
     getURI() {

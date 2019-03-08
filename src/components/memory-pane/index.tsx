@@ -14,6 +14,9 @@ import { User } from '../../services/user';
 
 let clientY: number;
 
+let animationStartTime: number = 0;
+const ANIMATION_MIN_TIME = 1500;
+
 export class MemoryPane {
     public element: HTMLElement;
     private _panel: Panel;
@@ -187,9 +190,12 @@ export class MemoryPane {
     }
 
     onMemory = async (path: string): Promise<void> => {
+        this.showProgress();
+
         let response: IUserMemoryResponse;
         try {
             response = await this._api.getUserMemory({ path, shard: this.shard });
+            this.hideProgress();
         } catch (err) {
             return;
         }
@@ -260,6 +266,35 @@ export class MemoryPane {
 
     onSegmentUpdate = (data: string) => {
         this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
+    }
+
+    showProgress() {
+        animationStartTime = new Date() .getTime();
+
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            isProgressing: true
+        });
+    }
+
+    hideProgress() {
+        const now = new Date() .getTime();
+        const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
+
+        setTimeout(() => {
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+
+            this.memoryViewRef.current.setState({
+                ...this.memoryViewRef.current.state,
+                isProgressing: false
+            });
+        }, delay > 0 ? delay : 0);
     }
 
     // Atom pane required interface's methods
