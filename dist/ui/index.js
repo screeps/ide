@@ -11,4 +11,6 @@ const console_view_1 = require("./components/console-view");
 exports.ConsoleView = console_view_1.default;
 const memory_view_1 = require("./components/memory-view");
 exports.MemoryView = memory_view_1.default;
+const resizable_panel_1 = require("./components/resizable-panel");
+exports.ResizablePanel = resizable_panel_1.default;
 //# sourceMappingURL=index.js.map

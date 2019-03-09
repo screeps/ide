@@ -24,9 +24,6 @@ class MemoryView extends React.Component {
         this.onClose = () => {
             this.props.onClose && this.props.onClose();
         };
-        this.onResizeStart = (event) => {
-            this.props.onResizeStart && this.props.onResizeStart(event);
-        };
         this.onToggleView = ({ view }) => {
             this.setState(Object.assign({}, this.state, { view }));
         };
@@ -79,7 +76,6 @@ class MemoryView extends React.Component {
             segmentControls = (React.createElement(segment_controls_1.default, { segment: this.state.segment, hasChange: this.state.segmentHasChange, onSegment: this.onSegment, onRefresh: this.onSegmentRefresh, onUpdate: this.onSegmentUpdate }));
         }
         return (React.createElement("div", { className: 'screeps-ide screeps-memory screeps-memory__view' },
-            React.createElement("div", { className: 'panel-divider', onMouseDown: this.onResizeStart }),
             React.createElement(controls_1.default, { shard: this.state.shard, shards: this.state.shards, onShard: this.onShard, onClose: this.onClose, onToggleView: this.onToggleView }, segmentControls),
             React.createElement("hr", { className: 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') }),
             view));

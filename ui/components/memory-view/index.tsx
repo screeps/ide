@@ -72,7 +72,6 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
         return (
             <div className='screeps-ide screeps-memory screeps-memory__view'>
-                <div className='panel-divider' onMouseDown={ this.onResizeStart } />
                 <MemoryControlsView
                     shard={ this.state.shard }
                     shards={ this.state.shards }
@@ -114,10 +113,6 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
     onClose = () => {
         this.props.onClose && this.props.onClose();
-    }
-
-    onResizeStart = (event: any) => {
-        this.props.onResizeStart && this.props.onResizeStart(event);
     }
 
     onToggleView = ({ view }: { view: string }) => {

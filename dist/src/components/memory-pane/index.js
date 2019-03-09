@@ -6,7 +6,6 @@ const ReactDOM = require("react-dom");
 const rxjs_1 = require("rxjs");
 const ui_1 = require("../../../ui");
 const utils_1 = require("../../utils");
-let clientY;
 let animationStartTime = 0;
 const ANIMATION_MIN_TIME = 1500;
 class MemoryPane {
@@ -44,22 +43,6 @@ class MemoryPane {
         };
         this.onClose = () => {
             this._panel.destroy();
-        };
-        this.onResizeStart = (event) => {
-            clientY = event.clientY;
-            document.addEventListener('mousemove', this.onResize);
-            document.addEventListener('mouseup', this.onResizeStop);
-        };
-        this.onResize = (event) => {
-            const offsetY = event.clientY - clientY;
-            clientY = event.clientY;
-            //@ts-ignore
-            const height = parseInt(this.element.style.height, 10);
-            this.element.style.height = `${height - offsetY}px`;
-        };
-        this.onResizeStop = () => {
-            document.removeEventListener('mousemove', this.onResize);
-            document.removeEventListener('mouseup', this.onResizeStop);
         };
         this.onShard = (shard) => {
             this.shard = shard;
@@ -172,7 +155,8 @@ class MemoryPane {
         });
     }
     render({}) {
-        ReactDOM.render(React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, onInput: this.onInput, onDelete: this.onDelete, onClose: this.onClose, onResizeStart: this.onResizeStart, watches: this.watches, onMemory: this.onMemory, onMemoryRefresh: this.onMemory, onMemoryUpdate: this.onMemoryUpdate, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate }), this.element);
+        ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
+            React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, onInput: this.onInput, onDelete: this.onDelete, onClose: this.onClose, watches: this.watches, onMemory: this.onMemory, onMemoryRefresh: this.onMemory, onMemoryUpdate: this.onMemoryUpdate, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate })), this.element);
     }
     showProgress() {
         animationStartTime = new Date().getTime();

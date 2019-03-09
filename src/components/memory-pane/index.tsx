@@ -5,14 +5,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Subscription, merge } from 'rxjs';
 
-import { MemoryView } from '../../../ui';
+import { MemoryView, ResizablePanel } from '../../../ui';
 import { Service } from '../../service';
 import { Api } from '../../api';
 import { Socket } from '../../socket';
 import { getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
-
-let clientY: number;
 
 let animationStartTime: number = 0;
 const ANIMATION_MIN_TIME = 1500;
@@ -92,29 +90,30 @@ export class MemoryPane {
 
     render({ }) {
         ReactDOM.render(
-            <MemoryView ref={ this.memoryViewRef }
-                pipe={ this.pipe$ }
-                
-                onInput={ this.onInput }
-                onDelete={ this.onDelete }
-                
-                onClose={ this.onClose }
-                onResizeStart={ this.onResizeStart }
+            <ResizablePanel>
+                <MemoryView ref={ this.memoryViewRef }
+                    pipe={ this.pipe$ }
+                    
+                    onInput={ this.onInput }
+                    onDelete={ this.onDelete }
+                    
+                    onClose={ this.onClose }
 
-                watches={ this.watches }
-                onMemory={ this.onMemory }
-                onMemoryRefresh={ this.onMemory }
-                onMemoryUpdate={ this.onMemoryUpdate }
+                    watches={ this.watches }
+                    onMemory={ this.onMemory }
+                    onMemoryRefresh={ this.onMemory }
+                    onMemoryUpdate={ this.onMemoryUpdate }
 
-                shard={ this.shard }
-                shards={ this._service.shards$ }
-                onShard={ this.onShard }
+                    shard={ this.shard }
+                    shards={ this._service.shards$ }
+                    onShard={ this.onShard }
 
-                segment={ this.segment }
-                onSegment={ this.onSegment }
-                onSegmentRefresh={ this.onSegment }
-                onSegmentUpdate={ this.onSegmentUpdate }
-            />,
+                    segment={ this.segment }
+                    onSegment={ this.onSegment }
+                    onSegmentRefresh={ this.onSegment }
+                    onSegmentUpdate={ this.onSegmentUpdate }
+                />
+            </ResizablePanel>,
             this.element as HTMLElement
         )
     }
@@ -159,28 +158,6 @@ export class MemoryPane {
 
     onClose = () => {
         this._panel.destroy();
-    }
-
-    onResizeStart = (event: any) => {
-        clientY = event.clientY;
-
-        document.addEventListener('mousemove', this.onResize);
-        document.addEventListener('mouseup', this.onResizeStop);
-    }
-
-    onResize = (event: any) => {
-        const offsetY = event.clientY - clientY;
-        clientY = event.clientY;
-
-        //@ts-ignore
-        const height = parseInt(this.element.style.height, 10);
-
-        this.element.style.height = `${ height - offsetY }px`
-    }
-
-    onResizeStop = () => {
-        document.removeEventListener('mousemove', this.onResize);
-        document.removeEventListener('mouseup', this.onResizeStop);
     }
 
     onShard = (shard: string) => {

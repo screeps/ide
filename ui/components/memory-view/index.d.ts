@@ -21,7 +21,6 @@ interface IMemoryViewProps {
     onDelete?: Function;
     onShard?: Function;
     onClose?: Function;
-    onResizeStart?:Function;
 
     watches: any;
     onMemory?: Function;
