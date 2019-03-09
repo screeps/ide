@@ -243,11 +243,13 @@ export class MemoryPane {
     }
 
     onSegment = async (segment: string): Promise<void> => {
+        this.showProgress();
         this.segment = segment;
 
         let response: IUserMemorySegmentResponse;
         try {
             response = await this._api.getUserMemorySegment({ segment, shard: this.shard });
+            this.hideProgress();
         } catch (err) {
             return;
         }
@@ -258,14 +260,32 @@ export class MemoryPane {
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
+            segment,
             segmentData: response.data,
             _segmentData: response.data,
             segmentHasChange: false
         });
     }
 
-    onSegmentUpdate = (data: string) => {
-        this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
+    onSegmentUpdate = async (data: string): Promise<void> => {
+        this.showProgress();
+        try {
+            await this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
+            this.hideProgress();
+        } catch (err) {
+            //Noop.
+        }
+
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            segmentData: data,
+            _segmentData: data,
+            segmentHasChange: false
+        });
     }
 
     showProgress() {

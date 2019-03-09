@@ -24,7 +24,7 @@ class MemorySegmentControlsView extends React.Component {
         };
     }
     componentWillReceiveProps(nextProps) {
-        this.setState(Object.assign({}, this.state, { hasChange: nextProps.hasChange }));
+        this.setState(Object.assign({}, this.state, { segment: nextProps.segment, hasChange: nextProps.hasChange }));
     }
     render() {
         return (React.createElement("div", { className: 'screeps-memory__segment-controls' },

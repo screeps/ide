@@ -105,10 +105,12 @@ class MemoryPane {
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
         };
         this.onSegment = async (segment) => {
+            this.showProgress();
             this.segment = segment;
             let response;
             try {
                 response = await this._api.getUserMemorySegment({ segment, shard: this.shard });
+                this.hideProgress();
             }
             catch (err) {
                 return;
@@ -116,10 +118,21 @@ class MemoryPane {
             if (!this.memoryViewRef.current) {
                 return;
             }
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segmentData: response.data, _segmentData: response.data, segmentHasChange: false }));
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segment, segmentData: response.data, _segmentData: response.data, segmentHasChange: false }));
         };
-        this.onSegmentUpdate = (data) => {
-            this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
+        this.onSegmentUpdate = async (data) => {
+            this.showProgress();
+            try {
+                await this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
+                this.hideProgress();
+            }
+            catch (err) {
+                //Noop.
+            }
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segmentData: data, _segmentData: data, segmentHasChange: false }));
         };
         this.element = document.createElement('div');
         this.element.style.height = '300px';

@@ -37,6 +37,7 @@ export default class MemorySegmentControlsView extends React.Component<IMemorySe
     componentWillReceiveProps(nextProps: any) {
         this.setState({
             ...this.state,
+            segment: nextProps.segment,
             hasChange: nextProps.hasChange
         });
     }
