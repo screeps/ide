@@ -4,13 +4,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Observable } from 'rxjs';
 
-import { ConsoleView } from '../../../ui';
+import { ConsoleView, ResizablePanel } from '../../../ui';
 import { Api } from '../../api';
 import { Socket } from '../../socket';
 import { Service } from '../../service';
 import { User } from '../../services/user';
-
-let clientY: number;
 
 export class ConsolePane {
     public element: HTMLElement;
@@ -41,16 +39,17 @@ export class ConsolePane {
 
     render({ }) {
         ReactDOM.render(
-            <ConsoleView
-                output={ this.consolePipe$ }
-                shard={ this.shard }
-                shards={ this._service.shards$ }
+            <ResizablePanel>
+                <ConsoleView
+                    output={ this.consolePipe$ }
+                    shard={ this.shard }
+                    shards={ this._service.shards$ }
 
-                onShard={ this.onShard }
-                onInput={ this.onInput }
-                onClose={ this.onClose }
-                onResizeStart={ this.onResizeStart }
-            />,
+                    onShard={ this.onShard }
+                    onInput={ this.onInput }
+                    onClose={ this.onClose }
+                />
+            </ResizablePanel>,
             this.element as HTMLElement
         )
     }
@@ -75,28 +74,6 @@ export class ConsolePane {
 
     private onClose = () => {
         this._panel.destroy();
-    }
-
-    private onResizeStart = (event: any) => {
-        clientY = event.clientY;
-
-        document.addEventListener('mousemove', this.onResize);
-        document.addEventListener('mouseup', this.onResizeStop);
-    }
-
-    private onResize = (event: any) => {
-        const offsetY = event.clientY - clientY;
-        clientY = event.clientY;
-
-        //@ts-ignore
-        const height = parseInt(this.element.style.height, 10);
-
-        this.element.style.height = `${ height - offsetY }px`
-    }
-
-    private onResizeStop = () => {
-        document.removeEventListener('mousemove', this.onResize);
-        document.removeEventListener('mouseup', this.onResizeStop);
     }
 
     // Atom pane required interface's methods

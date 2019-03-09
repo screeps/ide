@@ -125,14 +125,9 @@ class ConsoleView extends React.Component<IConsoleViewProps> {
         this.props.onInput && this.props.onInput({ expression });
     }
 
-    onResizeStart = (event: any) => {
-        this.props.onResizeStart && this.props.onResizeStart(event);
-    }
-
     public render() {
         return (
             <div className='screeps-ide screeps-console screeps-console__view'>
-                <div className='panel-divider' onMouseDown={ this.onResizeStart }/>
                 <ConsoleControlsView
                     shard={ this.state.shard }
                     shards={ this.state.shards }

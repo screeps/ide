@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 const ReactDOM = require("react-dom");
 const ui_1 = require("../../../ui");
-let clientY;
 class ConsolePane {
     constructor(_user, _api, _socket, _service) {
         this._user = _user;
@@ -29,22 +28,6 @@ class ConsolePane {
         this.onClose = () => {
             this._panel.destroy();
         };
-        this.onResizeStart = (event) => {
-            clientY = event.clientY;
-            document.addEventListener('mousemove', this.onResize);
-            document.addEventListener('mouseup', this.onResizeStop);
-        };
-        this.onResize = (event) => {
-            const offsetY = event.clientY - clientY;
-            clientY = event.clientY;
-            //@ts-ignore
-            const height = parseInt(this.element.style.height, 10);
-            this.element.style.height = `${height - offsetY}px`;
-        };
-        this.onResizeStop = () => {
-            document.removeEventListener('mousemove', this.onResize);
-            document.removeEventListener('mouseup', this.onResizeStop);
-        };
         this.element = document.createElement('div');
         this.element.style.height = '300px';
         this.shard = this._user.shard;
@@ -56,7 +39,8 @@ class ConsolePane {
         });
     }
     render({}) {
-        ReactDOM.render(React.createElement(ui_1.ConsoleView, { output: this.consolePipe$, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, onInput: this.onInput, onClose: this.onClose, onResizeStart: this.onResizeStart }), this.element);
+        ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
+            React.createElement(ui_1.ConsoleView, { output: this.consolePipe$, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, onInput: this.onInput, onClose: this.onClose })), this.element);
     }
     // Atom pane required interface's methods
     getURI() {
