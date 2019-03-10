@@ -18,25 +18,12 @@ class MemoryPane {
         this._pipe$ = null;
         this.segment = '0';
         // Private component actions.
-        this.onInput = ({ expression: path }) => {
+        this.onInput = (path) => {
             if (!this.memoryViewRef.current) {
                 return;
             }
             const watches = [...this.memoryViewRef.current.state.watches, { path }];
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches }));
-            utils_1.putWatches(watches);
-            this.watches = watches;
-            this.initMemoryPipeSubscription();
-        };
-        this.onDelete = (path) => {
-            if (!this.memoryViewRef.current) {
-                return;
-            }
-            const watches = this.memoryViewRef.current.state.watches;
-            const watch = watches.find((item) => item.path === path);
-            const idx = watches.indexOf(watch);
-            watches.splice(idx, 1);
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
             utils_1.putWatches(watches);
             this.watches = watches;
             this.initMemoryPipeSubscription();
@@ -61,19 +48,24 @@ class MemoryPane {
             if (!this.memoryViewRef.current) {
                 return;
             }
-            let data;
+            let value;
             if (response.data) {
-                data = JSON.parse(pako.ungzip(atob(response.data.substring(3)), { to: 'string' }));
+                value = JSON.parse(pako.ungzip(atob(response.data.substring(3)), { to: 'string' }));
             }
             const watches = this.memoryViewRef.current.state.watches;
             const watch = watches.find((item) => item.path === path);
+            if (!watch) {
+                return;
+            }
             const idx = watches.indexOf(watch);
-            watches[idx] = Object.assign({}, watch, { data });
+            watches[idx] = Object.assign({}, watch, { value });
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
         };
         this.onMemoryUpdate = async (path, value) => {
+            this.showProgress();
             try {
                 await this._api.setUserMemory({ path, value, shard: this.shard });
+                this.hideProgress();
             }
             catch (err) {
                 return;
@@ -83,9 +75,41 @@ class MemoryPane {
             }
             const watches = this.memoryViewRef.current.state.watches;
             const watch = watches.find((item) => item.path === path);
-            const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
-            watches[idx] = Object.assign({}, watch, { data: value });
+            if (!watch) {
+                return;
+            }
+            const idx = watches.indexOf(watch);
+            watches[idx] = Object.assign({}, watch, { value });
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
+        };
+        this.onMemoryRemove = async (path) => {
+            this.showProgress();
+            try {
+                await this._api.setUserMemory({ path, shard: this.shard });
+                this.hideProgress();
+            }
+            catch (err) {
+                return;
+            }
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+        };
+        this.onMemoryDelete = (path) => {
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            const watches = this.memoryViewRef.current.state.watches;
+            const watch = watches.find((item) => item.path === path);
+            if (!watch) {
+                return;
+            }
+            const idx = watches.indexOf(watch);
+            watches.splice(idx, 1);
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
+            utils_1.putWatches(watches);
+            this.watches = watches;
+            this.initMemoryPipeSubscription();
         };
         this.onSegment = async (segment) => {
             this.showProgress();
@@ -146,9 +170,13 @@ class MemoryPane {
             }
             const watches = this.memoryViewRef.current.state.watches;
             const watch = watches.find((item) => item.path === path);
-            if (watch.value === value) {
+            if (!watch || watch.value === value) {
                 return;
             }
+            if (watch.value && watch.value.toString() === value) {
+                return;
+            }
+            console.log(path, value);
             const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
             watches[idx] = Object.assign({}, Object.assign({}, watch, { value }));
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { watches: [...watches] }));
@@ -156,7 +184,7 @@ class MemoryPane {
     }
     render({}) {
         ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
-            React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, onInput: this.onInput, onDelete: this.onDelete, onClose: this.onClose, watches: this.watches, onMemory: this.onMemory, onMemoryRefresh: this.onMemory, onMemoryUpdate: this.onMemoryUpdate, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate })), this.element);
+            React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, pipe: this.pipe$, onInput: this.onInput, onClose: this.onClose, watches: this.watches, onMemory: this.onMemory, onMemoryRefresh: this.onMemory, onMemoryUpdate: this.onMemoryUpdate, onMemoryRemove: this.onMemoryRemove, onMemoryDelete: this.onMemoryDelete, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, segment: this.segment, onSegment: this.onSegment, onSegmentRefresh: this.onSegment, onSegmentUpdate: this.onSegmentUpdate })), this.element);
     }
     showProgress() {
         animationStartTime = new Date().getTime();

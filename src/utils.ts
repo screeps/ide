@@ -47,7 +47,7 @@ export function getSocket() {
 }
 
 const _watches: any = [
-    {path: '', value: '[object Object]'},
+    {path: '', value: {}},
     {path: 'creeps'},
     {path: 'spawns'},
     {path: 'rooms'},

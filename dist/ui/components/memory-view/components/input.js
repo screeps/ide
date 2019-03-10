@@ -11,7 +11,7 @@ class MemoryInputView extends React.Component {
             if (!event.target.value) {
                 return;
             }
-            this.props.onInput && this.props.onInput({ expression: event.target.value });
+            this.props.onInput && this.props.onInput(event.target.value);
             event.target.value = '';
         };
         this.onSubmit = (event) => {

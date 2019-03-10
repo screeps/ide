@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
-const json_editor_1 = require("./json-editor");
+const jsoneditor_1 = require("./jsoneditor");
 class MemoryItemView extends React.Component {
     constructor(props) {
         super(props);
@@ -26,17 +26,17 @@ class MemoryItemView extends React.Component {
         this.onDelete = (data) => {
             this.props.onDelete && this.props.onDelete(data);
         };
+        this.onRemovePath = () => {
+            this.props.onRemovePath && this.props.onRemovePath();
+            this.onCancel();
+        };
         this.state = {
             isEdit: false,
             path: props.path,
-            data: props.data,
             value: props.value
         };
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.data !== this.state.data) {
-            this.setState(Object.assign({}, this.state, { data: nextProps.data }));
-        }
         if (nextProps.value !== this.state.value) {
             this.setState(Object.assign({}, this.state, { value: nextProps.value }));
         }
@@ -47,13 +47,20 @@ class MemoryItemView extends React.Component {
         let jsonEditor;
         let deleteBtn;
         if (!this.state.isEdit) {
+            let short;
+            try {
+                short = this.state.value.toString();
+            }
+            catch (err) {
+                short = 'undefined';
+            }
             value = (React.createElement("div", { className: 'screeps-memory__value' },
-                React.createElement("button", { className: 'btn btn--clear', type: 'button', onClick: this.onEdit }, this.state.value)));
+                React.createElement("button", { className: 'btn btn--clear', type: 'button', onClick: this.onEdit }, short)));
         }
         if (this.state.isEdit) {
             let deleteBtn;
             if (this.state.path) {
-                deleteBtn = (React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onDelete },
+                deleteBtn = (React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onRemovePath, title: 'Delete from memory' },
                     React.createElement("i", { className: 'sc-icon-delete' })));
             }
             jsonEditor = (React.createElement("div", { className: 'screeps-memory__json-editor' },
@@ -65,7 +72,7 @@ class MemoryItemView extends React.Component {
                     React.createElement("button", { type: 'button', className: 'btn btn--clear', onClick: this.onCancel },
                         React.createElement("i", { className: 'sc-icon-clear' })),
                     deleteBtn),
-                React.createElement(json_editor_1.default, { ref: this.editorRef, name: this.state.path, data: this.state.data })));
+                React.createElement(jsoneditor_1.default, { ref: this.editorRef, name: this.state.path, value: this.state.value })));
         }
         if (this.state.path) {
             deleteBtn = (React.createElement("div", { className: 'close-icon', onClick: () => this.onDelete(this.state.path) }));

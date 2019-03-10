@@ -29,4 +29,4 @@ class MemoryJSONEditorView extends React.Component {
     }
 }
 exports.default = MemoryJSONEditorView;
-//# sourceMappingURL=json-editor.js.map
+//# sourceMappingURL=jsoneditor.js.map

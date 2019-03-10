@@ -38,7 +38,7 @@ function getSocket() {
 }
 exports.getSocket = getSocket;
 const _watches = [
-    { path: '', value: '[object Object]' },
+    { path: '', value: {} },
     { path: 'creeps' },
     { path: 'spawns' },
     { path: 'rooms' },

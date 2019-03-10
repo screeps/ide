@@ -4,17 +4,18 @@ import { default as MemoryItemView } from './item';
 import { default as MemoryInputView } from './input';
 
 interface IMemoryMainViewProps {
-    watches: any[];
+    watches: IMemoryPath[];
 
     onClick?: Function;
     onDelete?: Function;
     onInput?: Function;
     onSave?: Function;
     onReload?: Function;
+    onRemovePath?: Function;
 }
 
 interface IMemoryMainViewState {
-    watches: any[];
+    watches: IMemoryPath[];
 }
 
 export default class MemoryMainView extends React.Component<IMemoryMainViewProps> {
@@ -43,17 +44,16 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
         return (
             <div className='screeps-memory__main'>
                 <div className='screeps-memory__main-items'>
-                    { this.state.watches.map(({ path, data, value }, index) => {
-                        // console.log(item);
-                        return (<MemoryItemView key={ index }
+                    { this.state.watches.map(({ path, value }) => {
+                        return (<MemoryItemView key={ path }
                             path={ path }
-                            data={ data }
                             value={ value }
 
                             onClick={ () => this.onClick(path) }
                             onReload={ () => this.onReload(path) }
-                            onDelete={ this.onDelete }
+                            onDelete={ () => this.onDelete(path) }
                             onSave={ (value: any) => this.onSave(path, value) }
+                            onRemovePath={ () => this.onRemovePath(path) }
                         />)
                     })}
                 </div>
@@ -75,11 +75,15 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
         this.props.onSave && this.props.onSave(path, value);
     }
 
-    onDelete = (data: any) => {
-        this.props.onDelete && this.props.onDelete(data);
+    onDelete = (path: string) => {
+        this.props.onDelete && this.props.onDelete(path);
     }
 
-    onInput = (data: any) => {
-        this.props.onInput && this.props.onInput(data);
+    onRemovePath = (path: string) => {
+        this.props.onRemovePath && this.props.onRemovePath(path);
+    }
+
+    onInput = (path: string) => {
+        this.props.onInput && this.props.onInput(path);
     }
 }

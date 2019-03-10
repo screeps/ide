@@ -46,11 +46,13 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
             view = (<MemoryMainView
                 watches={ this.state.watches }
 
-                onDelete={ this.onDelete }
                 onInput={ this.onInput }
+
                 onClick={ this.onMemory }
                 onSave={ this.onMemoryUpdate }
                 onReload={ this.onMemoryRefresh }
+                onDelete={ this.onMemoryDelete }
+                onRemovePath={ this.onMemoryRemove }
             />);
         }
 
@@ -97,12 +99,8 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         });
     }
 
-    onDelete = (path: string) => {
-        this.props.onDelete && this.props.onDelete(path);
-    }
-
-    onInput = (data: any) => {
-        this.props.onInput && this.props.onInput(data);
+    onInput = (path: string) => {
+        this.props.onInput && this.props.onInput(path);
     }
 
     onShard = (shard: string) => {
@@ -129,6 +127,14 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
     onMemoryRefresh = (path: string) => {
         this.props.onMemoryRefresh && this.props.onMemoryRefresh(path);
+    }
+
+    onMemoryRemove = (path: string) => {
+        this.props.onMemoryRemove && this.props.onMemoryRemove(path);
+    }
+
+    onMemoryDelete = (path: string) => {
+        this.props.onMemoryDelete && this.props.onMemoryDelete(path);
     }
 
     onSegment = (segment: string) => {

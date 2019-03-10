@@ -21,7 +21,7 @@ export class MemoryPane {
 
     memoryViewRef = React.createRef<MemoryView>();
 
-    watches: any;
+    watches: IMemoryPath[];
     pipe$: any;
     _pipe$: Subscription | null = null;
 
@@ -74,9 +74,15 @@ export class MemoryPane {
             const watches = this.memoryViewRef.current.state.watches;
             const watch = watches.find((item: any) => item.path === path);
 
-            if (watch.value === value) {
+            if (!watch || watch.value === value) {
                 return;
             }
+
+            if (watch.value && watch.value.toString() === value) {
+                return;
+            }
+
+            console.log(path, value);
 
             const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
             watches[idx] =  Object.assign({}, { ...watch, value })
@@ -95,14 +101,15 @@ export class MemoryPane {
                     pipe={ this.pipe$ }
                     
                     onInput={ this.onInput }
-                    onDelete={ this.onDelete }
-                    
+
                     onClose={ this.onClose }
 
                     watches={ this.watches }
                     onMemory={ this.onMemory }
                     onMemoryRefresh={ this.onMemory }
                     onMemoryUpdate={ this.onMemoryUpdate }
+                    onMemoryRemove={ this.onMemoryRemove }
+                    onMemoryDelete={ this.onMemoryDelete }
 
                     shard={ this.shard }
                     shards={ this._service.shards$ }
@@ -119,36 +126,16 @@ export class MemoryPane {
     }
 
     // Private component actions.
-    onInput = ({ expression: path }: { expression: string }) => {
+    onInput = (path: string) => {
         if (!this.memoryViewRef.current) {
             return;
         }
 
-        const watches = [...this.memoryViewRef.current.state.watches, { path }];
+        const watches = [...this.memoryViewRef.current.state.watches, { path } as IMemoryPath];
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
             watches
-        });
-
-        putWatches(watches);
-        this.watches = watches;
-        this.initMemoryPipeSubscription();
-    }
-
-    onDelete = (path: string) => {
-        if (!this.memoryViewRef.current) {
-            return;
-        }
-
-        const watches = this.memoryViewRef.current.state.watches;
-        const watch = watches.find((item: any) => item.path === path);
-        const idx = watches.indexOf(watch);
-        watches.splice(idx, 1);
-
-        this.memoryViewRef.current.setState({
-            ...this.memoryViewRef.current.state,
-            watches: [...watches]
         });
 
         putWatches(watches);
@@ -181,15 +168,20 @@ export class MemoryPane {
             return;
         }
 
-        let data;
+        let value;
         if (response.data) {
-            data = JSON.parse(pako.ungzip(atob(response.data.substring(3)), {to: 'string'}));
+            value = JSON.parse(pako.ungzip(atob(response.data.substring(3)), {to: 'string'}));
         }
 
         const watches = this.memoryViewRef.current.state.watches;
-        const watch: any = watches.find((item: any) => item.path === path);
+        const watch = watches.find((item: any) => item.path === path);
+
+        if (!watch) {
+            return;
+        }
+
         const idx = watches.indexOf(watch);
-        watches[idx] = { ...watch, data };
+        watches[idx] = { ...watch, value };
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
@@ -197,9 +189,11 @@ export class MemoryPane {
         });
     }
 
-    onMemoryUpdate = async (path: string, value: string): Promise<void> => {
+    onMemoryUpdate = async (path: string, value: any): Promise<void> => {
+        this.showProgress();
         try {
             await this._api.setUserMemory({ path, value, shard: this.shard });
+            this.hideProgress();
         } catch (err) {
             return;
         }
@@ -210,13 +204,57 @@ export class MemoryPane {
 
         const watches = this.memoryViewRef.current.state.watches;
         const watch = watches.find((item: any) => item.path === path);
-        const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
-        watches[idx] =  { ...watch, data: value };
+
+        if (!watch) {
+            return;
+        }
+
+        const idx = watches.indexOf(watch);
+        watches[idx] =  { ...watch, value };
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
             watches: [...watches]
         });
+    }
+
+    onMemoryRemove = async (path: string): Promise<void> => {
+        this.showProgress();
+        try {
+            await this._api.setUserMemory({ path, shard: this.shard });
+            this.hideProgress()
+        } catch (err) {
+            return;
+        }
+
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+    }
+
+    onMemoryDelete = (path: string) => {
+        if (!this.memoryViewRef.current) {
+            return;
+        }
+
+        const watches = this.memoryViewRef.current.state.watches;
+        const watch = watches.find((item: any) => item.path === path);
+
+        if (!watch) {
+            return;
+        }
+
+        const idx = watches.indexOf(watch);
+        watches.splice(idx, 1);
+
+        this.memoryViewRef.current.setState({
+            ...this.memoryViewRef.current.state,
+            watches: [...watches]
+        });
+
+        putWatches(watches);
+        this.watches = watches;
+        this.initMemoryPipeSubscription();
     }
 
     onSegment = async (segment: string): Promise<void> => {

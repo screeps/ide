@@ -15,11 +15,14 @@ class MemoryMainView extends React.Component {
         this.onSave = (path, value) => {
             this.props.onSave && this.props.onSave(path, value);
         };
-        this.onDelete = (data) => {
-            this.props.onDelete && this.props.onDelete(data);
+        this.onDelete = (path) => {
+            this.props.onDelete && this.props.onDelete(path);
         };
-        this.onInput = (data) => {
-            this.props.onInput && this.props.onInput(data);
+        this.onRemovePath = (path) => {
+            this.props.onRemovePath && this.props.onRemovePath(path);
+        };
+        this.onInput = (path) => {
+            this.props.onInput && this.props.onInput(path);
         };
         this.state = {
             watches: props.watches
@@ -34,9 +37,8 @@ class MemoryMainView extends React.Component {
     }
     render() {
         return (React.createElement("div", { className: 'screeps-memory__main' },
-            React.createElement("div", { className: 'screeps-memory__main-items' }, this.state.watches.map(({ path, data, value }, index) => {
-                // console.log(item);
-                return (React.createElement(item_1.default, { key: index, path: path, data: data, value: value, onClick: () => this.onClick(path), onReload: () => this.onReload(path), onDelete: this.onDelete, onSave: (value) => this.onSave(path, value) }));
+            React.createElement("div", { className: 'screeps-memory__main-items' }, this.state.watches.map(({ path, value }) => {
+                return (React.createElement(item_1.default, { key: path, path: path, value: value, onClick: () => this.onClick(path), onReload: () => this.onReload(path), onDelete: () => this.onDelete(path), onSave: (value) => this.onSave(path, value), onRemovePath: () => this.onRemovePath(path) }));
             })),
             React.createElement("hr", { className: 'screeps-hr' }),
             React.createElement(input_1.default, { onInput: this.onInput })));

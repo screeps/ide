@@ -5,7 +5,7 @@ import JSONEditor from 'jsoneditor';
 
 interface IMemoryJSONEditorViewProps {
     name: string;
-    data: any;
+    value: any;
 }
 
 export default class MemoryJSONEditorView extends React.Component<IMemoryJSONEditorViewProps> {
@@ -24,12 +24,12 @@ export default class MemoryJSONEditorView extends React.Component<IMemoryJSONEdi
     componentDidMount() {
         this.editorRef = new JSONEditor(this.editorContainerRef.current, {
             name: this.props.name || 'Memory'
-        }, this.props.data || 'undefined');
+        }, this.props.value || 'undefined');
     }
 
     componentWillReceiveProps(nextProps: IMemoryJSONEditorViewProps) {
-        if (nextProps.data) {
-            this.setValue(nextProps.data);
+        if (nextProps.value) {
+            this.setValue(nextProps.value);
         }
     }
 
@@ -43,7 +43,7 @@ export default class MemoryJSONEditorView extends React.Component<IMemoryJSONEdi
         return this.editorRef.get();
     }
 
-    setValue(value: any): any {
+    setValue(value: any): void {
         this.editorRef.set(value);
     }
 }

@@ -1,10 +1,9 @@
 import * as React from 'react';
 
-import { default as MemoryJSONEditorView } from './json-editor';
+import { default as MemoryJSONEditorView } from './jsoneditor';
 
 interface IMemoryItemViewProps {
     path: string;
-    data: any;
     value: any;
 
     onClick?: Function;
@@ -12,13 +11,13 @@ interface IMemoryItemViewProps {
     onSave?: Function;
     onReload?: Function;
     onDelete?: Function;
+    onRemovePath?: Function;
 }
 
 interface IMemoryItemViewState {
     isEdit: boolean;
 
     path: string;
-    data: any;
     value: any;
 }
 
@@ -36,19 +35,11 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
         this.state = {
             isEdit: false,
             path: props.path,
-            data: props.data,
             value: props.value
         };
     }
 
     componentWillReceiveProps(nextProps: IMemoryItemViewProps) {
-        if (nextProps.data !== this.state.data) {
-            this.setState({
-                ...this.state,
-                data: nextProps.data
-            });
-        }
-
         if (nextProps.value !== this.state.value) {
             this.setState({
                 ...this.state,
@@ -65,10 +56,17 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
         let deleteBtn;
 
         if(!this.state.isEdit) {
+            let short;
+            try {
+                short = this.state.value.toString();
+            } catch (err) {
+                short = 'undefined';
+            }
+
             value = (
                 <div className='screeps-memory__value'>
                     <button className='btn btn--clear' type='button' onClick={ this.onEdit }>
-                        { this.state.value }
+                        { short }
                     </button>
                 </div>
             );
@@ -78,7 +76,7 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
             let deleteBtn;
             if (this.state.path) {
                 deleteBtn = (
-                    <button type='button' className='btn btn--clear' onClick={ this.onDelete }>
+                    <button type='button' className='btn btn--clear' onClick={ this.onRemovePath } title='Delete from memory'>
                         <i className='sc-icon-delete' />
                     </button>
                 );
@@ -100,7 +98,7 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
                     </div>
                     <MemoryJSONEditorView ref={ this.editorRef }
                         name={ this.state.path }
-                        data={ this.state.data }
+                        value={ this.state.value }
                     />
                 </div>
             );
@@ -156,5 +154,10 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
 
     onDelete = (data: any) => {
         this.props.onDelete && this.props.onDelete(data);
+    }
+
+    onRemovePath = () => {
+        this.props.onRemovePath && this.props.onRemovePath();
+        this.onCancel();
     }
 }

@@ -1,10 +1,15 @@
+interface IMemoryPath {
+    path: string;
+    value: any;
+}
+
 interface IMemoryViewState {
     isProgressing: boolean;
 
     shard: any;
     shards: any;
     view: string;
-    watches: any;
+    watches: IMemoryPath[];
 
     segment: string;
     segmentData: string;
@@ -18,14 +23,15 @@ interface IMemoryViewProps {
     shards: any;
 
     onInput?: Function;
-    onDelete?: Function;
     onShard?: Function;
     onClose?: Function;
 
-    watches: any;
+    watches: IMemoryPath[];
     onMemory?: Function;
     onMemoryRefresh?: Function;
     onMemoryUpdate?: Function;
+    onMemoryRemove?: Function;
+    onMemoryDelete?: Function;
 
     segment: string;
     onSegment?: Function;

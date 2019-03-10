@@ -11,11 +11,8 @@ class MemoryView extends React.Component {
         super(props);
         this._shards$ = null;
         this._pipe$ = null;
-        this.onDelete = (path) => {
-            this.props.onDelete && this.props.onDelete(path);
-        };
-        this.onInput = (data) => {
-            this.props.onInput && this.props.onInput(data);
+        this.onInput = (path) => {
+            this.props.onInput && this.props.onInput(path);
         };
         this.onShard = (shard) => {
             this.setState(Object.assign({}, this.state, { shard }));
@@ -35,6 +32,12 @@ class MemoryView extends React.Component {
         };
         this.onMemoryRefresh = (path) => {
             this.props.onMemoryRefresh && this.props.onMemoryRefresh(path);
+        };
+        this.onMemoryRemove = (path) => {
+            this.props.onMemoryRemove && this.props.onMemoryRemove(path);
+        };
+        this.onMemoryDelete = (path) => {
+            this.props.onMemoryDelete && this.props.onMemoryDelete(path);
         };
         this.onSegment = (segment) => {
             this.setState(Object.assign({}, this.state, { segment }));
@@ -69,7 +72,7 @@ class MemoryView extends React.Component {
     render() {
         let view, segmentControls;
         if (this.state.view === 'main') {
-            view = (React.createElement(main_1.default, { watches: this.state.watches, onDelete: this.onDelete, onInput: this.onInput, onClick: this.onMemory, onSave: this.onMemoryUpdate, onReload: this.onMemoryRefresh }));
+            view = (React.createElement(main_1.default, { watches: this.state.watches, onInput: this.onInput, onClick: this.onMemory, onSave: this.onMemoryUpdate, onReload: this.onMemoryRefresh, onDelete: this.onMemoryDelete, onRemovePath: this.onMemoryRemove }));
         }
         if (this.state.view === 'segments') {
             view = (React.createElement(segment_1.default, { segment: this.state.segmentData, onChange: this.onSegmentChange }));

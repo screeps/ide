@@ -118,7 +118,7 @@ interface IUserMemoryRequest {
 interface IUserMemoryBodyRequest {
     path: string;
     shard: string;
-    value: any;
+    value?: any;
 }
 
 interface IUserMemoryResponse extends IResponse {
