@@ -1,5 +1,4 @@
 /// <reference path='./index.d.ts' />
-/// <reference path='./index.d.ts' />
 
 import * as React from 'react';
 
@@ -13,6 +12,8 @@ class ModulesView extends React.Component<IModulesViewProps> {
         super(props);
 
         this.state = {
+            isProgressing: false,
+
             modules: props.modules,
 
             branch: props.branch,
@@ -20,33 +21,6 @@ class ModulesView extends React.Component<IModulesViewProps> {
 
             isShowingBranches: false
         }
-    }
-
-    onChooseModules = () => {
-        this.setState({ isShowingBranches: false });
-        this.props.onChooseModules && this.props.onChooseModules();
-    }
-
-    onChooseBranches = () => {
-        this.setState({ isShowingBranches: true });
-        this.props.onChooseBranches && this.props.onChooseBranches();
-    }
-
-    onCopyBranch = (branch: string) => {
-        this.props.onCopyBranch && this.props.onCopyBranch(branch);
-    }
-
-    onSelectBranch = (branch: string) => {
-        this.setState({ isShowingBranches: false });
-        this.props.onSelectBranch && this.props.onSelectBranch(branch);
-    }
-
-    onDeleteBranch = (branch: string) => {
-        this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
-    }
-
-    onSelectModule = (module: string) => {
-        this.props.onSelectModule && this.props.onSelectModule(module);
     }
 
     public render() {
@@ -68,7 +42,6 @@ class ModulesView extends React.Component<IModulesViewProps> {
                     let world;
 
                     if (!activeSim && !activeWorld) {
-                        // deleteButton = <button><i className='sc-icon-delete' /></button>;
                         deleteButton = <div className='close-icon' onClick={() => this.onDeleteBranch(branch)}></div>;
                     }
 
@@ -85,9 +58,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
                         <li className='tab screeps-modules-view__item' key={_id}>
                             <button className='btn btn--clear' onClick={() => this.onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
                             <button className='btn btn--clear' onClick={() => this.onSelectBranch(branch)}>{ branch }</button>
-                            { world } { sim }
-                            {/* <div className='close-icon'></div> */}
-                            
+                            { world } { sim }                          
                             { deleteButton }
                         </li>
                     )
@@ -98,7 +69,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
             header = (
                 <div className='screeps-modules-view__header'>
                     <span>Branch</span>
-                    <button className='btn btn--clear' onClick={this.onChooseBranches}>{ this.state.branch }</button>
+                    <button className='btn btn--clear' onClick={() => this.onChooseBranches()}>{ this.state.branch }</button>
                 </div>
             )
 
@@ -132,10 +103,41 @@ class ModulesView extends React.Component<IModulesViewProps> {
         return (
             <div className='screeps-ide screeps-modules-view'>
                 { header }
-                <hr className='screeps-hr' />
+                <hr className={ 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') } />
                 { view }
             </div>
         );
+    }
+
+    onChooseModules() {
+        this.state.isShowingBranches = false;
+        this.setState({ ...this.state });
+        this.props.onChooseModules && this.props.onChooseModules();
+    }
+
+    onChooseBranches() {
+        this.state.isShowingBranches = true;
+        this.setState({ ...this.state });
+        this.props.onChooseBranches && this.props.onChooseBranches();
+    }
+
+    onCopyBranch(branch: string) {
+        this.props.onCopyBranch && this.props.onCopyBranch(branch);
+    }
+
+    onSelectBranch(branch: string) {
+        this.state.isShowingBranches = false;
+        this.state.modules = {};
+        this.setState({ ...this.state, branch });
+        this.props.onSelectBranch && this.props.onSelectBranch(branch);
+    }
+
+    onDeleteBranch(branch: string) {
+        this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
+    }
+
+    onSelectModule(module: string) {
+        this.props.onSelectModule && this.props.onSelectModule(module);
     }
 
     private _getAdditionalModules = (modules: IModules) => {

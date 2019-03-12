@@ -7,6 +7,30 @@ import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { Api } from '../../api';
 
+let animationStartTime: number = 0;
+const ANIMATION_MIN_TIME = 1500;
+
+// @ts-ignore
+function progress(target: any, name: any, descriptor: any) {
+    const original = descriptor.value;
+
+    descriptor.value = async function(...args: any[]) {
+        this.showProgress();
+
+        let result;
+        try {
+            result = await original.apply(this, args);
+        } catch (err) {
+            // Noop.
+        }
+
+        this.hideProgress();
+        return result;
+    };
+
+    return descriptor;
+}
+
 export class ModulesPane {
     public element: HTMLElement;
 
@@ -25,10 +49,22 @@ export class ModulesPane {
         return this.modulesViewRef.current.state;
     }
 
+    public set state(state: any) {
+        if (!this.modulesViewRef.current) {
+            return;
+        }
+
+        this.modulesViewRef.current.setState({
+            ...this.modulesViewRef.current.state,
+            ...state
+        });
+    }
+
     constructor(
         private _api: Api
     ) {
         this.element = document.createElement('div');
+        this.render(this.state);
 
         atom.workspace.open(this, {
             searchAllPanes: true,
@@ -59,20 +95,76 @@ export class ModulesPane {
 
                     modules={ modules }
 
-                    onSelectModule={ this.onSelectModule }
-                    onChooseModules={ this.onChooseModules }
+                    onChooseModules={() => this.onChooseModules()}
+                    onChooseBranches={() => this.onChooseBranches()}
 
-                    onCopyBranch={ this.onCopyBranch }
-                    onSelectBranch={ this.onSelectBranch }
-                    onDeleteBranch={ this.onDeleteBranch }
-                    onChooseBranches={ this.onChooseBranches }
+                    onCopyBranch={(...args) => this.onCopyBranch(...args)}
+                    onSelectBranch={(...args) => this.onSelectBranch(...args)}
+                    onDeleteBranch={(...args) => this.onDeleteBranch(...args)}
+                    onSelectModule={(...args) => this.onSelectModule(...args)}
                 />
             </div>,
             this.element as HTMLElement
         )
     }
 
-    onSelectModule = (module: any) => {
+
+    async onChooseModules(): Promise<void> {
+    }
+
+    async onChooseBranches(): Promise<void> {
+        if (!this.modulesViewRef.current) {
+            return;
+        }
+
+        console.log(1);
+        const { list: branches } = await this._api.getUserBranches();
+        console.log(1.1, branches );
+
+        //@ts-ignore
+        this.modulesViewRef.current.setState({
+            ...this.modulesViewRef.current.state,
+            branches
+        });
+    }
+
+    async onCopyBranch(branch: string): Promise<void> {
+        try {
+            const newName = await prompt({
+                legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
+            });
+
+            await this._api.cloneUserBranch({ branch, newName });
+
+            this.onChooseBranches();
+        } catch(err) {
+            // Ignore.
+        }
+    }
+
+    @progress
+    async onSelectBranch(_branch?: string): Promise<void> {
+        const { branch, modules } = await this._api.getUserCode(_branch);
+
+        this.state = { branch, modules };
+    }
+
+    async onDeleteBranch(branch: string): Promise<void> {
+        try {
+            await confirm({
+                submitBtn: 'Delete',
+                legend: 'This action cannot be undone! Are you sure?'
+            });
+
+            await this._api.deleteUserBranch(branch);
+
+            this.onChooseBranches();
+        } catch(err) {
+            // Ignore.
+        }
+    }
+
+    async onSelectModule(module: any): Promise<void> {
         if (!this.modulesViewRef.current) {
             return;
         }
@@ -92,60 +184,37 @@ export class ModulesPane {
         });
     }
 
-    onChooseModules = () => {
-    }
+    showProgress() {
+        animationStartTime = new Date() .getTime();
 
-
-    onCopyBranch = async (branch: string) => {
-        try {
-            const newName = await prompt({
-                legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
-            });
-
-            await this._api.cloneUserBranch({ branch, newName });
-
-            this.onChooseBranches();
-        } catch(err) {
-            // Ignore.
-        }
-    }
-
-    onSelectBranch = async (_branch?: string) => {
-        const { branch, modules } = await this._api.getUserCode(_branch);
-
-        //@ts-ignore
-        this.render({ branch, modules });
-    }
-
-    onDeleteBranch = async (branch: string) => {
-        try {
-            await confirm({
-                submitBtn: 'Delete',
-                legend: 'This action cannot be undone! Are you sure?'
-            });
-
-            await this._api.deleteUserBranch(branch);
-
-            this.onChooseBranches();
-        } catch(err) {
-            // Ignore.
-        }
-    }
-
-    onChooseBranches = async () => {
         if (!this.modulesViewRef.current) {
             return;
         }
 
-        console.log(1);
-        const { list: branches } = await this._api.getUserBranches();
-        console.log(1.1, branches );
+        console.log('show progress', this.modulesViewRef.current.state);
 
-        //@ts-ignore
+        this.modulesViewRef.current.state.isProgressing = true;
         this.modulesViewRef.current.setState({
-            ...this.modulesViewRef.current.state,
-            branches
+            ...this.modulesViewRef.current.state
         });
+    }
+
+    hideProgress() {
+        const now = new Date() .getTime();
+        const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
+
+        setTimeout(() => {
+            if (!this.modulesViewRef.current) {
+                return;
+            }
+
+            console.log('hide progress', this.modulesViewRef.current.state);
+
+            this.modulesViewRef.current.state.isProgressing = false;
+            this.modulesViewRef.current.setState({
+                ...this.modulesViewRef.current.state
+            });
+        }, delay > 0 ? delay : 0);
     }
 
     // Atom pane required interface's methods

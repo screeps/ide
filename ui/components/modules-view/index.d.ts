@@ -11,15 +11,17 @@ interface IModulesViewProps {
     branch: string;
     branches: IBranches[];
 
-    onChooseModules?: Function;
-    onChooseBranches?: Function;
-    onCopyBranch?: Function;
-    onSelectBranch?: Function;
-    onDeleteBranch?: Function;
-    onSelectModule?: Function;
+    onChooseModules?(): Promise<void>;
+    onChooseBranches?(): Promise<void>;
+    onCopyBranch?(branch: string): Promise<void>;
+    onSelectBranch?(branch: string): Promise<void>;
+    onDeleteBranch?(branch: string): Promise<void>;
+    onSelectModule?(branch: string): Promise<void>;
 }
 
 interface IModulesViewState {
+    isProgressing: boolean;
+
     modules: IModules;
 
     branch: string;

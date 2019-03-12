@@ -1,38 +1,17 @@
 "use strict";
 /// <reference path='./index.d.ts' />
-/// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 class ModulesView extends React.Component {
     constructor(props) {
         super(props);
-        this.onChooseModules = () => {
-            this.setState({ isShowingBranches: false });
-            this.props.onChooseModules && this.props.onChooseModules();
-        };
-        this.onChooseBranches = () => {
-            this.setState({ isShowingBranches: true });
-            this.props.onChooseBranches && this.props.onChooseBranches();
-        };
-        this.onCopyBranch = (branch) => {
-            this.props.onCopyBranch && this.props.onCopyBranch(branch);
-        };
-        this.onSelectBranch = (branch) => {
-            this.setState({ isShowingBranches: false });
-            this.props.onSelectBranch && this.props.onSelectBranch(branch);
-        };
-        this.onDeleteBranch = (branch) => {
-            this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
-        };
-        this.onSelectModule = (module) => {
-            this.props.onSelectModule && this.props.onSelectModule(module);
-        };
         this._getAdditionalModules = (modules) => {
             return Object.keys(modules).filter((item) => {
                 return item !== 'main' && modules[item];
             });
         };
         this.state = {
+            isProgressing: false,
             modules: props.modules,
             branch: props.branch,
             branches: props.branches,
@@ -50,7 +29,6 @@ class ModulesView extends React.Component {
                 let sim;
                 let world;
                 if (!activeSim && !activeWorld) {
-                    // deleteButton = <button><i className='sc-icon-delete' /></button>;
                     deleteButton = React.createElement("div", { className: 'close-icon', onClick: () => this.onDeleteBranch(branch) });
                 }
                 if (activeWorld) {
@@ -72,7 +50,7 @@ class ModulesView extends React.Component {
         else {
             header = (React.createElement("div", { className: 'screeps-modules-view__header' },
                 React.createElement("span", null, "Branch"),
-                React.createElement("button", { className: 'btn btn--clear', onClick: this.onChooseBranches }, this.state.branch)));
+                React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onChooseBranches() }, this.state.branch)));
             view = (React.createElement("div", null,
                 React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' },
                     React.createElement("li", { className: 'tab screeps-modules-view__item' },
@@ -85,8 +63,33 @@ class ModulesView extends React.Component {
         }
         return (React.createElement("div", { className: 'screeps-ide screeps-modules-view' },
             header,
-            React.createElement("hr", { className: 'screeps-hr' }),
+            React.createElement("hr", { className: 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') }),
             view));
+    }
+    onChooseModules() {
+        this.state.isShowingBranches = false;
+        this.setState(Object.assign({}, this.state));
+        this.props.onChooseModules && this.props.onChooseModules();
+    }
+    onChooseBranches() {
+        this.state.isShowingBranches = true;
+        this.setState(Object.assign({}, this.state));
+        this.props.onChooseBranches && this.props.onChooseBranches();
+    }
+    onCopyBranch(branch) {
+        this.props.onCopyBranch && this.props.onCopyBranch(branch);
+    }
+    onSelectBranch(branch) {
+        this.state.isShowingBranches = false;
+        this.state.modules = {};
+        this.setState(Object.assign({}, this.state, { branch }));
+        this.props.onSelectBranch && this.props.onSelectBranch(branch);
+    }
+    onDeleteBranch(branch) {
+        this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
+    }
+    onSelectModule(module) {
+        this.props.onSelectModule && this.props.onSelectModule(module);
     }
 }
 exports.default = ModulesView;
