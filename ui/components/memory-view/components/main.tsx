@@ -4,7 +4,7 @@ import { default as MemoryItemView } from './item';
 import { default as MemoryInputView } from './input';
 
 interface IMemoryMainViewProps {
-    watches: IMemoryPath[];
+    memory: IMemoryPath[];
 
     onClick?: Function;
     onDelete?: Function;
@@ -15,7 +15,7 @@ interface IMemoryMainViewProps {
 }
 
 interface IMemoryMainViewState {
-    watches: IMemoryPath[];
+    memory: IMemoryPath[];
 }
 
 export default class MemoryMainView extends React.Component<IMemoryMainViewProps> {
@@ -28,14 +28,14 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
         super(props);
 
         this.state = {
-            watches: props.watches
+            memory: props.memory
         }
     }
 
     componentWillReceiveProps(nextProps: IMemoryMainViewProps) {
-        if (nextProps.watches) {
+        if (nextProps.memory) {
             this.setState({
-                watches: nextProps.watches
+                memory: nextProps.memory
             });
         }
     }
@@ -44,7 +44,7 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
         return (
             <div className='screeps-memory__main'>
                 <div className='screeps-memory__main-items'>
-                    { this.state.watches.map(({ path, value }) => {
+                    { this.state.memory.map(({ path, value }) => {
                         return (<MemoryItemView key={ path }
                             path={ path }
                             value={ value }

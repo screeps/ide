@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+exports.MEMORY_MAIN_VIEW = 'MEMORY_MAIN_VIEW';
+exports.MEMORY_SEGMENTS_VIEW = 'MEMORY_SEGMENTS_VIEW';
 class MemoryControlsView extends React.Component {
     constructor(props) {
         super(props);
@@ -11,10 +13,10 @@ class MemoryControlsView extends React.Component {
             this.props.onClose && this.props.onClose();
         };
         this.onMainMemory = () => {
-            this.props.onToggleView && this.props.onToggleView({ view: 'main' });
+            this.props.onToggleView && this.props.onToggleView(exports.MEMORY_MAIN_VIEW);
         };
         this.onSegments = () => {
-            this.props.onToggleView && this.props.onToggleView({ view: 'segments' });
+            this.props.onToggleView && this.props.onToggleView(exports.MEMORY_SEGMENTS_VIEW);
         };
     }
     render() {

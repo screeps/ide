@@ -9,7 +9,7 @@ interface IMemoryViewState {
     shard: any;
     shards: any;
     view: string;
-    watches: IMemoryPath[];
+    memory: IMemoryPath[];
 
     segment: string;
     segmentData: string;
@@ -18,23 +18,22 @@ interface IMemoryViewState {
 }
 
 interface IMemoryViewProps {
-    pipe?: any;
-    shard: string;
-    shards: any;
-
     onInput?: Function;
-    onShard?: Function;
     onClose?: Function;
 
-    watches: IMemoryPath[];
-    onMemory?: Function;
-    onMemoryRefresh?: Function;
-    onMemoryUpdate?: Function;
-    onMemoryRemove?: Function;
-    onMemoryDelete?: Function;
+    shard: string;
+    shards?: any;
+    onShard?(shard: string): Promise<void>;
+
+    memory?: IMemoryPath[];
+    onMemory(path: string, shard: string): Promise<void>;
+    onMemoryRefresh(path: string, shard: string): Promise<void>;
+    onMemoryUpdate(path: string, value: any, shard: string): Promise<void>;
+    onMemoryRemove(path: string, shard: string): Promise<void>;
+    onMemoryDelete(path: string): Promise<void>;
 
     segment: string;
-    onSegment?: Function;
-    onSegmentRefresh?: Function;
-    onSegmentUpdate?: Function;
+    onSegment(segment: string, shard: string): Promise<void>;
+    onSegmentRefresh(segment: string, shard: string): Promise<void>;
+    onSegmentUpdate(segment: string, data: string, shard: string): Promise<void>;
 }

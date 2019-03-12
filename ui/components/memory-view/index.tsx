@@ -1,9 +1,12 @@
 /// <reference path='./index.d.ts' />
 
 import * as React from 'react';
-import { Subscription } from 'rxjs';
 
-import { default as MemoryControlsView } from './components/controls';
+import {
+    MEMORY_MAIN_VIEW,
+    MEMORY_SEGMENTS_VIEW,
+    default as MemoryControlsView
+} from './components/controls';
 import { default as MemoryMainView } from './components/main';
 import { default as MemorySegmentView } from './components/segment';
 import { default as MemorySegmentControlsView } from './components/segment-controls';
@@ -14,37 +17,28 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
     state: IMemoryViewState;
 
-    _shards$: Subscription | null = null;
-    _pipe$: Subscription | null = null;
-
     constructor(props: IMemoryViewProps) {
         super(props);
 
         this.state = {
             isProgressing: false,
             shard: props.shard,
-            shards: [],
-            view: 'main',
+            shards: props.shards || [],
+            view: MEMORY_MAIN_VIEW,
             segment: props.segment,
             segmentData: '',
             _segmentData: '',
             segmentHasChange: false,
-            watches: props.watches
+            memory: props.memory || []
         };
-    }
-
-    componentDidMount() {
-        if (this.props.shards) {
-            this.initShardsPipeSubscription();
-        }
     }
 
     public render() {
         let view, segmentControls;
 
-        if (this.state.view === 'main') {
+        if (this.state.view === MEMORY_MAIN_VIEW) {
             view = (<MemoryMainView
-                watches={ this.state.watches }
+                memory={ this.state.memory }
 
                 onInput={ this.onInput }
 
@@ -56,7 +50,7 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
             />);
         }
 
-        if (this.state.view === 'segments') {
+        if (this.state.view === MEMORY_SEGMENTS_VIEW) {
             view = (<MemorySegmentView 
                 segment={ this.state.segmentData }
 
@@ -90,47 +84,48 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
         );
     }
 
-    initShardsPipeSubscription() {
-        this._shards$ = this.props.shards.subscribe((shards: any) => {
-            this.setState({
-                ...this.state,
-                shards
-            });
-        });
-    }
-
     onInput = (path: string) => {
         this.props.onInput && this.props.onInput(path);
     }
 
     onShard = (shard: string) => {
+        this.state.shard = shard;
         this.setState({ ...this.state, shard });
 
         this.props.onShard && this.props.onShard(shard);
+
+        if (this.state.view === MEMORY_SEGMENTS_VIEW) {
+            this.onSegment(this.state.segment);
+        }
     }
 
     onClose = () => {
         this.props.onClose && this.props.onClose();
     }
 
-    onToggleView = ({ view }: { view: string }) => {
+    onToggleView = (view: string) => {
+        this.state.view = view;
         this.setState({ ...this.state, view });
+
+        if (view === MEMORY_SEGMENTS_VIEW) {
+            this.onSegment(this.state.segment);
+        }
     }
 
     onMemory = async (path: string): Promise<void> => {
-        this.props.onMemory && await this.props.onMemory(path);
+        this.props.onMemory && await this.props.onMemory(path, this.state.shard);
     }
 
     onMemoryUpdate = (path: string, value: string) => {
-        this.props.onMemoryUpdate && this.props.onMemoryUpdate(path, value);
+        this.props.onMemoryUpdate && this.props.onMemoryUpdate(path, value, this.state.shard);
     }
 
     onMemoryRefresh = (path: string) => {
-        this.props.onMemoryRefresh && this.props.onMemoryRefresh(path);
+        this.props.onMemoryRefresh && this.props.onMemoryRefresh(path, this.state.shard);
     }
 
     onMemoryRemove = (path: string) => {
-        this.props.onMemoryRemove && this.props.onMemoryRemove(path);
+        this.props.onMemoryRemove && this.props.onMemoryRemove(path, this.state.shard);
     }
 
     onMemoryDelete = (path: string) => {
@@ -138,9 +133,9 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
     }
 
     onSegment = (segment: string) => {
-        this.setState({ ...this.state, segment });
+        this.props.onSegment && this.props.onSegment(segment, this.state.shard);
 
-        this.props.onSegment && this.props.onSegment(segment);
+        this.setState({ ...this.state, segment });
     }
 
     onSegmentChange = (data: string) => {
@@ -152,10 +147,14 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
     }
 
     onSegmentRefresh = () => {
-        this.props.onSegmentRefresh && this.props.onSegmentRefresh(this.state.segment);
+        const { segment, shard } = this.state;
+
+        this.props.onSegmentRefresh && this.props.onSegmentRefresh(segment, shard);
     }
 
     onSegmentUpdate = () => {
-        this.props.onSegmentUpdate && this.props.onSegmentUpdate(this.state.segmentData);
+        const { segment, segmentData, shard } = this.state;
+
+        this.props.onSegmentUpdate && this.props.onSegmentUpdate(segment, segmentData, shard);
     }
 }

@@ -15,18 +15,34 @@ import { User } from '../../services/user';
 let animationStartTime: number = 0;
 const ANIMATION_MIN_TIME = 1500;
 
+// @ts-ignore
+function progress(target: any, name: any, descriptor: any) {
+    const original = descriptor.value;
+
+    descriptor.value = async function(...args: any[]) {
+        this.showProgress();
+
+        let result;
+        try {
+            result = await original.apply(this, args);
+        } catch (err) {
+            // Noop.
+        }
+
+        this.hideProgress();
+        return result;
+    };
+
+    return descriptor;
+}
+
 export class MemoryPane {
     public element: HTMLElement;
     private _panel: Panel;
 
     memoryViewRef = React.createRef<MemoryView>();
 
-    watches: IMemoryPath[];
-    pipe$: any;
     _pipe$: Subscription | null = null;
-
-    shard: string;
-    segment: string = '0';
 
     constructor(
         private _user: User,
@@ -37,18 +53,28 @@ export class MemoryPane {
         this.element = document.createElement('div');
         this.element.style.height = '300px';
 
-        this.shard = this._user.shard;
-
-        this.watches = getWatches();
-        this.initMemoryPipeSubscription();
-
-        this.render({});
-
-        this.onSegment(this.segment);
+        this.render({
+            shard: this._user.shard,
+            memory: getWatches(),
+            segment: '0'
+        });
 
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
             visible: true
+        });
+
+        this.initMemoryPipeSubscription();
+
+        this._service.shards$.subscribe((shards: any) => {
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+
+            this.memoryViewRef.current.setState({
+                ...this.memoryViewRef.current.state,
+                shards
+            });
         });
     }
 
@@ -57,68 +83,80 @@ export class MemoryPane {
             this._pipe$.unsubscribe();
         }
 
-        const watches$: any = [];
-        this.watches.forEach((item: any) => {
-            const pipe = this._socket.on(`user:${ this._user.id }/memory/${ this.shard }/${ item.path }`);
-            watches$.push(pipe);
-        });
-        this.pipe$ = merge(...watches$);
+        if (!this.memoryViewRef.current) {
+            return;
+        }
 
-        this._pipe$ = this.pipe$.subscribe(({ data: [channel, value] }: { data: any }) => {
-            const [, , , path] = channel.match(/user\:(.+)\/memory\/(.+)\/(.+)/i);
+        const state = this.memoryViewRef.current.state;
+
+        const memory: IMemoryPath[] = getWatches();
+        const paths$: any = [];
+
+        memory.forEach(({ path }) => {
+            const pipe = this._socket.on(`user:${ this._user.id }/memory/${ state.shard }/${ path }`);
+            paths$.push(pipe);
+        });
+
+        const pipe$: any = merge(...paths$);
+
+        this._pipe$ = pipe$.subscribe(({ data: [channel, value] }: { data: any }) => {
+            const [, , , _path] = channel.match(/user\:(.+)\/memory\/(.+)\/(.+)/i);
 
             if (!this.memoryViewRef.current) {
                 return;
             }
 
-            const watches = this.memoryViewRef.current.state.watches;
-            const watch = watches.find((item: any) => item.path === path);
+            const memory: IMemoryPath[] = this.memoryViewRef.current.state.memory;
+            const path = memory.find(({ path }) => path === _path);
 
-            if (!watch || watch.value === value) {
+            if (!path || path.value === value) {
                 return;
             }
 
-            if (watch.value && watch.value.toString() === value) {
+            // Check value for undefined, if undefined return
+            if (path.value && path.value.toString() === value) {
                 return;
             }
 
-            console.log(path, value);
-
-            const idx = this.memoryViewRef.current.state.watches.indexOf(watch);
-            watches[idx] =  Object.assign({}, { ...watch, value })
+            const idx = this.memoryViewRef.current.state.memory.indexOf(path);
+            memory[idx] =  Object.assign({}, { ...path, value })
 
             this.memoryViewRef.current.setState({
                 ...this.memoryViewRef.current.state,
-                watches: [...watches]
+                memory: [...memory]
             });
         });
     }
 
-    render({ }) {
+    render({
+        shard,
+        memory,
+        segment
+    }: {
+        shard: string,
+        memory: IMemoryPath[]
+        segment: string
+    }) {
         ReactDOM.render(
             <ResizablePanel>
                 <MemoryView ref={ this.memoryViewRef }
-                    pipe={ this.pipe$ }
-                    
                     onInput={ this.onInput }
-
                     onClose={ this.onClose }
 
-                    watches={ this.watches }
-                    onMemory={ this.onMemory }
-                    onMemoryRefresh={ this.onMemory }
-                    onMemoryUpdate={ this.onMemoryUpdate }
-                    onMemoryRemove={ this.onMemoryRemove }
-                    onMemoryDelete={ this.onMemoryDelete }
+                    shard={ shard }
+                    onShard={ () => this.onShard() }
 
-                    shard={ this.shard }
-                    shards={ this._service.shards$ }
-                    onShard={ this.onShard }
+                    memory={ memory }
+                    onMemory={ (...args) => this.onMemory(...args) }
+                    onMemoryRefresh={ (...args) => this.onMemory(...args) }
+                    onMemoryRemove={ (...args) => this.onMemoryRemove(...args) }
+                    onMemoryDelete={ (...args) => this.onMemoryDelete(...args) }
+                    onMemoryUpdate={ (...args) => this.onMemoryUpdate(...args) }
 
-                    segment={ this.segment }
-                    onSegment={ this.onSegment }
-                    onSegmentRefresh={ this.onSegment }
-                    onSegmentUpdate={ this.onSegmentUpdate }
+                    segment={ segment }
+                    onSegment={ (...args) => this.onSegment(...args) }
+                    onSegmentRefresh={ (...args) => this.onSegment(...args) }
+                    onSegmentUpdate={ (...args) => this.onSegmentUpdate(...args) }
                 />
             </ResizablePanel>,
             this.element as HTMLElement
@@ -131,35 +169,34 @@ export class MemoryPane {
             return;
         }
 
-        const watches = [...this.memoryViewRef.current.state.watches, { path } as IMemoryPath];
+        const memory = [...this.memoryViewRef.current.state.memory, { path } as IMemoryPath];
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
-            watches
+            memory
         });
 
-        putWatches(watches);
-        this.watches = watches;
+        putWatches(memory);
         this.initMemoryPipeSubscription();
     }
 
     onClose = () => {
+        if (this._pipe$) {
+            this._pipe$.unsubscribe();
+        }
+
         this._panel.destroy();
     }
 
-    onShard = (shard: string) => {
-        this.shard = shard;
-
-        this.onSegment(this.segment);
+    onShard = async (): Promise<void> => {
+        this.initMemoryPipeSubscription();
     }
 
-    onMemory = async (path: string): Promise<void> => {
-        this.showProgress();
-
+    @progress
+    async onMemory(path: string, shard: string): Promise<void> {
         let response: IUserMemoryResponse;
         try {
-            response = await this._api.getUserMemory({ path, shard: this.shard });
-            this.hideProgress();
+            response = await this._api.getUserMemory({ path, shard });
         } catch (err) {
             return;
         }
@@ -173,7 +210,7 @@ export class MemoryPane {
             value = JSON.parse(pako.ungzip(atob(response.data.substring(3)), {to: 'string'}));
         }
 
-        const watches = this.memoryViewRef.current.state.watches;
+        const watches = this.memoryViewRef.current.state.memory;
         const watch = watches.find((item: any) => item.path === path);
 
         if (!watch) {
@@ -185,14 +222,15 @@ export class MemoryPane {
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
-            watches: [...watches]
+            memory: [...watches]
         });
     }
 
-    onMemoryUpdate = async (path: string, value: any): Promise<void> => {
+    @progress
+    async onMemoryUpdate(path: string, value: any, shard: string): Promise<void> {
         this.showProgress();
         try {
-            await this._api.setUserMemory({ path, value, shard: this.shard });
+            await this._api.setUserMemory({ path, value, shard });
             this.hideProgress();
         } catch (err) {
             return;
@@ -202,7 +240,7 @@ export class MemoryPane {
             return;
         }
 
-        const watches = this.memoryViewRef.current.state.watches;
+        const watches = this.memoryViewRef.current.state.memory;
         const watch = watches.find((item: any) => item.path === path);
 
         if (!watch) {
@@ -214,14 +252,15 @@ export class MemoryPane {
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
-            watches: [...watches]
+            memory: [...watches]
         });
     }
 
-    onMemoryRemove = async (path: string): Promise<void> => {
+    @progress
+    async onMemoryRemove(path: string, shard: string): Promise<void> {
         this.showProgress();
         try {
-            await this._api.setUserMemory({ path, shard: this.shard });
+            await this._api.setUserMemory({ path, shard });
             this.hideProgress()
         } catch (err) {
             return;
@@ -232,12 +271,13 @@ export class MemoryPane {
         }
     }
 
-    onMemoryDelete = (path: string) => {
+    @progress
+    async onMemoryDelete(path: string): Promise<void> {
         if (!this.memoryViewRef.current) {
             return;
         }
 
-        const watches = this.memoryViewRef.current.state.watches;
+        const watches = this.memoryViewRef.current.state.memory;
         const watch = watches.find((item: any) => item.path === path);
 
         if (!watch) {
@@ -249,22 +289,18 @@ export class MemoryPane {
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
-            watches: [...watches]
+            memory: [...watches]
         });
 
         putWatches(watches);
-        this.watches = watches;
         this.initMemoryPipeSubscription();
     }
 
-    onSegment = async (segment: string): Promise<void> => {
-        this.showProgress();
-        this.segment = segment;
-
+    @progress
+    async onSegment(segment: string, shard: string): Promise<void> {
         let response: IUserMemorySegmentResponse;
         try {
-            response = await this._api.getUserMemorySegment({ segment, shard: this.shard });
-            this.hideProgress();
+            response = await this._api.getUserMemorySegment({ segment, shard });
         } catch (err) {
             return;
         }
@@ -275,20 +311,18 @@ export class MemoryPane {
 
         this.memoryViewRef.current.setState({
             ...this.memoryViewRef.current.state,
-            segment,
             segmentData: response.data,
             _segmentData: response.data,
             segmentHasChange: false
         });
     }
 
-    onSegmentUpdate = async (data: string): Promise<void> => {
-        this.showProgress();
+    @progress
+    async onSegmentUpdate(segment: string, data: string, shard: string): Promise<void> {
         try {
-            await this._api.setUserMemorySegment({ data, segment: this.segment, shard: this.shard });
-            this.hideProgress();
+            await this._api.setUserMemorySegment({ segment, data, shard });
         } catch (err) {
-            //Noop.
+            return;
         }
 
         if (!this.memoryViewRef.current) {
@@ -310,9 +344,9 @@ export class MemoryPane {
             return;
         }
 
+        this.memoryViewRef.current.state.isProgressing = true;
         this.memoryViewRef.current.setState({
-            ...this.memoryViewRef.current.state,
-            isProgressing: true
+            ...this.memoryViewRef.current.state
         });
     }
 
@@ -325,9 +359,9 @@ export class MemoryPane {
                 return;
             }
 
+            this.memoryViewRef.current.state.isProgressing = false;
             this.memoryViewRef.current.setState({
-                ...this.memoryViewRef.current.state,
-                isProgressing: false
+                ...this.memoryViewRef.current.state
             });
         }, delay > 0 ? delay : 0);
     }

@@ -13,6 +13,9 @@ interface IMemoryControlsViewProps {
     children?: any;
 }
 
+export const MEMORY_MAIN_VIEW = 'MEMORY_MAIN_VIEW';
+export const MEMORY_SEGMENTS_VIEW = 'MEMORY_SEGMENTS_VIEW';
+
 export default class MemoryControlsView extends React.Component<IMemoryControlsViewProps> {
     //@ts-ignore
     props: IMemoryControlsViewProps;
@@ -30,11 +33,11 @@ export default class MemoryControlsView extends React.Component<IMemoryControlsV
     }
 
     onMainMemory = () => {
-        this.props.onToggleView && this.props.onToggleView({ view: 'main' });
+        this.props.onToggleView && this.props.onToggleView(MEMORY_MAIN_VIEW);
     }
 
     onSegments = () => {
-        this.props.onToggleView && this.props.onToggleView({ view: 'segments' });
+        this.props.onToggleView && this.props.onToggleView(MEMORY_SEGMENTS_VIEW);
     }
 
     public render() {

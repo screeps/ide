@@ -25,19 +25,19 @@ class MemoryMainView extends React.Component {
             this.props.onInput && this.props.onInput(path);
         };
         this.state = {
-            watches: props.watches
+            memory: props.memory
         };
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.watches) {
+        if (nextProps.memory) {
             this.setState({
-                watches: nextProps.watches
+                memory: nextProps.memory
             });
         }
     }
     render() {
         return (React.createElement("div", { className: 'screeps-memory__main' },
-            React.createElement("div", { className: 'screeps-memory__main-items' }, this.state.watches.map(({ path, value }) => {
+            React.createElement("div", { className: 'screeps-memory__main-items' }, this.state.memory.map(({ path, value }) => {
                 return (React.createElement(item_1.default, { key: path, path: path, value: value, onClick: () => this.onClick(path), onReload: () => this.onReload(path), onDelete: () => this.onDelete(path), onSave: (value) => this.onSave(path, value), onRemovePath: () => this.onRemovePath(path) }));
             })),
             React.createElement("hr", { className: 'screeps-hr' }),
