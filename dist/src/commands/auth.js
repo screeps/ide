@@ -31,11 +31,10 @@ function createTokenCommand(api) {
 }
 exports.createTokenCommand = createTokenCommand;
 function authCommand() {
-    console.log('SCREEPS__AUTH');
     const apiUrl = config_1.configGetter('apiUrl');
     const api = new api_1.Api({ url: apiUrl });
     return new Promise((resolve) => {
-        const authModalRef = new atom_modal_1.AtomModal(ui_1.AuthModal);
+        const authModalRef = new atom_modal_1.AtomModal(ui_1.AuthView);
         authModalRef.events$
             .pipe(operators_1.filter(({ type }) => type === 'MODAL_SUBMIT'))
             .pipe(operators_1.switchMap(({ payload }) => {

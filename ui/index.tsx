@@ -1,4 +1,4 @@
-export { default as AuthModal, MODAL_CLOSE } from './components/auth';
+export { default as AuthView, MODAL_CLOSE } from './components/auth-view';
 export { default as TokenModal } from './components/token';
 export { default as ModulesView} from './components/modules-view';
 export { default as ConsoleView } from './components/console-view';

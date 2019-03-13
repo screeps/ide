@@ -15,7 +15,7 @@ interface ICredentials {
     [key: string]: String;
 }
 
-class AuthModal extends React.Component<IAuthModalProps> {
+export default class AuthView extends React.Component<IAuthModalProps> {
     //@ts-ignore
     props: IAuthModalProps;
     state: IAuthModalState;
@@ -110,5 +110,3 @@ class AuthModal extends React.Component<IAuthModalProps> {
         this.props.onSubmit && this.props.onSubmit(this._data);
     }
 }
-
-export default AuthModal;

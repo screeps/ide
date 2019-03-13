@@ -2,7 +2,7 @@ import { empty, from } from 'rxjs';
 import { filter, switchMap, tap, map, catchError } from 'rxjs/operators';
 
 import { AtomModal } from '../components/atom-modal';
-import { AuthModal } from '../../ui';
+import { AuthView } from '../../ui';
 import { TokenModal } from '../../ui';
 
 import { Api } from '../api';
@@ -34,13 +34,11 @@ export function createTokenCommand(api: Api) {
 }
 
 export function authCommand(): Promise<any> {
-    console.log('SCREEPS__AUTH');
-
     const apiUrl = configGetter('apiUrl');
     const api = new Api({ url: apiUrl });
 
     return new Promise((resolve) => {
-        const authModalRef = new AtomModal(AuthModal);
+        const authModalRef = new AtomModal(AuthView);
         authModalRef.events$
             .pipe(filter(({ type }) => type === 'MODAL_SUBMIT'))
             .pipe(switchMap(({ payload }) => {

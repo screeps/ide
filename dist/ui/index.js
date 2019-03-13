@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var auth_1 = require("./components/auth");
-exports.AuthModal = auth_1.default;
-exports.MODAL_CLOSE = auth_1.MODAL_CLOSE;
+var auth_view_1 = require("./components/auth-view");
+exports.AuthView = auth_view_1.default;
+exports.MODAL_CLOSE = auth_view_1.MODAL_CLOSE;
 var token_1 = require("./components/token");
 exports.TokenModal = token_1.default;
 var modules_view_1 = require("./components/modules-view");
