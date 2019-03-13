@@ -47,6 +47,12 @@ class TreeViewDir {
             }
         });
     }
+    destroy() {
+        if (!this._btnRef) {
+            return;
+        }
+        this._btnRef.remove();
+    }
 }
 exports.TreeViewDir = TreeViewDir;
 //# sourceMappingURL=index.js.map

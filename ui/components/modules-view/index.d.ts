@@ -11,6 +11,8 @@ interface IModulesViewProps {
     branch: string;
     branches: IBranches[];
 
+    onClose?(): Promise<void>;
+
     onChooseModules?(): Promise<void>;
     onChooseBranches?(): Promise<void>;
     onCopyBranch?(branch: string): Promise<void>;

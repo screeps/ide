@@ -3,11 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const React = require("react");
 const ReactDOM = require("react-dom");
+const rxjs_1 = require("rxjs");
 const ui_1 = require("../../../ui");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 let animationStartTime = 0;
 const ANIMATION_MIN_TIME = 1500;
+exports.ACTION_CLOSE = 'ACTION_CLOSE';
 // @ts-ignore
 function progress(target, name, descriptor) {
     const original = descriptor.value;
@@ -30,6 +32,8 @@ class ModulesPane {
         this._api = _api;
         this.data = {};
         this.modulesViewRef = React.createRef();
+        this._eventsSbj = new rxjs_1.Subject();
+        this.events$ = this._eventsSbj.asObservable();
         this.element = document.createElement('div');
         this.render(this.state);
         atom.workspace.open(this, {
@@ -41,6 +45,12 @@ class ModulesPane {
         })
             .then(() => {
             const pane = atom.workspace.paneForItem(this);
+            if (!pane) {
+                return;
+            }
+            pane.onDidDestroy(() => {
+                this._eventsSbj.next({ type: exports.ACTION_CLOSE });
+            });
             // @ts-ignore
             const insetPanel = pane.element.firstChild;
             insetPanel.style.position = 'absolute';
@@ -74,9 +84,7 @@ class ModulesPane {
         if (!this.modulesViewRef.current) {
             return;
         }
-        console.log(1);
         const { list: branches } = await this._api.getUserBranches();
-        console.log(1.1, branches);
         //@ts-ignore
         this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state, { branches }));
     }
@@ -128,7 +136,6 @@ class ModulesPane {
         if (!this.modulesViewRef.current) {
             return;
         }
-        console.log('show progress', this.modulesViewRef.current.state);
         this.modulesViewRef.current.state.isProgressing = true;
         this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state));
     }
@@ -139,7 +146,6 @@ class ModulesPane {
             if (!this.modulesViewRef.current) {
                 return;
             }
-            console.log('hide progress', this.modulesViewRef.current.state);
             this.modulesViewRef.current.state.isProgressing = false;
             this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state));
         }, delay > 0 ? delay : 0);
@@ -158,6 +164,9 @@ class ModulesPane {
         return ['left'];
     }
 }
+tslib_1.__decorate([
+    progress
+], ModulesPane.prototype, "onChooseBranches", null);
 tslib_1.__decorate([
     progress
 ], ModulesPane.prototype, "onSelectBranch", null);

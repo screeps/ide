@@ -65,5 +65,11 @@ export class TreeViewDir {
         });
     }
 
-    
+    destroy() {
+        if (!this._btnRef) {
+            return;
+        }
+
+        this._btnRef.remove();
+    }
 }

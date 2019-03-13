@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Subject, Observable } from 'rxjs';
 
 import { ModulesView } from '../../../ui';
 
@@ -9,6 +10,8 @@ import { Api } from '../../api';
 
 let animationStartTime: number = 0;
 const ANIMATION_MIN_TIME = 1500;
+
+export const ACTION_CLOSE = 'ACTION_CLOSE';
 
 // @ts-ignore
 function progress(target: any, name: any, descriptor: any) {
@@ -37,6 +40,9 @@ export class ModulesPane {
     public data: any = {};
 
     modulesViewRef = React.createRef<ModulesView>();
+
+    private _eventsSbj = new Subject();
+    public events$: Observable<any> = this._eventsSbj.asObservable();
 
     public get state() {
         if (!this.modulesViewRef.current) {
@@ -76,6 +82,14 @@ export class ModulesPane {
             .then(() => {
                 const pane = atom.workspace.paneForItem(this);
 
+                if (!pane) {
+                    return;
+                }
+
+                pane.onDidDestroy(() => {
+                    this._eventsSbj.next({ type: ACTION_CLOSE });
+                });
+
                 // @ts-ignore
                 const insetPanel = pane.element.firstChild;
                 insetPanel.style.position = 'absolute';
@@ -108,18 +122,16 @@ export class ModulesPane {
         )
     }
 
-
     async onChooseModules(): Promise<void> {
     }
 
+    @progress
     async onChooseBranches(): Promise<void> {
         if (!this.modulesViewRef.current) {
             return;
         }
 
-        console.log(1);
         const { list: branches } = await this._api.getUserBranches();
-        console.log(1.1, branches );
 
         //@ts-ignore
         this.modulesViewRef.current.setState({
@@ -191,8 +203,6 @@ export class ModulesPane {
             return;
         }
 
-        console.log('show progress', this.modulesViewRef.current.state);
-
         this.modulesViewRef.current.state.isProgressing = true;
         this.modulesViewRef.current.setState({
             ...this.modulesViewRef.current.state
@@ -207,8 +217,6 @@ export class ModulesPane {
             if (!this.modulesViewRef.current) {
                 return;
             }
-
-            console.log('hide progress', this.modulesViewRef.current.state);
 
             this.modulesViewRef.current.state.isProgressing = false;
             this.modulesViewRef.current.setState({
