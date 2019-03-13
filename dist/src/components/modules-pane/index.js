@@ -7,31 +7,13 @@ const rxjs_1 = require("rxjs");
 const ui_1 = require("../../../ui");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
-let animationStartTime = 0;
-const ANIMATION_MIN_TIME = 1500;
+const decoratos_1 = require("../../decoratos");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
-// @ts-ignore
-function progress(target, name, descriptor) {
-    const original = descriptor.value;
-    descriptor.value = async function (...args) {
-        this.showProgress();
-        let result;
-        try {
-            result = await original.apply(this, args);
-        }
-        catch (err) {
-            // Noop.
-        }
-        this.hideProgress();
-        return result;
-    };
-    return descriptor;
-}
 class ModulesPane {
     constructor(_api) {
         this._api = _api;
         this.data = {};
-        this.modulesViewRef = React.createRef();
+        this.viewRef = React.createRef();
         this._eventsSbj = new rxjs_1.Subject();
         this.events$ = this._eventsSbj.asObservable();
         this.element = document.createElement('div');
@@ -60,33 +42,33 @@ class ModulesPane {
         this.onSelectBranch('default');
     }
     get state() {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return {
                 branch: 'default',
                 modules: []
             };
         }
-        return this.modulesViewRef.current.state;
+        return this.viewRef.current.state;
     }
     set state(state) {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
-        this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state, state));
+        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, state));
     }
     render({ modules = {}, branch = '', branches = [] }) {
         ReactDOM.render(React.createElement("div", null,
-            React.createElement(ui_1.ModulesView, { ref: this.modulesViewRef, branch: branch, branches: branches, modules: modules, onChooseModules: () => this.onChooseModules(), onChooseBranches: () => this.onChooseBranches(), onCopyBranch: (...args) => this.onCopyBranch(...args), onSelectBranch: (...args) => this.onSelectBranch(...args), onDeleteBranch: (...args) => this.onDeleteBranch(...args), onSelectModule: (...args) => this.onSelectModule(...args) })), this.element);
+            React.createElement(ui_1.ModulesView, { ref: this.viewRef, branch: branch, branches: branches, modules: modules, onChooseModules: () => this.onChooseModules(), onChooseBranches: () => this.onChooseBranches(), onCopyBranch: (...args) => this.onCopyBranch(...args), onSelectBranch: (...args) => this.onSelectBranch(...args), onDeleteBranch: (...args) => this.onDeleteBranch(...args), onSelectModule: (...args) => this.onSelectModule(...args) })), this.element);
     }
     async onChooseModules() {
     }
     async onChooseBranches() {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
         const { list: branches } = await this._api.getUserBranches();
         //@ts-ignore
-        this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state, { branches }));
+        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { branches }));
     }
     async onCopyBranch(branch) {
         try {
@@ -118,11 +100,11 @@ class ModulesPane {
         }
     }
     async onSelectModule(module) {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
         const textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
-        const { branch, modules } = this.modulesViewRef.current.state;
+        const { branch, modules } = this.viewRef.current.state;
         textEditor.setText(modules[module]);
         textEditor.getTitle = () => `@${branch}/${module}.js`;
         const grammar = atom.grammars.grammarForScopeName('source.js');
@@ -130,25 +112,6 @@ class ModulesPane {
             atom.textEditors.setGrammarOverride(textEditor, grammar.scopeName);
         }
         atom.workspace.open(textEditor, {});
-    }
-    showProgress() {
-        animationStartTime = new Date().getTime();
-        if (!this.modulesViewRef.current) {
-            return;
-        }
-        this.modulesViewRef.current.state.isProgressing = true;
-        this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state));
-    }
-    hideProgress() {
-        const now = new Date().getTime();
-        const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
-        setTimeout(() => {
-            if (!this.modulesViewRef.current) {
-                return;
-            }
-            this.modulesViewRef.current.state.isProgressing = false;
-            this.modulesViewRef.current.setState(Object.assign({}, this.modulesViewRef.current.state));
-        }, delay > 0 ? delay : 0);
     }
     // Atom pane required interface's methods
     getURI() {
@@ -165,10 +128,10 @@ class ModulesPane {
     }
 }
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], ModulesPane.prototype, "onChooseBranches", null);
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], ModulesPane.prototype, "onSelectBranch", null);
 exports.ModulesPane = ModulesPane;
 //# sourceMappingURL=index.js.map

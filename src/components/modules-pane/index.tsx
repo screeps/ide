@@ -7,61 +7,38 @@ import { ModulesView } from '../../../ui';
 import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { Api } from '../../api';
-
-let animationStartTime: number = 0;
-const ANIMATION_MIN_TIME = 1500;
+import { progress } from '../../decoratos';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
-
-// @ts-ignore
-function progress(target: any, name: any, descriptor: any) {
-    const original = descriptor.value;
-
-    descriptor.value = async function(...args: any[]) {
-        this.showProgress();
-
-        let result;
-        try {
-            result = await original.apply(this, args);
-        } catch (err) {
-            // Noop.
-        }
-
-        this.hideProgress();
-        return result;
-    };
-
-    return descriptor;
-}
 
 export class ModulesPane {
     public element: HTMLElement;
 
     public data: any = {};
 
-    modulesViewRef = React.createRef<ModulesView>();
+    viewRef = React.createRef<ModulesView>();
 
     private _eventsSbj = new Subject();
     public events$: Observable<any> = this._eventsSbj.asObservable();
 
     public get state() {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return {
                 branch: 'default',
                 modules: []
             };
         }
 
-        return this.modulesViewRef.current.state;
+        return this.viewRef.current.state;
     }
 
     public set state(state: any) {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
 
-        this.modulesViewRef.current.setState({
-            ...this.modulesViewRef.current.state,
+        this.viewRef.current.setState({
+            ...this.viewRef.current.state,
             ...state
         });
     }
@@ -103,7 +80,7 @@ export class ModulesPane {
     render({ modules = {}, branch = '', branches = [] }) {
         ReactDOM.render(
             <div>
-                <ModulesView ref={ this.modulesViewRef }
+                <ModulesView ref={ this.viewRef }
                     branch={ branch }
                     branches={ branches }
 
@@ -127,15 +104,15 @@ export class ModulesPane {
 
     @progress
     async onChooseBranches(): Promise<void> {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
 
         const { list: branches } = await this._api.getUserBranches();
 
         //@ts-ignore
-        this.modulesViewRef.current.setState({
-            ...this.modulesViewRef.current.state,
+        this.viewRef.current.setState({
+            ...this.viewRef.current.state,
             branches
         });
     }
@@ -177,12 +154,12 @@ export class ModulesPane {
     }
 
     async onSelectModule(module: any): Promise<void> {
-        if (!this.modulesViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
 
         const textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
-        const { branch, modules } = this.modulesViewRef.current.state;
+        const { branch, modules } = this.viewRef.current.state;
 
         textEditor.setText(modules[module]);
         textEditor.getTitle = () => `@${ branch }/${ module }.js`;
@@ -194,35 +171,6 @@ export class ModulesPane {
 
         atom.workspace.open(textEditor, {
         });
-    }
-
-    showProgress() {
-        animationStartTime = new Date() .getTime();
-
-        if (!this.modulesViewRef.current) {
-            return;
-        }
-
-        this.modulesViewRef.current.state.isProgressing = true;
-        this.modulesViewRef.current.setState({
-            ...this.modulesViewRef.current.state
-        });
-    }
-
-    hideProgress() {
-        const now = new Date() .getTime();
-        const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
-
-        setTimeout(() => {
-            if (!this.modulesViewRef.current) {
-                return;
-            }
-
-            this.modulesViewRef.current.state.isProgressing = false;
-            this.modulesViewRef.current.setState({
-                ...this.modulesViewRef.current.state
-            });
-        }, delay > 0 ? delay : 0);
     }
 
     // Atom pane required interface's methods

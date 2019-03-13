@@ -9,42 +9,24 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const ui_1 = require("../../../ui");
 const utils_1 = require("../../utils");
-let animationStartTime = 0;
-const ANIMATION_MIN_TIME = 1500;
-// @ts-ignore
-function progress(target, name, descriptor) {
-    const original = descriptor.value;
-    descriptor.value = async function (...args) {
-        this.showProgress();
-        let result;
-        try {
-            result = await original.apply(this, args);
-        }
-        catch (err) {
-            // Noop.
-        }
-        this.hideProgress();
-        return result;
-    };
-    return descriptor;
-}
+const decoratos_1 = require("../../decoratos");
 class MemoryPane {
     constructor(_user, _api, _socket, _service) {
         this._user = _user;
         this._api = _api;
         this._socket = _socket;
         this._service = _service;
-        this.memoryViewRef = React.createRef();
+        this.viewRef = React.createRef();
         this._memorySbj = new rxjs_1.Subject();
         this.memory$ = this._memorySbj.asObservable();
         this._tooltips = {};
         this._pipe$ = null;
         // Private component actions.
         this.onInput = (path) => {
-            if (!this.memoryViewRef.current) {
+            if (!this.viewRef.current) {
                 return;
             }
-            const memory = [...this.memoryViewRef.current.state.memory, { path }];
+            const memory = [...this.viewRef.current.state.memory, { path }];
             this._memorySbj.next(memory);
             utils_1.putWatches(memory);
             this.initMemoryPipeSubscription();
@@ -72,19 +54,19 @@ class MemoryPane {
         this.initMemoryPipeSubscription();
         this._service.shards$
             .pipe(operators_1.tap((shards) => {
-            if (!this.memoryViewRef.current) {
+            if (!this.viewRef.current) {
                 return;
             }
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { shards }));
+            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { shards }));
         }))
             .subscribe();
         const subscriptions = new atom_1.CompositeDisposable();
         this.memory$
             .pipe(operators_1.tap((memory) => {
-            if (!this.memoryViewRef.current) {
+            if (!this.viewRef.current) {
                 return;
             }
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory }));
+            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { memory }));
         }))
             .pipe(operators_1.tap(() => {
             subscriptions.dispose();
@@ -107,10 +89,10 @@ class MemoryPane {
         if (this._pipe$) {
             this._pipe$.unsubscribe();
         }
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
-        const state = this.memoryViewRef.current.state;
+        const state = this.viewRef.current.state;
         const memory = utils_1.getWatches();
         const paths$ = [];
         memory.forEach(({ path }) => {
@@ -120,10 +102,10 @@ class MemoryPane {
         const pipe$ = rxjs_1.merge(...paths$);
         this._pipe$ = pipe$.subscribe(({ data: [channel, value] }) => {
             const [, , , _path] = channel.match(/user\:(.+)\/memory\/(.+)\/(.+)/i);
-            if (!this.memoryViewRef.current) {
+            if (!this.viewRef.current) {
                 return;
             }
-            const memory = this.memoryViewRef.current.state.memory;
+            const memory = this.viewRef.current.state.memory;
             const path = memory.find(({ path }) => path === _path);
             if (!path || path.value === value) {
                 return;
@@ -132,14 +114,14 @@ class MemoryPane {
             if (path.value && path.value.toString() === value) {
                 return;
             }
-            const idx = this.memoryViewRef.current.state.memory.indexOf(path);
+            const idx = this.viewRef.current.state.memory.indexOf(path);
             memory[idx] = Object.assign({}, path, { value });
             this._memorySbj.next([...memory]);
         });
     }
     render({ shard, memory, segment }) {
         ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
-            React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) })), this.element);
+            React.createElement(ui_1.MemoryView, { ref: this.viewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) })), this.element);
     }
     async onMemory(path, shard) {
         let response;
@@ -149,14 +131,14 @@ class MemoryPane {
         catch (err) {
             return;
         }
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
         let value;
         if (response.data) {
             value = JSON.parse(pako.ungzip(atob(response.data.substring(3)), { to: 'string' }));
         }
-        const memory = this.memoryViewRef.current.state.memory;
+        const memory = this.viewRef.current.state.memory;
         const idx = memory.findIndex((item) => item.path === path);
         if (idx === -1) {
             return;
@@ -191,18 +173,16 @@ class MemoryPane {
         });
     }
     async onMemoryUpdate(path, value, shard) {
-        this.showProgress();
         try {
             await this._api.setUserMemory({ path, value, shard });
-            this.hideProgress();
         }
         catch (err) {
             return;
         }
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
-        const memory = this.memoryViewRef.current.state.memory;
+        const memory = this.viewRef.current.state.memory;
         const idx = memory.findIndex((item) => item.path === path);
         if (idx === -1) {
             return;
@@ -211,23 +191,21 @@ class MemoryPane {
         this._memorySbj.next([...memory]);
     }
     async onMemoryRemove(path, shard) {
-        this.showProgress();
         try {
             await this._api.setUserMemory({ path, shard });
-            this.hideProgress();
         }
         catch (err) {
             return;
         }
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
     }
     async onMemoryDelete(path) {
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
-        const memory = this.memoryViewRef.current.state.memory;
+        const memory = this.viewRef.current.state.memory;
         const idx = memory.findIndex((item) => item.path === path);
         if (idx === -1) {
             return;
@@ -249,10 +227,10 @@ class MemoryPane {
         catch (err) {
             return;
         }
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
-        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segmentData: response.data, _segmentData: response.data, segmentHasChange: false }));
+        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { segmentData: response.data, _segmentData: response.data, segmentHasChange: false }));
     }
     async onSegmentUpdate(segment, data, shard) {
         try {
@@ -261,29 +239,10 @@ class MemoryPane {
         catch (err) {
             return;
         }
-        if (!this.memoryViewRef.current) {
+        if (!this.viewRef.current) {
             return;
         }
-        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { segmentData: data, _segmentData: data, segmentHasChange: false }));
-    }
-    showProgress() {
-        animationStartTime = new Date().getTime();
-        if (!this.memoryViewRef.current) {
-            return;
-        }
-        this.memoryViewRef.current.state.isProgressing = true;
-        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state));
-    }
-    hideProgress() {
-        const now = new Date().getTime();
-        const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
-        setTimeout(() => {
-            if (!this.memoryViewRef.current) {
-                return;
-            }
-            this.memoryViewRef.current.state.isProgressing = false;
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state));
-        }, delay > 0 ? delay : 0);
+        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { segmentData: data, _segmentData: data, segmentHasChange: false }));
     }
     // Atom pane required interface's methods
     getURI() {
@@ -300,22 +259,22 @@ class MemoryPane {
     }
 }
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], MemoryPane.prototype, "onMemory", null);
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], MemoryPane.prototype, "onMemoryUpdate", null);
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], MemoryPane.prototype, "onMemoryRemove", null);
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], MemoryPane.prototype, "onMemoryDelete", null);
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], MemoryPane.prototype, "onSegment", null);
 tslib_1.__decorate([
-    progress
+    decoratos_1.progress
 ], MemoryPane.prototype, "onSegmentUpdate", null);
 exports.MemoryPane = MemoryPane;
 //# sourceMappingURL=index.js.map
