@@ -31,6 +31,7 @@ interface IMemoryViewProps {
     onMemoryUpdate(path: string, value: any, shard: string): Promise<void>;
     onMemoryRemove(path: string, shard: string): Promise<void>;
     onMemoryDelete(path: string): Promise<void>;
+    onMemoryCancel(path: string): Promise<void>;
 
     segment: string;
     onSegment(segment: string, shard: string): Promise<void>;

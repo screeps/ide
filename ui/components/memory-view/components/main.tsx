@@ -12,6 +12,7 @@ interface IMemoryMainViewProps {
     onSave?: Function;
     onReload?: Function;
     onRemovePath?: Function;
+    onCancel?: Function;
 }
 
 interface IMemoryMainViewState {
@@ -54,6 +55,7 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
                             onDelete={ () => this.onDelete(path) }
                             onSave={ (value: any) => this.onSave(path, value) }
                             onRemovePath={ () => this.onRemovePath(path) }
+                            onCancel={() => this.onCancel(path)}
                         />)
                     })}
                 </div>
@@ -85,5 +87,9 @@ export default class MemoryMainView extends React.Component<IMemoryMainViewProps
 
     onInput = (path: string) => {
         this.props.onInput && this.props.onInput(path);
+    }
+
+    onCancel = (path: string) => {
+        this.props.onCancel && this.props.onCancel(path);
     }
 }

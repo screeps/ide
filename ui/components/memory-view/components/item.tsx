@@ -12,6 +12,7 @@ interface IMemoryItemViewProps {
     onReload?: Function;
     onDelete?: Function;
     onRemovePath?: Function;
+    onCancel?: Function;
 }
 
 interface IMemoryItemViewState {
@@ -21,10 +22,15 @@ interface IMemoryItemViewState {
     value: any;
 }
 
+export const BTN_REMOVE = 'screeps-memory__item-remove-watch-';
+export const BTN_DELETE = 'screeps-memory__item-delete-watch-';
+export const BTN_UPDATE = 'screeps-memory__item-update-watch-';
+export const BTN_RELOAD = 'screeps-memory__item-reload-watch-';
+export const BTN_CANCEL = 'screeps-memory__item-cancel-watch-';
+
 export default class MemoryItemView extends React.Component<IMemoryItemViewProps> {
     //@ts-ignore
     props: IMemoryItemViewProps;
-
     state: IMemoryItemViewState;
 
     editorRef = React.createRef<MemoryJSONEditorView>();
@@ -76,7 +82,8 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
             let deleteBtn;
             if (this.state.path) {
                 deleteBtn = (
-                    <button type='button' className='btn btn--clear' onClick={ this.onRemovePath } title='Delete from memory'>
+                    <button id={ `${ BTN_DELETE }${ this.state.path }` }
+                        type='button' className='btn btn--clear' onClick={ this.onRemovePath } title='Delete from memory'>
                         <i className='sc-icon-delete' />
                     </button>
                 );
@@ -85,13 +92,16 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
             jsonEditor = (
                 <div className='screeps-memory__json-editor'>
                     <div className='screeps-memory__json-editor-controlls'>
-                        <button type='button' className='btn btn--clear' onClick={ this.onSave }>
+                        <button id={ `${ BTN_UPDATE }${ this.state.path || 'root' }` }
+                            type='button' className='btn btn--clear' onClick={ this.onSave }>
                             <i className='sc-icon-done' />
                         </button>
-                        <button type='button' className='btn btn--clear' onClick={ this.onReload }>
+                        <button id={ `${ BTN_RELOAD }${ this.state.path || 'root' }` }
+                            type='button' className='btn btn--clear' onClick={ this.onReload }>
                             <i className='sc-icon-cached' />
                         </button>
-                        <button type='button' className='btn btn--clear' onClick={ this.onCancel }>
+                        <button id={ `${ BTN_CANCEL }${ this.state.path || 'root' }` }
+                            type='button' className='btn btn--clear' onClick={ this.onCancel }>
                             <i className='sc-icon-clear' />
                         </button>
                         { deleteBtn }
@@ -106,13 +116,16 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
 
         if (this.state.path) {
             deleteBtn = (
-                <div className='close-icon' onClick={() => this.onDelete(this.state.path)}></div>
+                <div id={ `${ BTN_REMOVE }${ this.state.path }` }
+                    className='close-icon'
+                    onClick={() => this.onDelete(this.state.path)}
+                />
             );
         }
 
         return (
             <div className='screeps-memory__item'>
-                <div className='screeps-memory__expression'>
+                <div className='screeps-memory__item-path'>
                     <label className={ this.state.path ? '' : '--italic' }>{ path }</label>
                     { deleteBtn }
                 </div>
@@ -150,6 +163,8 @@ export default class MemoryItemView extends React.Component<IMemoryItemViewProps
             ...this.state,
             isEdit: false
         });
+
+        this.props.onCancel && this.props.onCancel(this.state.path);
     }
 
     onDelete = (data: any) => {

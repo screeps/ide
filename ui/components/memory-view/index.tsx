@@ -47,6 +47,8 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
                 onReload={ this.onMemoryRefresh }
                 onDelete={ this.onMemoryDelete }
                 onRemovePath={ this.onMemoryRemove }
+                onCancel={ this.onMemoryCancel }
+
             />);
         }
 
@@ -130,6 +132,10 @@ export default class MemoryView extends React.Component<IMemoryViewProps> {
 
     onMemoryDelete = (path: string) => {
         this.props.onMemoryDelete && this.props.onMemoryDelete(path);
+    }
+
+    onMemoryCancel = (path: string) => {
+        this.props.onMemoryCancel && this.props.onMemoryCancel(path);
     }
 
     onSegment = (segment: string) => {

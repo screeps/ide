@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+const atom_1 = require("atom");
 const pako = require('pako');
 const React = require("react");
 const ReactDOM = require("react-dom");
 const rxjs_1 = require("rxjs");
+const operators_1 = require("rxjs/operators");
 const ui_1 = require("../../../ui");
 const utils_1 = require("../../utils");
 let animationStartTime = 0;
@@ -33,6 +35,9 @@ class MemoryPane {
         this._socket = _socket;
         this._service = _service;
         this.memoryViewRef = React.createRef();
+        this._memorySbj = new rxjs_1.Subject();
+        this.memory$ = this._memorySbj.asObservable();
+        this._tooltips = {};
         this._pipe$ = null;
         // Private component actions.
         this.onInput = (path) => {
@@ -40,7 +45,7 @@ class MemoryPane {
                 return;
             }
             const memory = [...this.memoryViewRef.current.state.memory, { path }];
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory }));
+            this._memorySbj.next(memory);
             utils_1.putWatches(memory);
             this.initMemoryPipeSubscription();
         };
@@ -65,12 +70,38 @@ class MemoryPane {
             visible: true
         });
         this.initMemoryPipeSubscription();
-        this._service.shards$.subscribe((shards) => {
+        this._service.shards$
+            .pipe(operators_1.tap((shards) => {
             if (!this.memoryViewRef.current) {
                 return;
             }
             this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { shards }));
-        });
+        }))
+            .subscribe();
+        const subscriptions = new atom_1.CompositeDisposable();
+        this.memory$
+            .pipe(operators_1.tap((memory) => {
+            if (!this.memoryViewRef.current) {
+                return;
+            }
+            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory }));
+        }))
+            .pipe(operators_1.tap(() => {
+            subscriptions.dispose();
+        }))
+            .pipe(operators_1.tap((memory) => {
+            memory.forEach(({ path }) => {
+                const ref = document.getElementById(`${ui_1.PATH_BTN_REMOVE}${path || 'root'}`);
+                if (!ref) {
+                    return;
+                }
+                const disposable = atom.tooltips.add(ref, {
+                    title: 'Delete watch'
+                });
+                subscriptions.add(disposable);
+            });
+        }))
+            .subscribe();
     }
     initMemoryPipeSubscription() {
         if (this._pipe$) {
@@ -102,13 +133,13 @@ class MemoryPane {
                 return;
             }
             const idx = this.memoryViewRef.current.state.memory.indexOf(path);
-            memory[idx] = Object.assign({}, Object.assign({}, path, { value }));
-            this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory: [...memory] }));
+            memory[idx] = Object.assign({}, path, { value });
+            this._memorySbj.next([...memory]);
         });
     }
     render({ shard, memory, segment }) {
         ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
-            React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) })), this.element);
+            React.createElement(ui_1.MemoryView, { ref: this.memoryViewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) })), this.element);
     }
     async onMemory(path, shard) {
         let response;
@@ -125,14 +156,39 @@ class MemoryPane {
         if (response.data) {
             value = JSON.parse(pako.ungzip(atob(response.data.substring(3)), { to: 'string' }));
         }
-        const watches = this.memoryViewRef.current.state.memory;
-        const watch = watches.find((item) => item.path === path);
-        if (!watch) {
+        const memory = this.memoryViewRef.current.state.memory;
+        const idx = memory.findIndex((item) => item.path === path);
+        if (idx === -1) {
             return;
         }
-        const idx = watches.indexOf(watch);
-        watches[idx] = Object.assign({}, watch, { value });
-        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory: [...watches] }));
+        memory[idx] = { path, value };
+        this._memorySbj.next([...memory]);
+        setTimeout(() => {
+            if (this._tooltips[path]) {
+                this.onMemoryCancel(path);
+            }
+            const subscriptions = this._tooltips[path] = new atom_1.CompositeDisposable();
+            let ref = document.getElementById(`${ui_1.PATH_BTN_DELETE}${path || 'root'}`);
+            if (ref) {
+                const disposable = atom.tooltips.add(ref, { title: 'Delete from memory' });
+                subscriptions.add(disposable);
+            }
+            ref = document.getElementById(`${ui_1.PATH_BTN_UPDATE}${path || 'root'}`);
+            if (ref) {
+                const disposable = atom.tooltips.add(ref, { title: 'Save' });
+                subscriptions.add(disposable);
+            }
+            ref = document.getElementById(`${ui_1.PATH_BTN_RELOAD}${path || 'root'}`);
+            if (ref) {
+                const disposable = atom.tooltips.add(ref, { title: 'Reload' });
+                subscriptions.add(disposable);
+            }
+            ref = document.getElementById(`${ui_1.PATH_BTN_CANCEL}${path || 'root'}`);
+            if (ref) {
+                const disposable = atom.tooltips.add(ref, { title: 'Cancel changes' });
+                subscriptions.add(disposable);
+            }
+        });
     }
     async onMemoryUpdate(path, value, shard) {
         this.showProgress();
@@ -146,14 +202,13 @@ class MemoryPane {
         if (!this.memoryViewRef.current) {
             return;
         }
-        const watches = this.memoryViewRef.current.state.memory;
-        const watch = watches.find((item) => item.path === path);
-        if (!watch) {
+        const memory = this.memoryViewRef.current.state.memory;
+        const idx = memory.findIndex((item) => item.path === path);
+        if (idx === -1) {
             return;
         }
-        const idx = watches.indexOf(watch);
-        watches[idx] = Object.assign({}, watch, { value });
-        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory: [...watches] }));
+        memory[idx] = { path, value };
+        this._memorySbj.next([...memory]);
     }
     async onMemoryRemove(path, shard) {
         this.showProgress();
@@ -172,16 +227,19 @@ class MemoryPane {
         if (!this.memoryViewRef.current) {
             return;
         }
-        const watches = this.memoryViewRef.current.state.memory;
-        const watch = watches.find((item) => item.path === path);
-        if (!watch) {
+        const memory = this.memoryViewRef.current.state.memory;
+        const idx = memory.findIndex((item) => item.path === path);
+        if (idx === -1) {
             return;
         }
-        const idx = watches.indexOf(watch);
-        watches.splice(idx, 1);
-        this.memoryViewRef.current.setState(Object.assign({}, this.memoryViewRef.current.state, { memory: [...watches] }));
-        utils_1.putWatches(watches);
+        memory.splice(idx, 1);
+        this._memorySbj.next([...memory]);
+        utils_1.putWatches(memory);
         this.initMemoryPipeSubscription();
+    }
+    async onMemoryCancel(path) {
+        this._tooltips[path].dispose();
+        delete this._tooltips[path];
     }
     async onSegment(segment, shard) {
         let response;
@@ -253,6 +311,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     progress
 ], MemoryPane.prototype, "onMemoryDelete", null);
+tslib_1.__decorate([
+    progress
+], MemoryPane.prototype, "onMemoryCancel", null);
 tslib_1.__decorate([
     progress
 ], MemoryPane.prototype, "onSegment", null);

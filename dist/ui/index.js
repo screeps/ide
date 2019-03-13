@@ -1,16 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const auth_1 = require("./components/auth");
+var auth_1 = require("./components/auth");
 exports.AuthModal = auth_1.default;
 exports.MODAL_CLOSE = auth_1.MODAL_CLOSE;
-const token_1 = require("./components/token");
+var token_1 = require("./components/token");
 exports.TokenModal = token_1.default;
-const modules_view_1 = require("./components/modules-view");
+var modules_view_1 = require("./components/modules-view");
 exports.ModulesView = modules_view_1.default;
-const console_view_1 = require("./components/console-view");
+var console_view_1 = require("./components/console-view");
 exports.ConsoleView = console_view_1.default;
-const memory_view_1 = require("./components/memory-view");
+var memory_view_1 = require("./components/memory-view");
 exports.MemoryView = memory_view_1.default;
-const resizable_panel_1 = require("./components/resizable-panel");
+var resizable_panel_1 = require("./components/resizable-panel");
 exports.ResizablePanel = resizable_panel_1.default;
+var item_1 = require("./components/memory-view/components/item");
+exports.PATH_BTN_REMOVE = item_1.BTN_REMOVE;
+exports.PATH_BTN_DELETE = item_1.BTN_DELETE;
+exports.PATH_BTN_UPDATE = item_1.BTN_UPDATE;
+exports.PATH_BTN_RELOAD = item_1.BTN_RELOAD;
+exports.PATH_BTN_CANCEL = item_1.BTN_CANCEL;
 //# sourceMappingURL=index.js.map

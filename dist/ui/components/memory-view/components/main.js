@@ -24,6 +24,9 @@ class MemoryMainView extends React.Component {
         this.onInput = (path) => {
             this.props.onInput && this.props.onInput(path);
         };
+        this.onCancel = (path) => {
+            this.props.onCancel && this.props.onCancel(path);
+        };
         this.state = {
             memory: props.memory
         };
@@ -38,7 +41,7 @@ class MemoryMainView extends React.Component {
     render() {
         return (React.createElement("div", { className: 'screeps-memory__main' },
             React.createElement("div", { className: 'screeps-memory__main-items' }, this.state.memory.map(({ path, value }) => {
-                return (React.createElement(item_1.default, { key: path, path: path, value: value, onClick: () => this.onClick(path), onReload: () => this.onReload(path), onDelete: () => this.onDelete(path), onSave: (value) => this.onSave(path, value), onRemovePath: () => this.onRemovePath(path) }));
+                return (React.createElement(item_1.default, { key: path, path: path, value: value, onClick: () => this.onClick(path), onReload: () => this.onReload(path), onDelete: () => this.onDelete(path), onSave: (value) => this.onSave(path, value), onRemovePath: () => this.onRemovePath(path), onCancel: () => this.onCancel(path) }));
             })),
             React.createElement("hr", { className: 'screeps-hr' }),
             React.createElement(input_1.default, { onInput: this.onInput })));
