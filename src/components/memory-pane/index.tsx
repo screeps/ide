@@ -357,7 +357,6 @@ export class MemoryPane {
         this.initMemoryPipeSubscription();
     }
 
-    @progress
     async onMemoryCancel(path: string): Promise<void> {
         this._tooltips[path].dispose();
         delete this._tooltips[path];

@@ -313,9 +313,6 @@ tslib_1.__decorate([
 ], MemoryPane.prototype, "onMemoryDelete", null);
 tslib_1.__decorate([
     progress
-], MemoryPane.prototype, "onMemoryCancel", null);
-tslib_1.__decorate([
-    progress
 ], MemoryPane.prototype, "onSegment", null);
 tslib_1.__decorate([
     progress
