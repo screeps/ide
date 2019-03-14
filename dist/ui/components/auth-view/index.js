@@ -36,16 +36,16 @@ class AuthView extends React.Component {
                 React.createElement("button", { className: 'btn _cross', onClick: this.onCancel })),
             React.createElement("form", null,
                 React.createElement("fieldset", { className: 'screeps-field' },
-                    React.createElement("input", { ref: this._emailRef, className: 'native-key-bindings', type: 'text', name: 'email', onChange: this.onInput, disabled: this.state.isBlocking, required: true }),
+                    React.createElement("input", { ref: this._emailRef, className: 'native-key-bindings', type: 'text', name: 'email', onChange: this.onInput, disabled: this.state.isBlocking, required: true, tabIndex: 1 }),
                     React.createElement("label", null, "E-mail or username"),
                     React.createElement("div", { className: 'underline' })),
                 React.createElement("fieldset", { className: 'screeps-field' },
-                    React.createElement("input", { ref: this._passwordRef, className: 'native-key-bindings', type: 'password', name: 'password', onChange: this.onInput, disabled: this.state.isBlocking, required: true }),
+                    React.createElement("input", { ref: this._passwordRef, className: 'native-key-bindings', type: 'password', name: 'password', onChange: this.onInput, disabled: this.state.isBlocking, required: true, tabIndex: 2 }),
                     React.createElement("label", null, "Password"),
                     React.createElement("div", { className: 'underline' }))),
             React.createElement("footer", null,
-                React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel }, "Cancel"),
-                React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', onClick: this.onSubmit, disabled: this.state.isBlocking }, "Sign In"))));
+                React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel, tabIndex: 3 }, "Cancel"),
+                React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', onClick: this.onSubmit, disabled: this.state.isBlocking, tabIndex: 4 }, "Sign In"))));
     }
 }
 exports.default = AuthView;

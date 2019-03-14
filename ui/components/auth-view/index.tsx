@@ -54,7 +54,9 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                             onChange={this.onInput}
 
                             disabled={ this.state.isBlocking }
-                            required={ true } />
+                            required={ true }
+
+                            tabIndex={ 1 }/>
                         <label>E-mail or username</label>
                         <div className='underline' />
                     </fieldset>
@@ -68,7 +70,9 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                             onChange={this.onInput} 
 
                             disabled={ this.state.isBlocking }
-                            required={ true } />
+                            required={ true }
+
+                            tabIndex={ 2 }/>
                         <label>Password</label>
                         <div className='underline' />
                     </fieldset>
@@ -77,10 +81,14 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                     <button
                         className='btn btn--big btn--transparent'
                         onClick={this.onCancel}
+
+                        tabIndex={ 3 }
                     >Cancel</button>
                     <button
                         className='btn btn--big btn--primary' type='submit' onClick={this.onSubmit}
                         disabled={ this.state.isBlocking }
+
+                        tabIndex={ 4 }
                     >Sign In</button>
                 </footer>
             </div>

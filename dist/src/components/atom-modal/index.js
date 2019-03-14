@@ -9,7 +9,7 @@ class AtomModal {
         this.ref = React.createRef();
         this.onCancel = () => {
             this._eventsSbj.next({ type: 'MODAL_CANCEL ' });
-            this.hide();
+            this.destroy();
         };
         this.onSubmit = (payload) => {
             this._eventsSbj.next({ type: 'MODAL_SUBMIT', payload });
@@ -24,6 +24,9 @@ class AtomModal {
     }
     hide() {
         this._atomModalPanelRef.hide();
+    }
+    destroy() {
+        this._atomModalPanelRef.destroy();
     }
     setState(state) {
         this.ref.current.setState(state);

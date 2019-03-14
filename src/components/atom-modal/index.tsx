@@ -46,13 +46,17 @@ export class AtomModal {
         this._atomModalPanelRef.hide();
     }
 
+    destroy() {
+        this._atomModalPanelRef.destroy();
+    }
+
     setState(state: any) {
         this.ref.current.setState(state);
     }
 
     onCancel = () => {
         this._eventsSbj.next({ type: 'MODAL_CANCEL '});
-        this.hide();
+        this.destroy();
     }
 
     onSubmit = (payload: ICredentials) => {
