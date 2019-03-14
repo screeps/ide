@@ -83,7 +83,8 @@ async function getUser() {
         if (err !== 'unauthorized') {
             throw err;
         }
-        api = await auth_1.authCommand();
+        const _api = await auth_1.authCommand();
+        Object.assign(api, _api);
         user = await getUser();
     }
     return user;

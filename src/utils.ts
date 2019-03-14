@@ -95,7 +95,8 @@ export async function getUser(): Promise<User> {
             throw err;
         }
 
-        api = await authCommand();
+        const _api = await authCommand();
+        Object.assign(api, _api);
         user = await getUser();
     }
 
