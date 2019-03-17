@@ -10,7 +10,7 @@ import { Socket } from '../../socket';
 import { Service } from '../../service';
 import { User } from '../../services/user';
 
-export class ConsolePane {
+export class ConsolePanel {
     public element: HTMLElement;
     private _panel: Panel;
 

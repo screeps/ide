@@ -1,8 +1,8 @@
 import { CompositeDisposable } from 'atom';
 
 import {
-    showConsolePaneCommand,
-    showMemoryPaneCommand,
+    showConsolePanelCommand,
+    showMemoryPanelCommand,
     showModulesPaneCommand
 } from '../commands';
 
@@ -13,7 +13,7 @@ export function consumeStatusBar(statusBar: any) {
 
     const consoleElementRef = document.createElement('div');
     consoleElementRef.classList.add('screeps-ide__status-bar', 'inline-block', 'sc-icon-screeps');
-    consoleElementRef.addEventListener('click', () => showConsolePaneCommand());
+    consoleElementRef.addEventListener('click', () => showConsolePanelCommand());
 
     statusBar.addLeftTile({
         item: consoleElementRef,
@@ -35,7 +35,7 @@ export function consumeStatusBar(statusBar: any) {
     const memoryElementRef = document.createElement('div');
     memoryElementRef.innerText = 'Memory';
     memoryElementRef.classList.add('screeps-ide__status-bar', 'inline-block');
-    memoryElementRef.addEventListener('click', () => showMemoryPaneCommand());
+    memoryElementRef.addEventListener('click', () => showMemoryPanelCommand());
 
     statusBar.addLeftTile({
         item: memoryElementRef,

@@ -1,11 +1,11 @@
 import { getSocket, getApi, getUser } from '../utils';
 
 import { Service } from '../service';
-import { MemoryPane } from '../components/memory-pane';
+import { MemoryPanel } from '../components/memory-panel';
 
-let memoryPanel: MemoryPane;
+let memoryPanel: MemoryPanel;
 
-export async function showMemoryPaneCommand() {
+export async function showMemoryPanelCommand() {
     try {
         if (memoryPanel && memoryPanel.isVisible) {
             return;
@@ -24,7 +24,7 @@ export async function showMemoryPaneCommand() {
         const user = await getUser();
         const socket = getSocket();
 
-        memoryPanel = new MemoryPane(user, api, socket, new Service());
+        memoryPanel = new MemoryPanel(user, api, socket, new Service());
     } catch(err) {
         // Ignore.
     }

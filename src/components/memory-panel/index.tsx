@@ -22,7 +22,7 @@ import { getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
 import { progress } from '../../decoratos';
 
-export class MemoryPane {
+export class MemoryPanel {
     public element: HTMLElement;
     private _panel: Panel;
 

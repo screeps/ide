@@ -7,7 +7,7 @@ function consumeStatusBar(statusBar) {
     const subscriptions = new atom_1.CompositeDisposable();
     const consoleElementRef = document.createElement('div');
     consoleElementRef.classList.add('screeps-ide__status-bar', 'inline-block', 'sc-icon-screeps');
-    consoleElementRef.addEventListener('click', () => commands_1.showConsolePaneCommand());
+    consoleElementRef.addEventListener('click', () => commands_1.showConsolePanelCommand());
     statusBar.addLeftTile({
         item: consoleElementRef,
         priority: 10000
@@ -25,7 +25,7 @@ function consumeStatusBar(statusBar) {
     const memoryElementRef = document.createElement('div');
     memoryElementRef.innerText = 'Memory';
     memoryElementRef.classList.add('screeps-ide__status-bar', 'inline-block');
-    memoryElementRef.addEventListener('click', () => commands_1.showMemoryPaneCommand());
+    memoryElementRef.addEventListener('click', () => commands_1.showMemoryPanelCommand());
     statusBar.addLeftTile({
         item: memoryElementRef,
         priority: 10000

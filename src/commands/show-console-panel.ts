@@ -1,11 +1,11 @@
 import { getApi, getSocket, getUser } from '../utils';
 
 import { Service } from '../service';
-import { ConsolePane } from '../components/console-pane';
+import { ConsolePanel } from '../components/console-panel';
 
-let consolePanel: ConsolePane;
+let consolePanel: ConsolePanel;
 
-export async function showConsolePaneCommand() {
+export async function showConsolePanelCommand() {
     try {
         if (consolePanel && consolePanel.isVisible) {
             return;
@@ -24,7 +24,7 @@ export async function showConsolePaneCommand() {
         const user = await getUser();
         const socket = getSocket();
 
-        consolePanel = new ConsolePane(user, api, socket, new Service());
+        consolePanel = new ConsolePanel(user, api, socket, new Service());
     } catch(err) {
         // Ignore.
     }
