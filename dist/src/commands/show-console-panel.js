@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const operators_1 = require("rxjs/operators");
 const utils_1 = require("../utils");
 const service_1 = require("../service");
 const console_panel_1 = require("../components/console-panel");
@@ -20,6 +21,12 @@ async function showConsolePanelCommand() {
         const user = await utils_1.getUser();
         const socket = utils_1.getSocket();
         consolePanel = new console_panel_1.ConsolePanel(user, api, socket, new service_1.Service());
+        consolePanel.events$
+            .pipe(operators_1.filter(({ type }) => type === console_panel_1.ACTION_CLOSE))
+            .pipe(operators_1.tap(() => {
+            consolePanel = null;
+        }))
+            .subscribe();
     }
     catch (err) {
         // Ignore.

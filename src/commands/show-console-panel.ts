@@ -1,9 +1,11 @@
+import { tap, filter } from 'rxjs/operators';
+
 import { getApi, getSocket, getUser } from '../utils';
 
 import { Service } from '../service';
-import { ConsolePanel } from '../components/console-panel';
+import { ConsolePanel, ACTION_CLOSE } from '../components/console-panel';
 
-let consolePanel: ConsolePanel;
+let consolePanel: ConsolePanel | null;
 
 export async function showConsolePanelCommand() {
     try {
@@ -25,6 +27,13 @@ export async function showConsolePanelCommand() {
         const socket = getSocket();
 
         consolePanel = new ConsolePanel(user, api, socket, new Service());
+
+        consolePanel.events$
+            .pipe(filter(({ type }) => type === ACTION_CLOSE))
+            .pipe(tap(() => {
+                consolePanel = null;
+            }))
+            .subscribe();
     } catch(err) {
         // Ignore.
     }

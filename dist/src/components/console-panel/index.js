@@ -2,13 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 const ReactDOM = require("react-dom");
+const rxjs_1 = require("rxjs");
 const ui_1 = require("../../../ui");
+exports.ACTION_CLOSE = 'ACTION_CLOSE';
 class ConsolePanel {
     constructor(_user, _api, _socket, _service) {
         this._user = _user;
         this._api = _api;
         this._socket = _socket;
         this._service = _service;
+        this._eventsSbj = new rxjs_1.Subject();
+        this.events$ = this._eventsSbj.asObservable();
         // Private component actions.
         this.onInput = async ({ expression }) => {
             try {
@@ -36,6 +40,9 @@ class ConsolePanel {
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
             visible: true
+        });
+        this._panel.onDidDestroy(() => {
+            this._eventsSbj.next({ type: exports.ACTION_CLOSE });
         });
     }
     get isVisible() {

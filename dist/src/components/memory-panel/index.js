@@ -10,6 +10,7 @@ const operators_1 = require("rxjs/operators");
 const ui_1 = require("../../../ui");
 const utils_1 = require("../../utils");
 const decoratos_1 = require("../../decoratos");
+exports.ACTION_CLOSE = 'ACTION_CLOSE';
 class MemoryPanel {
     constructor(_user, _api, _socket, _service) {
         this._user = _user;
@@ -21,6 +22,8 @@ class MemoryPanel {
         this.memory$ = this._memorySbj.asObservable();
         this._tooltips = {};
         this._pipe$ = null;
+        this._eventsSbj = new rxjs_1.Subject();
+        this.events$ = this._eventsSbj.asObservable();
         // Private component actions.
         this.onInput = (path) => {
             if (!this.viewRef.current) {
@@ -50,6 +53,9 @@ class MemoryPanel {
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
             visible: true
+        });
+        this._panel.onDidDestroy(() => {
+            this._eventsSbj.next({ type: exports.ACTION_CLOSE });
         });
         this.initMemoryPipeSubscription();
         this._service.shards$

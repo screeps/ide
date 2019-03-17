@@ -1,9 +1,11 @@
+import { tap, filter } from 'rxjs/operators';
+
 import { getSocket, getApi, getUser } from '../utils';
 
 import { Service } from '../service';
-import { MemoryPanel } from '../components/memory-panel';
+import { MemoryPanel, ACTION_CLOSE } from '../components/memory-panel';
 
-let memoryPanel: MemoryPanel;
+let memoryPanel: MemoryPanel | null;
 
 export async function showMemoryPanelCommand() {
     try {
@@ -25,6 +27,13 @@ export async function showMemoryPanelCommand() {
         const socket = getSocket();
 
         memoryPanel = new MemoryPanel(user, api, socket, new Service());
+
+        memoryPanel.events$
+            .pipe(filter(({ type }) => type === ACTION_CLOSE))
+            .pipe(tap(() => {
+                memoryPanel = null;
+            }))
+            .subscribe();
     } catch(err) {
         // Ignore.
     }

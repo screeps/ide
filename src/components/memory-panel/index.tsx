@@ -22,6 +22,8 @@ import { getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
 import { progress } from '../../decoratos';
 
+export const ACTION_CLOSE = 'ACTION_CLOSE';
+
 export class MemoryPanel {
     public element: HTMLElement;
     private _panel: Panel;
@@ -33,6 +35,9 @@ export class MemoryPanel {
     private _tooltips: { [key: string]: CompositeDisposable } = {};
 
     _pipe$: Subscription | null = null;
+
+    private _eventsSbj = new Subject();
+    public events$: Observable<any> = this._eventsSbj.asObservable();
 
     get isVisible() {
         if (!this._panel) {
@@ -60,6 +65,10 @@ export class MemoryPanel {
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
             visible: true
+        });
+
+        this._panel.onDidDestroy(() => {
+            this._eventsSbj.next({ type: ACTION_CLOSE });
         });
 
         this.initMemoryPipeSubscription();

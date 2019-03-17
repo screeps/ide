@@ -2,7 +2,7 @@ import { Panel } from 'atom';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
 import { ConsoleView, ResizablePanel } from '../../../ui';
 import { Api } from '../../api';
@@ -10,12 +10,17 @@ import { Socket } from '../../socket';
 import { Service } from '../../service';
 import { User } from '../../services/user';
 
+export const ACTION_CLOSE = 'ACTION_CLOSE';
+
 export class ConsolePanel {
     public element: HTMLElement;
     private _panel: Panel;
 
     public shard: any;
     public consolePipe$: Observable<any>;
+
+    private _eventsSbj = new Subject();
+    public events$: Observable<any> = this._eventsSbj.asObservable();
 
     get isVisible() {
         if (!this._panel) {
@@ -42,6 +47,10 @@ export class ConsolePanel {
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
             visible: true
+        });
+
+        this._panel.onDidDestroy(() => {
+            this._eventsSbj.next({ type: ACTION_CLOSE });
         });
     }
 
