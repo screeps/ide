@@ -7,6 +7,14 @@ import { TreeViewDir } from '../components/tree-view-dir';
 
 export async function showModulesPaneCommand() {
     try {
+        const pane = atom.workspace.getPaneItems().find((pane) => {
+            return pane instanceof ModulesPane;
+        });
+
+        if (pane) {
+            return;
+        }
+
         const api = await getApi();
         await getUser();
 

@@ -6,6 +6,12 @@ const modules_pane_1 = require("../components/modules-pane");
 const tree_view_dir_1 = require("../components/tree-view-dir");
 async function showModulesPaneCommand() {
     try {
+        const pane = atom.workspace.getPaneItems().find((pane) => {
+            return pane instanceof modules_pane_1.ModulesPane;
+        });
+        if (pane) {
+            return;
+        }
         const api = await utils_1.getApi();
         await utils_1.getUser();
         const modulesPane = new modules_pane_1.ModulesPane(api);
