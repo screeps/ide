@@ -38,9 +38,21 @@ class ConsolePane {
             visible: true
         });
     }
+    get isVisible() {
+        if (!this._panel) {
+            return false;
+        }
+        return this._panel.isVisible();
+    }
     render({}) {
         ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
             React.createElement(ui_1.ConsoleView, { output: this.consolePipe$, shard: this.shard, shards: this._service.shards$, onShard: this.onShard, onInput: this.onInput, onClose: this.onClose })), this.element);
+    }
+    show() {
+        this._panel.show();
+    }
+    hide() {
+        this._panel.hide();
     }
     // Atom pane required interface's methods
     getURI() {

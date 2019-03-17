@@ -34,6 +34,14 @@ export class MemoryPane {
 
     _pipe$: Subscription | null = null;
 
+    get isVisible() {
+        if (!this._panel) {
+            return false;
+        }
+
+        return this._panel.isVisible();
+    }
+
     constructor(
         private _user: User,
         private _api: Api,
@@ -374,6 +382,14 @@ export class MemoryPane {
             _segmentData: data,
             segmentHasChange: false
         });
+    }
+
+    public show() {
+        this._panel.show();
+    }
+
+    public hide() {
+        this._panel.hide();
     }
 
     // Atom pane required interface's methods

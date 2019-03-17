@@ -17,6 +17,14 @@ export class ConsolePane {
     public shard: any;
     public consolePipe$: Observable<any>;
 
+    get isVisible() {
+        if (!this._panel) {
+            return false;
+        }
+
+        return this._panel.isVisible();
+    }
+
     constructor(
         private _user: User,
         private _api: Api,
@@ -74,6 +82,14 @@ export class ConsolePane {
 
     private onClose = () => {
         this._panel.destroy();
+    }
+
+    public show() {
+        this._panel.show();
+    }
+
+    public hide() {
+        this._panel.hide();
     }
 
     // Atom pane required interface's methods

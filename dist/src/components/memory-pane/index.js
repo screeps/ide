@@ -85,6 +85,12 @@ class MemoryPane {
         }))
             .subscribe();
     }
+    get isVisible() {
+        if (!this._panel) {
+            return false;
+        }
+        return this._panel.isVisible();
+    }
     initMemoryPipeSubscription() {
         if (this._pipe$) {
             this._pipe$.unsubscribe();
@@ -243,6 +249,12 @@ class MemoryPane {
             return;
         }
         this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { segmentData: data, _segmentData: data, segmentHasChange: false }));
+    }
+    show() {
+        this._panel.show();
+    }
+    hide() {
+        this._panel.hide();
     }
     // Atom pane required interface's methods
     getURI() {
