@@ -23,24 +23,26 @@ class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProp
             );
         }
 
-        if (this.props.message.data[1].shard) {
+        if (this.props.message.shard) {
             shard = (
                 <span>
                     <span className='brackets'>
-                        { this.props.message.data[1].shard }
+                        { this.props.message.shard }
                     </span>
                     &nbsp;
                 </span>
             );
         }
 
-        try {
+        if (this.props.message.log) {
             message = (
-                <span className={timestamp ? '' : '--input'}>{ this.props.message.data[1].messages.log[0] }</span>
+                <span className={timestamp ? '' : '--input'}>{ this.props.message.log }</span>
             );
-        } catch(err) {
+        }
+
+        if (this.props.message.error) {
             error =(
-                <span className='--error'>{ this.props.message.data[1].error }</span>
+                <span className='--error'>{ this.props.message.error }</span>
             );
         }
 

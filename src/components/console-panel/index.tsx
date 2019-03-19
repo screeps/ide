@@ -95,11 +95,7 @@ export class ConsolePanel {
         }
 
         const msg = {
-            data: [null, {
-                messages: {
-                    log: [ expression ]
-                }
-            }]
+            log: expression
         };
 
         if (!this.viewRef.current) {
@@ -166,9 +162,34 @@ export class ConsolePanel {
                     return;
                 }
 
+                const timeStamp = msg.timeStamp;
+                const shard = msg.data[1].shard;
+
+                const messages: any = [];
+                try {
+                    msg.data[1].messages.log.reduce((messages: any[], log: string) => {
+                        messages.push({
+                            log,
+                            timeStamp,
+                            shard
+                        });
+                        return messages
+                    }, messages)
+                } catch (err) {
+                    // Noop.
+                }
+
+                if (msg.data[1].error) {
+                    messages.push({
+                        error: msg.data[1].error,
+                        timeStamp,
+                        shard
+                    })
+                }
+
                 this.viewRef.current.setState({
                     ...this.viewRef.current.state,
-                    messages: [...this.viewRef.current.state.messages, msg]
+                    messages: [...this.viewRef.current.state.messages, ...messages]
                 });
             }))
             .subscribe();

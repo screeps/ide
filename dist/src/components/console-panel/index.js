@@ -56,11 +56,7 @@ class ConsolePanel {
             return;
         }
         const msg = {
-            data: [null, {
-                    messages: {
-                        log: [expression]
-                    }
-                }]
+            log: expression
         };
         if (!this.viewRef.current) {
             return;
@@ -111,7 +107,30 @@ class ConsolePanel {
             if (!this.viewRef.current) {
                 return;
             }
-            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { messages: [...this.viewRef.current.state.messages, msg] }));
+            const timeStamp = msg.timeStamp;
+            const shard = msg.data[1].shard;
+            const messages = [];
+            try {
+                msg.data[1].messages.log.reduce((messages, log) => {
+                    messages.push({
+                        log,
+                        timeStamp,
+                        shard
+                    });
+                    return messages;
+                }, messages);
+            }
+            catch (err) {
+                // Noop.
+            }
+            if (msg.data[1].error) {
+                messages.push({
+                    error: msg.data[1].error,
+                    timeStamp,
+                    shard
+                });
+            }
+            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { messages: [...this.viewRef.current.state.messages, ...messages] }));
         }))
             .subscribe();
         this._applyTooltips();
