@@ -23,7 +23,7 @@ class ConsoleMessageItemView extends React.Component {
         catch (err) {
             error = (React.createElement("span", { className: '--error' }, this.props.message.data[1].error));
         }
-        return (React.createElement("div", { className: 'screeps-console__message' },
+        return (React.createElement("div", { className: 'screeps-console__message native-key-bindings', tabIndex: -1 },
             timestamp,
             shard,
             message,

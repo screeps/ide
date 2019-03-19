@@ -45,7 +45,7 @@ class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProp
         }
 
         return (
-            <div className='screeps-console__message'>
+            <div className='screeps-console__message native-key-bindings' tabIndex={ -1 }>
                 { timestamp }
                 { shard }
                 { message }
