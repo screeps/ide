@@ -1,18 +1,34 @@
 "use strict";
+/// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const React = require("react");
 exports.MODAL_CLOSE = 'MODAL_CLOSE';
+// @ts-ignore
+function validate(target, name, descriptor) {
+    const original = descriptor.value;
+    descriptor.value = async function (...args) {
+        let result;
+        try {
+            result = await original.apply(this, args);
+        }
+        catch (err) {
+            // Noop.
+        }
+        let isBlocking = true;
+        if (this._data.email && this._data.password) {
+            isBlocking = false;
+        }
+        this.setState(Object.assign({}, this.state, { isInvalid: false, isBlocking }));
+        return result;
+    };
+    return descriptor;
+}
+exports.validate = validate;
 class AuthView extends React.Component {
     constructor(props) {
         super(props);
         this._data = {};
-        // Private component actions.
-        this.onInput = (event) => {
-            const target = event.target;
-            const name = target.name;
-            const value = target.value;
-            this._data[name] = value;
-        };
         // Public component output actions.
         this.onCancel = () => {
             this.props.onCancel && this.props.onCancel();
@@ -24,7 +40,8 @@ class AuthView extends React.Component {
             this.props.onSubmit && this.props.onSubmit(this._data);
         };
         this.state = {
-            isBlocking: false
+            isInvalid: false,
+            isBlocking: true
         };
         this._emailRef = React.createRef();
         this._passwordRef = React.createRef();
@@ -34,19 +51,31 @@ class AuthView extends React.Component {
             React.createElement("header", null,
                 React.createElement("div", { className: 'logotype' }),
                 React.createElement("button", { className: 'btn _cross', onClick: this.onCancel })),
-            React.createElement("form", null,
+            React.createElement("form", { className: this.state.isInvalid ? '--invalid' : '' },
                 React.createElement("fieldset", { className: 'screeps-field' },
-                    React.createElement("input", { ref: this._emailRef, className: 'native-key-bindings', type: 'text', name: 'email', onChange: this.onInput, disabled: this.state.isBlocking, required: true, tabIndex: 1 }),
+                    React.createElement("input", { ref: this._emailRef, className: 'native-key-bindings', type: 'text', name: 'email', placeholder: ' ', onChange: (event) => this.onInput(event), required: true, autoComplete: 'off', tabIndex: 1 }),
                     React.createElement("label", null, "E-mail or username"),
                     React.createElement("div", { className: 'underline' })),
                 React.createElement("fieldset", { className: 'screeps-field' },
-                    React.createElement("input", { ref: this._passwordRef, className: 'native-key-bindings', type: 'password', name: 'password', onChange: this.onInput, disabled: this.state.isBlocking, required: true, tabIndex: 2 }),
+                    React.createElement("input", { ref: this._passwordRef, className: 'native-key-bindings', type: 'password', name: 'password', placeholder: ' ', onChange: (event) => this.onInput(event), required: true, autoComplete: 'off', tabIndex: 2 }),
                     React.createElement("label", null, "Password"),
-                    React.createElement("div", { className: 'underline' }))),
+                    React.createElement("div", { className: 'underline' })),
+                React.createElement("div", { className: 'error' }, "Account credentials are invalid")),
             React.createElement("footer", null,
                 React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel, tabIndex: 3 }, "Cancel"),
                 React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', onClick: this.onSubmit, disabled: this.state.isBlocking, tabIndex: 4 }, "Sign In"))));
     }
+    // Private component actions.
+    async onInput(event) {
+        const target = event.target;
+        const name = target.name;
+        const value = target.value;
+        // @ts-ignore
+        this._data[name] = value;
+    }
 }
+tslib_1.__decorate([
+    validate
+], AuthView.prototype, "onInput", null);
 exports.default = AuthView;
 //# sourceMappingURL=index.js.map

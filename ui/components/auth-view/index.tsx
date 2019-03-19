@@ -1,18 +1,36 @@
+/// <reference path='./index.d.ts' />
+
 import * as React from 'react';
 
 export const MODAL_CLOSE = 'MODAL_CLOSE';
 
-interface IAuthModalProps {
-    onCancel?: Function;
-    onSubmit?: Function;
-}
+// @ts-ignore
+export function validate(target: any, name: any, descriptor: any) {
+    const original = descriptor.value;
 
-interface IAuthModalState {
-    isBlocking: boolean;
-}
+    descriptor.value = async function(...args: any[]) {
+        let result;
+        try {
+            result = await original.apply(this, args);
+        } catch (err) {
+            // Noop.
+        }
 
-interface ICredentials {
-    [key: string]: String;
+        let isBlocking = true;
+        if (this._data.email && this._data.password) {
+            isBlocking = false;
+        }
+
+        this.setState({
+            ...this.state,
+            isInvalid: false,
+            isBlocking
+        });
+
+        return result;
+    };
+
+    return descriptor;
 }
 
 export default class AuthView extends React.Component<IAuthModalProps> {
@@ -29,7 +47,8 @@ export default class AuthView extends React.Component<IAuthModalProps> {
         super(props);
 
         this.state = {
-            isBlocking: false
+            isInvalid: false,
+            isBlocking: true
         };
 
         this._emailRef = React.createRef();
@@ -43,19 +62,20 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                     <div className='logotype' />
                     <button className='btn _cross' onClick={this.onCancel}/>
                 </header>
-                <form>
+                <form className={ this.state.isInvalid ? '--invalid' : '' }>
                     <fieldset className='screeps-field'>
                         <input ref={ this._emailRef }
                             className='native-key-bindings'
 
                             type='text'
                             name='email'
+                            placeholder=' '
 
-                            onChange={this.onInput}
+                            onChange={(event: React.ChangeEvent) => this.onInput(event)}
 
-                            disabled={ this.state.isBlocking }
                             required={ true }
 
+                            autoComplete='off'
                             tabIndex={ 1 }/>
                         <label>E-mail or username</label>
                         <div className='underline' />
@@ -66,16 +86,18 @@ export default class AuthView extends React.Component<IAuthModalProps> {
 
                             type='password'
                             name='password'
+                            placeholder=' '
 
-                            onChange={this.onInput} 
+                            onChange={(event: React.ChangeEvent) => this.onInput(event)}
 
-                            disabled={ this.state.isBlocking }
                             required={ true }
 
+                            autoComplete='off'
                             tabIndex={ 2 }/>
                         <label>Password</label>
                         <div className='underline' />
                     </fieldset>
+                    <div className='error'>Account credentials are invalid</div>
                 </form>
                 <footer>
                     <button
@@ -96,12 +118,14 @@ export default class AuthView extends React.Component<IAuthModalProps> {
     }
 
     // Private component actions.
-    private onInput = (event: React.ChangeEvent) => {
+    @validate
+    async onInput(event: React.ChangeEvent) {
         const target = event.target as HTMLInputElement;
 
         const name = target.name;
         const value = target.value;
 
+        // @ts-ignore
         this._data[name] = value;
     }
 

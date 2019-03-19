@@ -9,8 +9,8 @@ interface IApiSettings {
 }
 
 interface ICredentials {
-    email: string;
-    password: string;
+    email?: string;
+    password?: string;
 }
 
 interface IModules {

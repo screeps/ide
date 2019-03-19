@@ -45,7 +45,8 @@ function authCommand() {
             }))
                 .pipe(operators_1.catchError(() => {
                 authModalRef.setState({
-                    isBlocking: false
+                    isInvalid: true,
+                    isBlocking: true
                 });
                 return rxjs_1.empty();
             }));

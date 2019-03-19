@@ -1,4 +1,31 @@
+@text-color-fail: #D2554A;
+
 .screeps-ide {
+    form.--invalid {
+        input  ~ .underline {
+            border-color: @text-color-fail;
+        }
+
+        .error {
+            opacity: 1;
+        }
+    }
+
+    form {
+        .error {
+            position: absolute;
+            bottom: 10px;
+
+            display: block;
+            opacity: 0;
+
+            color: @text-color-fail;
+            font-size: 12px;
+
+            transition: opacity .3s ease;
+        }
+    }
+
     .screeps-field {
         position: relative;
         display: flex;
@@ -46,21 +73,17 @@
         pointer-events: none;
         transition: top 0.3s ease, font-size 0.3s ease;
     }
-    .screeps-field input:focus ~ label {
-        top: -1.42em;
-        font-size: 1em;
-    }
-    .screeps-field input:valid ~ label {
-        top: -1.42em;
-        font-size: 1em;
-    }
-    .screeps-field input:disabled ~ label {
+    .screeps-field input:focus ~ label,
+    .screeps-field input:valid ~ label,
+    .screeps-field input:disabled ~ label,
+    .screeps-field input:not(:placeholder-shown) ~ label {
         top: -1.42em;
         font-size: 1em;
     }
     .screeps-field input ~ .underline {
         position: relative;
         border-bottom: 1px solid #d9dfff;
+        transition: border-color .3s ease;
     }
     .screeps-field input ~ .underline:before {
         content: '';

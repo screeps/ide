@@ -49,7 +49,8 @@ export function authCommand(): Promise<any> {
                     }))
                     .pipe(catchError(() => {
                         authModalRef.setState({
-                            isBlocking: false
+                            isInvalid: true,
+                            isBlocking: true
                         });
 
                         return empty();
