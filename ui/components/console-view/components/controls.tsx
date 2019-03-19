@@ -6,7 +6,7 @@ interface IConsoleControlsViewProps {
     paused: boolean;
 
     onShard?: Function;
-    onStart?: Function;
+    onResume?: Function;
     onPause?: Function;
     onClose?: Function;
     onDelete?: Function;
@@ -29,41 +29,17 @@ class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
         };
     }
 
-    onShard = (event: any) => {
-        this.props.onShard && this.props.onShard(event.target.value);
-    }
-
-    onStart = () => {
-        this.setState({
-            ...this.state,
-            paused: true
-        });
-        this.props.onStart && this.props.onStart();
-    }
-
-    onPause = () => {
-        this.setState({
-            ...this.state,
-            paused: false
-        });
-        this.props.onPause && this.props.onPause();
-    }
-
-    onClose = () => {
-        this.props.onClose && this.props.onClose();
-    }
-
-    onDelete = () => {
-        this.props.onDelete && this.props.onDelete();
-    }
-
     public render() {
         let toggle;
 
         if (!this.state.paused) {
-            toggle = (<button className='btn icon' onClick={ this.onStart }><i className='sc-icon-play' /></button>);
+            toggle = (<button id='screeps-console__play'
+                className='btn icon' onClick={ this.onResume }><i className='sc-icon-play' />
+            </button>);
         } else {
-            toggle = (<button className='btn icon' onClick={ this.onPause }><i className='sc-icon-pause' /></button>);
+            toggle = (<button id='screeps-console__pause'
+                className='btn icon' onClick={ this.onPause }><i className='sc-icon-pause' />
+            </button>);
         }
 
         return (
@@ -76,12 +52,42 @@ class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
                     </select>
                 </div>
                 <div className='btn-group'>
-                    <button className='btn icon' onClick={ this.onDelete }><i className='sc-icon-delete' /></button>
+                    <button id='screeps-console__delete'
+                        className='btn icon' onClick={ this.onDelete }><i className='sc-icon-delete' />
+                    </button>
                     { toggle }
-                    <button className='btn icon' onClick={ this.onClose }><i className='sc-icon-clear' /></button>
+                    <button id='screeps-console__close'
+                        className='btn icon' onClick={ this.onClose }><i className='sc-icon-clear' />
+                    </button>
                 </div>
             </div>
         );
+    }
+
+    onShard = (event: any) => {
+        this.props.onShard && this.props.onShard(event.target.value);
+    }
+
+    onPause = () => {
+        this.state.paused = false;
+        this.setState({ ...this.state });
+
+        this.props.onPause && this.props.onPause();
+    }
+
+    onResume = () => {
+        this.state.paused = true;
+        this.setState({ ...this.state });
+
+        this.props.onResume && this.props.onResume();
+    }
+
+    onClose = () => {
+        this.props.onClose && this.props.onClose();
+    }
+
+    onDelete = () => {
+        this.props.onDelete && this.props.onDelete();
     }
 }
 

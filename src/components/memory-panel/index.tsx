@@ -33,6 +33,7 @@ export class MemoryPanel {
     public memory$: Observable<IMemoryPath[]> = this._memorySbj.asObservable();
 
     private _tooltips: { [key: string]: CompositeDisposable } = {};
+    private _tooltipsDisposables: CompositeDisposable | null = null;
 
     _pipe$: Subscription | null = null;
 
@@ -117,6 +118,8 @@ export class MemoryPanel {
                 });
             }))
             .subscribe();
+
+        this._applyTooltips();
     }
 
     initMemoryPipeSubscription() {
@@ -217,6 +220,10 @@ export class MemoryPanel {
     onClose = () => {
         if (this._pipe$) {
             this._pipe$.unsubscribe();
+        }
+
+        if (this._tooltipsDisposables) {
+            this._tooltipsDisposables.dispose();
         }
 
         this._panel.destroy();
@@ -399,6 +406,34 @@ export class MemoryPanel {
 
     public hide() {
         this._panel.hide();
+    }
+
+    private _applyTooltips() {
+        setTimeout(() => {
+            if (this._tooltipsDisposables) {
+                this._tooltipsDisposables.dispose();
+            }
+
+            this._tooltipsDisposables = new CompositeDisposable();
+
+            const showMainMemoryBtnRef = document.getElementById('screeps-memory__control-main');
+            if (showMainMemoryBtnRef) {
+                const disposable = atom.tooltips.add(showMainMemoryBtnRef, { title: 'Main memory' });
+                this._tooltipsDisposables.add(disposable);
+            }
+
+            const showSegmentsMemoryBtnRef = document.getElementById('screeps-memory__control-segments');
+            if (showSegmentsMemoryBtnRef) {
+                const disposable = atom.tooltips.add(showSegmentsMemoryBtnRef, { title: 'Segments memory' });
+                this._tooltipsDisposables.add(disposable);
+            }
+
+            const closeMemoryBtnRef = document.getElementById('screeps-memory__control-close');
+            if (closeMemoryBtnRef) {
+                const disposable = atom.tooltips.add(closeMemoryBtnRef, { title: 'Close panel' });
+                this._tooltipsDisposables.add(disposable);
+            }
+        });
     }
 
     // Atom pane required interface's methods

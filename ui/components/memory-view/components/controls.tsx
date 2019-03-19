@@ -52,13 +52,16 @@ export default class MemoryControlsView extends React.Component<IMemoryControlsV
                     { this.props.children }
                 </div>
                 <div className='btn-group'>
-                    <button className='btn icon' onClick={ this.onMainMemory }>
+                    <button id='screeps-memory__control-main'
+                        className='btn icon' onClick={ this.onMainMemory }>
                         <i className='sc-icon-dehaze' />
                     </button>
-                    <button className='btn icon' onClick={ this.onSegments }>
+                    <button id='screeps-memory__control-segments'
+                        className='btn icon' onClick={ this.onSegments }>
                         <i className='sc-icon-view' />
                     </button>
-                    <button className='btn icon' onClick={ this.onClose }>
+                    <button id='screeps-memory__control-close'
+                        className='btn icon' onClick={ this.onClose }>
                         <i className='sc-icon-clear' />
                     </button>
                 </div>

@@ -7,11 +7,13 @@ declare interface IConsoleViewState {
 
 declare interface IConsoleViewProps {
     shard?: string;
-    output: any;
-    shards: any;
+    output?: any;
+    shards?: any;
+    messages?: any[];
 
-    onShard?: Function;
-    onInput?: Function;
-    onClose?: Function;
-    onResizeStart?:Function;
+    onShard?(shard: string): Promise<void>;
+    onInput?(expression: string): Promise<void>;
+    onClose?(): Promise<void>;
+    onPause?(): Promise<void>;
+    onResume?(): Promise<void>;
 }

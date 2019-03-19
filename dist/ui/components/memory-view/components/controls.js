@@ -27,11 +27,11 @@ class MemoryControlsView extends React.Component {
                 })),
                 this.props.children),
             React.createElement("div", { className: 'btn-group' },
-                React.createElement("button", { className: 'btn icon', onClick: this.onMainMemory },
+                React.createElement("button", { id: 'screeps-memory__control-main', className: 'btn icon', onClick: this.onMainMemory },
                     React.createElement("i", { className: 'sc-icon-dehaze' })),
-                React.createElement("button", { className: 'btn icon', onClick: this.onSegments },
+                React.createElement("button", { id: 'screeps-memory__control-segments', className: 'btn icon', onClick: this.onSegments },
                     React.createElement("i", { className: 'sc-icon-view' })),
-                React.createElement("button", { className: 'btn icon', onClick: this.onClose },
+                React.createElement("button", { id: 'screeps-memory__control-close', className: 'btn icon', onClick: this.onClose },
                     React.createElement("i", { className: 'sc-icon-clear' })))));
     }
 }

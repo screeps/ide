@@ -21,6 +21,7 @@ class MemoryPanel {
         this._memorySbj = new rxjs_1.Subject();
         this.memory$ = this._memorySbj.asObservable();
         this._tooltips = {};
+        this._tooltipsDisposables = null;
         this._pipe$ = null;
         this._eventsSbj = new rxjs_1.Subject();
         this.events$ = this._eventsSbj.asObservable();
@@ -37,6 +38,9 @@ class MemoryPanel {
         this.onClose = () => {
             if (this._pipe$) {
                 this._pipe$.unsubscribe();
+            }
+            if (this._tooltipsDisposables) {
+                this._tooltipsDisposables.dispose();
             }
             this._panel.destroy();
         };
@@ -90,6 +94,7 @@ class MemoryPanel {
             });
         }))
             .subscribe();
+        this._applyTooltips();
     }
     get isVisible() {
         if (!this._panel) {
@@ -261,6 +266,29 @@ class MemoryPanel {
     }
     hide() {
         this._panel.hide();
+    }
+    _applyTooltips() {
+        setTimeout(() => {
+            if (this._tooltipsDisposables) {
+                this._tooltipsDisposables.dispose();
+            }
+            this._tooltipsDisposables = new atom_1.CompositeDisposable();
+            const showMainMemoryBtnRef = document.getElementById('screeps-memory__control-main');
+            if (showMainMemoryBtnRef) {
+                const disposable = atom.tooltips.add(showMainMemoryBtnRef, { title: 'Main memory' });
+                this._tooltipsDisposables.add(disposable);
+            }
+            const showSegmentsMemoryBtnRef = document.getElementById('screeps-memory__control-segments');
+            if (showSegmentsMemoryBtnRef) {
+                const disposable = atom.tooltips.add(showSegmentsMemoryBtnRef, { title: 'Segments memory' });
+                this._tooltipsDisposables.add(disposable);
+            }
+            const closeMemoryBtnRef = document.getElementById('screeps-memory__control-close');
+            if (closeMemoryBtnRef) {
+                const disposable = atom.tooltips.add(closeMemoryBtnRef, { title: 'Close panel' });
+                this._tooltipsDisposables.add(disposable);
+            }
+        });
     }
     // Atom pane required interface's methods
     getURI() {

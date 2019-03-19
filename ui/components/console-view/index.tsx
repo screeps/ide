@@ -1,8 +1,6 @@
 /// <reference path='./index.d.ts' />
 
 import * as React from 'react';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
 
 import { default as ConsoleControlsView } from './components/controls';
 import { default as ConsoleMessagesListView } from './components/messages-list';
@@ -11,89 +9,57 @@ import { default as ConsoleInputView } from './components/console-input';
 class ConsoleView extends React.Component<IConsoleViewProps> {
     //@ts-ignore
     props: IConsoleViewProps;
-
     state: IConsoleViewState;
-
-    _output$: Subscription | null = null;
-    _shards$: Subscription | null = null;
 
     constructor(props: IConsoleViewProps) {
         super(props);
 
         this.state = {
             shard: props.shard,
-            shards: [],
+            shards: props.shards || [],
             paused: true,
-            messages: []
+            messages: props.messages || []
         };
     }
 
-    componentDidMount() {
-        this._subscribe();
+    public render() {
+        return (
+            <div className='screeps-ide screeps-console screeps-console__view'>
+                <ConsoleControlsView
+                    shard={ this.state.shard }
+                    shards={ this.state.shards }
+                    paused={ this.state.paused }
 
-        this.setState({
-            ...this.state,
-            shard: this.props.shard
-        });
-
-        this._shards$ = this.props.shards.subscribe((shards: any) => {
-            this.setState({
-                ...this.state,
-                shards
-            });
-        });
+                    onShard={ this.onShard }
+                    onResume={ this.onResume }
+                    onPause={ this.onPause }
+                    onClose={ this.onClose }
+                    onDelete={ this.onDelete }
+                />
+                <hr className='screeps-hr' />
+                <ConsoleMessagesListView messages={ this.state.messages || [] }/>
+                <hr className='screeps-hr' />
+                <ConsoleInputView onInput={ this.onInput }/>
+            </div>
+        );
     }
 
-    _subscribe() {
-        this._output$ = this.props.output
-            .pipe(filter((msg: any) => {
-                if (msg.data && msg.data[1].messages && msg.data[1].messages.log.length) {
-                    return true;
-                }
-
-                if (msg.data && msg.data[1].error) {
-                    return true;
-                }
-
-                return false;
-            }))
-            .subscribe((msg: any) => {
-                this.pushMessage(msg);
-            });
-
+    onResume = () => {
         this.setState({
             ...this.state,
             paused: false
         });
+
+        this.props.onResume && this.props.onResume();
     }
 
-    _unsubscribe() {
-        if (!this._output$) {
-            return;
-        }
-
-        this._output$.unsubscribe();
-        this._output$ = null
-
+    onPause = () => {
         this.setState({
             ...this.state,
             paused: true
         });
-    }
 
-    pushMessage(msg: any) {
-        this.setState({
-            ...this.state,
-            messages: [...this.state.messages, msg]
-        });
-    }
-
-    onStart = () => {
-        this._subscribe();
-    }
-
-    onPause = () => {
-        this._unsubscribe();
+        this.props.onPause && this.props.onPause();
     }
 
     onShard = (shard: string) => {
@@ -113,38 +79,8 @@ class ConsoleView extends React.Component<IConsoleViewProps> {
         });
     }
 
-    onInput = ({ expression }: { expression: string}) => {
-        this.pushMessage({
-            data: [null, {
-                messages: {
-                    log: [ expression ]
-                }
-            }]
-        });
-
-        this.props.onInput && this.props.onInput({ expression });
-    }
-
-    public render() {
-        return (
-            <div className='screeps-ide screeps-console screeps-console__view'>
-                <ConsoleControlsView
-                    shard={ this.state.shard }
-                    shards={ this.state.shards }
-                    paused={ this.state.paused }
-
-                    onShard={ this.onShard }
-                    onStart={ this.onStart }
-                    onPause={ this.onPause }
-                    onClose={ this.onClose }
-                    onDelete={ this.onDelete }
-                />
-                <hr className='screeps-hr' />
-                <ConsoleMessagesListView messages={ this.state.messages || [] }/>
-                <hr className='screeps-hr' />
-                <ConsoleInputView onInput={ this.onInput }/>
-            </div>
-        );
+    onInput = (expression: string) => {
+        this.props.onInput && this.props.onInput(expression);
     }
 }
 

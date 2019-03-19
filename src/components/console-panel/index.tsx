@@ -1,8 +1,9 @@
-import { Panel } from 'atom';
+import { Panel, CompositeDisposable } from 'atom';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, Subscription } from 'rxjs';
+import { tap, filter } from 'rxjs/operators';
 
 import { ConsoleView, ResizablePanel } from '../../../ui';
 import { Api } from '../../api';
@@ -16,11 +17,13 @@ export class ConsolePanel {
     public element: HTMLElement;
     private _panel: Panel;
 
-    public shard: any;
-    public consolePipe$: Observable<any>;
+    public viewRef = React.createRef<ConsoleView>();
 
     private _eventsSbj = new Subject();
     public events$: Observable<any> = this._eventsSbj.asObservable();
+
+    private _console$: Subscription | null = null;
+    private _tooltipsDisposables: CompositeDisposable | null = null;
 
     get isVisible() {
         if (!this._panel) {
@@ -39,10 +42,9 @@ export class ConsolePanel {
         this.element = document.createElement('div');
         this.element.style.height = '300px';
 
-        this.shard = this._user.shard;
-        this.consolePipe$ = this._socket.on(`user:${ this._user.id }/console`);
-
-        this.render({});
+        this.render({
+            shard: this._user.shard
+        });
 
         this._panel = atom.workspace.addBottomPanel({
             item: this.element,
@@ -52,19 +54,34 @@ export class ConsolePanel {
         this._panel.onDidDestroy(() => {
             this._eventsSbj.next({ type: ACTION_CLOSE });
         });
+
+        this._service.shards$
+            .pipe(tap((shards: any) => {
+                if (!this.viewRef.current) {
+                    return;
+                }
+
+                this.viewRef.current.setState({
+                    ...this.viewRef.current.state,
+                    shards
+                });
+            }))
+            .subscribe();
+
+        this.onResume();
     }
 
-    render({ }) {
+    render({ shard }: { shard: string }) {
         ReactDOM.render(
             <ResizablePanel>
-                <ConsoleView
-                    output={ this.consolePipe$ }
-                    shard={ this.shard }
-                    shards={ this._service.shards$ }
+                <ConsoleView ref={ this.viewRef }
+                    shard={ shard }
 
-                    onShard={ this.onShard }
-                    onInput={ this.onInput }
-                    onClose={ this.onClose }
+                    onShard={() => this.onShard()}
+                    onInput={(expression: string) => this.onInput(expression)}
+                    onClose={() => this.onClose()}
+                    onPause={() => this.onPause()}
+                    onResume={() => this.onResume()}
                 />
             </ResizablePanel>,
             this.element as HTMLElement
@@ -72,25 +89,91 @@ export class ConsolePanel {
     }
 
     // Private component actions.
-    private onInput = async ({ expression }: { expression: string }) => {
-        try {
-            const data = await this._api.sendUserConsole({
-                expression,
-                shard: this.shard
-            });
+    private async onInput(expression: string): Promise<void> {
+        if (!this.viewRef.current) {
+            return;
+        }
 
-            console.log(data);
+        const msg = {
+            data: [null, {
+                messages: {
+                    log: [ expression ]
+                }
+            }]
+        };
+
+        if (!this.viewRef.current) {
+            return;
+        }
+
+        this.viewRef.current.setState({
+            ...this.viewRef.current.state,
+            messages: [...this.viewRef.current.state.messages, msg]
+        });
+
+        try {
+            await this._api.sendUserConsole({
+                expression,
+                shard: this.viewRef.current.state.shard
+            });
         } catch (err) {
-            console.log(err);
+            // Noop.
         }
     }
 
-    private onShard = (shard: string) => {
-        this.shard = shard;
+    private async onShard(): Promise<void> {
     }
 
-    private onClose = () => {
+    private async onClose(): Promise<void> {
+        if (this._console$) {
+            this._console$.unsubscribe();
+            this._console$ = null;
+        }
+
+        if (this._tooltipsDisposables) {
+            this._tooltipsDisposables.dispose();
+        }
+
         this._panel.destroy();
+    }
+
+    private async onPause(): Promise<void> {
+        if (this._console$) {
+            this._console$.unsubscribe();
+            this._console$ = null;
+        }
+
+        this._applyTooltips();
+    }
+
+    private async onResume(): Promise<void> {
+        this.onPause();
+
+        this._console$ = this._socket.on(`user:${ this._user.id }/console`)
+            .pipe(filter((msg: any) => {
+                if (msg.data && msg.data[1].messages && msg.data[1].messages.log.length) {
+                    return true;
+                }
+
+                if (msg.data && msg.data[1].error) {
+                    return true;
+                }
+
+                return false;
+            }))
+            .pipe(tap((msg: any) => {
+                if (!this.viewRef.current) {
+                    return;
+                }
+
+                this.viewRef.current.setState({
+                    ...this.viewRef.current.state,
+                    messages: [...this.viewRef.current.state.messages, msg]
+                });
+            }))
+            .subscribe();
+
+        this._applyTooltips();
     }
 
     public show() {
@@ -99,6 +182,40 @@ export class ConsolePanel {
 
     public hide() {
         this._panel.hide();
+    }
+
+    private _applyTooltips() {
+        setTimeout(() => {
+            if (this._tooltipsDisposables) {
+                this._tooltipsDisposables.dispose();
+            }
+
+            this._tooltipsDisposables = new CompositeDisposable();
+
+            const clearConsoleBtnRef = document.getElementById('screeps-console__delete');
+            if (clearConsoleBtnRef) {
+                const disposable = atom.tooltips.add(clearConsoleBtnRef, { title: 'Clear' });
+                this._tooltipsDisposables.add(disposable);
+            }
+
+            const closeConsoleBtnRef = document.getElementById('screeps-console__close');
+            if (closeConsoleBtnRef) {
+                const disposable = atom.tooltips.add(closeConsoleBtnRef, { title: 'Close panel' });
+                this._tooltipsDisposables.add(disposable);
+            }
+
+            const pauseConsoleBtnRef = document.getElementById('screeps-console__pause');
+            if (pauseConsoleBtnRef) {
+                const disposable = atom.tooltips.add(pauseConsoleBtnRef, { title: 'Pause tracking' });
+                this._tooltipsDisposables.add(disposable);
+            }
+
+            const playConsoleBtnRef = document.getElementById('screeps-console__play');
+            if (playConsoleBtnRef) {
+                const disposable = atom.tooltips.add(playConsoleBtnRef, { title: 'Resume tracking' });
+                this._tooltipsDisposables.add(disposable);
+            }
+        });
     }
 
     // Atom pane required interface's methods

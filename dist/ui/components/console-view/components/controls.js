@@ -7,13 +7,15 @@ class ConsoleControlsView extends React.Component {
         this.onShard = (event) => {
             this.props.onShard && this.props.onShard(event.target.value);
         };
-        this.onStart = () => {
-            this.setState(Object.assign({}, this.state, { paused: true }));
-            this.props.onStart && this.props.onStart();
-        };
         this.onPause = () => {
-            this.setState(Object.assign({}, this.state, { paused: false }));
+            this.state.paused = false;
+            this.setState(Object.assign({}, this.state));
             this.props.onPause && this.props.onPause();
+        };
+        this.onResume = () => {
+            this.state.paused = true;
+            this.setState(Object.assign({}, this.state));
+            this.props.onResume && this.props.onResume();
         };
         this.onClose = () => {
             this.props.onClose && this.props.onClose();
@@ -28,11 +30,11 @@ class ConsoleControlsView extends React.Component {
     render() {
         let toggle;
         if (!this.state.paused) {
-            toggle = (React.createElement("button", { className: 'btn icon', onClick: this.onStart },
+            toggle = (React.createElement("button", { id: 'screeps-console__play', className: 'btn icon', onClick: this.onResume },
                 React.createElement("i", { className: 'sc-icon-play' })));
         }
         else {
-            toggle = (React.createElement("button", { className: 'btn icon', onClick: this.onPause },
+            toggle = (React.createElement("button", { id: 'screeps-console__pause', className: 'btn icon', onClick: this.onPause },
                 React.createElement("i", { className: 'sc-icon-pause' })));
         }
         return (React.createElement("div", { className: 'screeps-console__controls' },
@@ -41,10 +43,10 @@ class ConsoleControlsView extends React.Component {
                     return (React.createElement("option", { key: name, value: name }, name));
                 }))),
             React.createElement("div", { className: 'btn-group' },
-                React.createElement("button", { className: 'btn icon', onClick: this.onDelete },
+                React.createElement("button", { id: 'screeps-console__delete', className: 'btn icon', onClick: this.onDelete },
                     React.createElement("i", { className: 'sc-icon-delete' })),
                 toggle,
-                React.createElement("button", { className: 'btn icon', onClick: this.onClose },
+                React.createElement("button", { id: 'screeps-console__close', className: 'btn icon', onClick: this.onClose },
                     React.createElement("i", { className: 'sc-icon-clear' })))));
     }
 }

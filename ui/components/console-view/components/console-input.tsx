@@ -18,7 +18,7 @@ class ConsoleInputView extends React.Component<IConsoleInputViewProps> {
             return;
         }
 
-        this.props.onInput && this.props.onInput({ expression: event.target.value });
+        this.props.onInput && this.props.onInput(event.target.value);
 
         event.target.value = '';
     }
