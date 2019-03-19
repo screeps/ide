@@ -8,6 +8,7 @@ import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { Api } from '../../api';
 import { progress } from '../../decoratos';
+// import { AtomModal } from '../atom-modal';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 
@@ -158,11 +159,25 @@ export class ModulesPane {
             return;
         }
 
-        const textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
         const { branch, modules } = this.viewRef.current.state;
+        const title = `@${ branch }/${ module }.js`;
+
+        const textEditors = atom.workspace.getTextEditors();
+        let textEditor = textEditors.find((textEditor) => {
+            return textEditor.getTitle() === title;
+        });
+
+        if (textEditor) {
+            atom.workspace.open(textEditor);
+            return;
+        }
+
+        textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
 
         textEditor.setText(modules[module]);
-        textEditor.getTitle = () => `@${ branch }/${ module }.js`;
+        textEditor.getTitle = () => `${ title }`;
+        // @ts-ignore
+        textEditor.readOnly = true;
 
         const grammar = atom.grammars.grammarForScopeName('source.js');
         if (grammar) {

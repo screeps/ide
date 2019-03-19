@@ -8,6 +8,7 @@ const ui_1 = require("../../../ui");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const decoratos_1 = require("../../decoratos");
+// import { AtomModal } from '../atom-modal';
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 class ModulesPane {
     constructor(_api) {
@@ -103,10 +104,21 @@ class ModulesPane {
         if (!this.viewRef.current) {
             return;
         }
-        const textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
         const { branch, modules } = this.viewRef.current.state;
+        const title = `@${branch}/${module}.js`;
+        const textEditors = atom.workspace.getTextEditors();
+        let textEditor = textEditors.find((textEditor) => {
+            return textEditor.getTitle() === title;
+        });
+        if (textEditor) {
+            atom.workspace.open(textEditor);
+            return;
+        }
+        textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
         textEditor.setText(modules[module]);
-        textEditor.getTitle = () => `@${branch}/${module}.js`;
+        textEditor.getTitle = () => `${title}`;
+        // @ts-ignore
+        textEditor.readOnly = true;
         const grammar = atom.grammars.grammarForScopeName('source.js');
         if (grammar) {
             atom.textEditors.setGrammarOverride(textEditor, grammar.scopeName);
