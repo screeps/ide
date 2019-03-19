@@ -4,6 +4,7 @@ const tslib_1 = require("tslib");
 const atom_1 = require("atom");
 const config_1 = require("./config");
 const commands_1 = require("./commands");
+const welcome_pane_1 = require("./components/welcome-pane");
 const subscriptions = new atom_1.CompositeDisposable();
 var config_2 = require("./config");
 exports.config = config_2.default;
@@ -20,6 +21,9 @@ function activate(state) {
         [`${config_1.PACKAGE_NAME}:${commands_1.startCommand.name}`]: commands_1.startCommand,
         [`${config_1.PACKAGE_NAME}:${commands_1.commitCommand.name}`]: commands_1.commitCommand
     }));
+    if (config_1.configGetter('showOnStartup')) {
+        setTimeout(() => new welcome_pane_1.WelcomePane(), 500);
+    }
 }
 exports.activate = activate;
 function deactivate() {

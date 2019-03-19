@@ -60,7 +60,7 @@ module.exports = (env, {
   const COMPILER_LOADER = [
     {
       test: /\.(ts|tsx)$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, /\.old$/],
       use: [{
         loader: 'ts-loader'
       }]
@@ -106,7 +106,8 @@ module.exports = (env, {
 
     resolve: {
       alias: {
-        assets: path.join(srcDir, 'assets')
+        assets: path.join(srcDir, 'assets'),
+        'ui-variables.less': path.join(srcDir, 'examples/ui-variables.less'),
       },
       extensions: ['.ts', '.tsx', '.js', '.json']
     },

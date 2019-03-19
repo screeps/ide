@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 interface IAtomConfig {
+    showOnStartup: any;
     global: any;
     local?: any;
 }
@@ -122,6 +123,12 @@ const _global = {
 };
 
 let config: IAtomConfig = {
+    showOnStartup: {
+        type: 'boolean',
+        default: true,
+        description: 'Show welcome panes with useful information when opening a new Atom window.'
+    },
+
     global: _global
 };
 
@@ -133,7 +140,11 @@ if (local) {
 export default config;
 
 export function configGetter(name: string): string {
-    let value = atom.config.get(`${ PACKAGE_NAME }.local.${ name }`);
+    let value = atom.config.get(`${ PACKAGE_NAME }.${ name }`);
+
+    if (!value) {
+        value = atom.config.get(`${ PACKAGE_NAME }.local.${ name }`);
+    }
 
     if (!value) {
         value = atom.config.get(`${ PACKAGE_NAME }.global.${ name }`);

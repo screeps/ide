@@ -1,12 +1,13 @@
 import { CompositeDisposable } from 'atom';
 
-import { PACKAGE_NAME } from './config';
+import { PACKAGE_NAME, configGetter } from './config';
 
 import {
     authCommand,
     startCommand,
     commitCommand
 } from './commands';
+import { WelcomePane } from './components/welcome-pane';
 
 const subscriptions = new CompositeDisposable();
 
@@ -27,6 +28,9 @@ export function activate(state: any) {
         [`${ PACKAGE_NAME }:${ commitCommand.name }`]: commitCommand
     }));
 
+    if (configGetter('showOnStartup')) {
+        setTimeout(() => new WelcomePane(), 500);
+    }
 }
 
 export function deactivate() {

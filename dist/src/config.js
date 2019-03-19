@@ -95,6 +95,11 @@ const _global = {
     }
 };
 let config = {
+    showOnStartup: {
+        type: 'boolean',
+        default: true,
+        description: 'Show welcome panes with useful information when opening a new Atom window.'
+    },
     global: _global
 };
 //@ts-ignore
@@ -103,7 +108,10 @@ if (local) {
 }
 exports.default = config;
 function configGetter(name) {
-    let value = atom.config.get(`${exports.PACKAGE_NAME}.local.${name}`);
+    let value = atom.config.get(`${exports.PACKAGE_NAME}.${name}`);
+    if (!value) {
+        value = atom.config.get(`${exports.PACKAGE_NAME}.local.${name}`);
+    }
     if (!value) {
         value = atom.config.get(`${exports.PACKAGE_NAME}.global.${name}`);
     }
