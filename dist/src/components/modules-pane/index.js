@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+const atom_1 = require("atom");
 const React = require("react");
 const ReactDOM = require("react-dom");
 const rxjs_1 = require("rxjs");
@@ -8,7 +9,7 @@ const ui_1 = require("../../../ui");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const decoratos_1 = require("../../decoratos");
-// import { AtomModal } from '../atom-modal';
+const utils_1 = require("../../utils");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 class ModulesPane {
     constructor(_api) {
@@ -46,7 +47,7 @@ class ModulesPane {
         if (!this.viewRef.current) {
             return {
                 branch: 'default',
-                modules: []
+                modules: {}
             };
         }
         return this.viewRef.current.state;
@@ -59,7 +60,7 @@ class ModulesPane {
     }
     render({ modules = {}, branch = '', branches = [] }) {
         ReactDOM.render(React.createElement("div", null,
-            React.createElement(ui_1.ModulesView, { ref: this.viewRef, branch: branch, branches: branches, modules: modules, onChooseModules: () => this.onChooseModules(), onChooseBranches: () => this.onChooseBranches(), onCopyBranch: (...args) => this.onCopyBranch(...args), onSelectBranch: (...args) => this.onSelectBranch(...args), onDeleteBranch: (...args) => this.onDeleteBranch(...args), onSelectModule: (...args) => this.onSelectModule(...args) })), this.element);
+            React.createElement(ui_1.ModulesView, { ref: this.viewRef, branch: branch, branches: branches, modules: modules, onChooseModules: () => this.onChooseModules(), onChooseBranches: () => this.onChooseBranches(), onCopyBranch: (...args) => this.onCopyBranch(...args), onSelectBranch: (...args) => this.onSelectBranch(...args), onDeleteBranch: (...args) => this.onDeleteBranch(...args), onSelectModule: (...args) => this.onSelectModule(...args), onDeleteModule: (...args) => this.onDeleteModule(...args), onApplyChanges: () => this.onApplyChanges(), onRevertChanges: () => this.onRevertChanges() })), this.element);
     }
     async onChooseModules() {
     }
@@ -84,8 +85,27 @@ class ModulesPane {
         }
     }
     async onSelectBranch(_branch) {
-        const { branch, modules } = await this._api.getUserCode(_branch);
-        this.state = { branch, modules };
+        const { branch, modules: _modules } = await this._api.getUserCode(_branch);
+        const modules = {};
+        const __modules = Object.entries(_modules);
+        for (let i = 0; i < __modules.length; i++) {
+            const [module, content] = __modules[i];
+            const moduleFile = new atom_1.File(utils_1.getModulePath(branch, module));
+            let modified = false;
+            const isExist = await moduleFile.exists();
+            if (isExist) {
+                const _content = await moduleFile.read();
+                modified = content !== _content;
+            }
+            modules[module] = {
+                content,
+                modified
+            };
+        }
+        this.state = {
+            branch,
+            modules
+        };
     }
     async onDeleteBranch(branch) {
         try {
@@ -101,29 +121,67 @@ class ModulesPane {
         }
     }
     async onSelectModule(module) {
-        if (!this.viewRef.current) {
-            return;
-        }
-        const { branch, modules } = this.viewRef.current.state;
-        const title = `@${branch}/${module}.js`;
-        const textEditors = atom.workspace.getTextEditors();
-        let textEditor = textEditors.find((textEditor) => {
-            return textEditor.getTitle() === title;
-        });
-        if (textEditor) {
-            atom.workspace.open(textEditor);
-            return;
-        }
-        textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
-        textEditor.setText(modules[module]);
-        textEditor.getTitle = () => `${title}`;
+        const { branch, modules } = this.state;
         // @ts-ignore
-        textEditor.readOnly = true;
-        const grammar = atom.grammars.grammarForScopeName('source.js');
-        if (grammar) {
-            atom.textEditors.setGrammarOverride(textEditor, grammar.scopeName);
+        const modulePath = utils_1.getModulePath(branch, module);
+        const moduleFile = new atom_1.File(modulePath);
+        const isExist = await moduleFile.exists();
+        const content = modules[module].content;
+        if (!isExist) {
+            await moduleFile.create();
+            await moduleFile.write(content);
         }
-        atom.workspace.open(textEditor, {});
+        // @ts-ignore
+        const textEditor = await atom.workspace.open(moduleFile.getPath(), {
+            searchAllPanes: true
+        });
+        console.log(textEditor);
+        textEditor.onDidChange(() => {
+            console.log(1.1);
+            const { branch: _branch, modules } = this.state;
+            console.log(1.2);
+            if (_branch !== branch) {
+                return;
+            }
+            console.log(1.3);
+            let modified = false;
+            if (content !== textEditor.getText()) {
+                modified = true;
+            }
+            modules[module] = Object.assign({}, modules[module], { modified });
+            console.log(1.4, modules);
+            this.state = { modules };
+        });
+    }
+    async onDeleteModule(module) {
+        try {
+            const modules = this.state.modules;
+            delete modules[module];
+            this.state = { modules };
+        }
+        catch (err) {
+            // Ignore.
+        }
+    }
+    async onApplyChanges() {
+        const { branch, modules: _modules } = this.state;
+        const __modules = {};
+        // @ts-ignore
+        Object.entries(_modules).reduce((modules, [module, { content }]) => {
+            modules[module] = content;
+            return modules;
+        }, __modules);
+        let modules = await utils_1.readUserCode(utils_1.getBranchPath(branch));
+        modules = Object.assign({}, __modules, modules);
+        try {
+            await this._api.updateUserCode({ branch, modules });
+            await this.onSelectBranch(branch);
+        }
+        catch (err) {
+            // Noop.
+        }
+    }
+    async onRevertChanges() {
     }
     // Atom pane required interface's methods
     getURI() {

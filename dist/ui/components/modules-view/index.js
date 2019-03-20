@@ -2,19 +2,20 @@
 /// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+const MAIN_MODULE = 'main';
 class ModulesView extends React.Component {
     constructor(props) {
         super(props);
         this._getAdditionalModules = (modules) => {
-            return Object.keys(modules).filter((item) => {
-                return item !== 'main' && modules[item];
+            return Object.entries(modules).filter(([name, { content }]) => {
+                return name !== MAIN_MODULE && content;
             });
         };
         this.state = {
             isProgressing: false,
             modules: props.modules,
             branch: props.branch,
-            branches: props.branches,
+            branches: props.branches || [],
             isShowingBranches: false
         };
     }
@@ -24,7 +25,7 @@ class ModulesView extends React.Component {
         if (this.state.isShowingBranches) {
             header = (React.createElement("div", { className: 'screeps-modules-view__header' },
                 React.createElement("span", null, "Choose active branch:")));
-            view = (React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' }, this.state.branches.map(({ _id, branch, activeSim, activeWorld }) => {
+            view = (React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' }, this.state.branches && this.state.branches.map(({ _id, branch, activeSim, activeWorld }) => {
                 let deleteButton;
                 let sim;
                 let world;
@@ -50,21 +51,29 @@ class ModulesView extends React.Component {
         else {
             header = (React.createElement("div", { className: 'screeps-modules-view__header' },
                 React.createElement("span", null, "Branch"),
-                React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onChooseBranches() }, this.state.branch)));
+                React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onChooseBranches() }, this.state.branch),
+                React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onApplyChanges(), disabled: !this.hasChanges() },
+                    React.createElement("i", { className: 'sc-icon-done' })),
+                React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onRevertChanges(), disabled: !this.hasChanges() },
+                    React.createElement("i", { className: 'sc-icon-revert' }))));
             view = (React.createElement("div", null,
                 React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' },
-                    React.createElement("li", { className: 'tab screeps-modules-view__item' },
-                        React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule('main') }, "main")),
-                    this._getAdditionalModules(this.state.modules).map((moduleName) => {
-                        return (React.createElement("li", { className: 'tab screeps-modules-view__item', key: moduleName },
+                    React.createElement("li", { className: 'tab screeps-modules-view__item' + (this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : '') },
+                        React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(MAIN_MODULE) }, MAIN_MODULE),
+                        React.createElement("div", { className: 'close-icon' })),
+                    this._getAdditionalModules(this.state.modules).map(([moduleName, { modified }]) => {
+                        return (React.createElement("li", { className: 'tab screeps-modules-view__item' + (modified ? ' modified' : ''), key: moduleName },
                             React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(moduleName) }, moduleName),
-                            React.createElement("div", { className: 'close-icon' })));
+                            React.createElement("div", { className: 'close-icon', onClick: () => this.onDeleteModule(moduleName) })));
                     }))));
         }
         return (React.createElement("div", { className: 'screeps-ide screeps-modules-view' },
             header,
             React.createElement("hr", { className: 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') }),
             view));
+    }
+    hasChanges() {
+        return Object.values(this.state.modules).some(({ modified }) => !!modified);
     }
     onChooseModules() {
         this.state.isShowingBranches = false;
@@ -90,6 +99,15 @@ class ModulesView extends React.Component {
     }
     onSelectModule(module) {
         this.props.onSelectModule && this.props.onSelectModule(module);
+    }
+    onDeleteModule(module) {
+        this.props.onDeleteModule && this.props.onDeleteModule(module);
+    }
+    onApplyChanges() {
+        this.props.onApplyChanges && this.props.onApplyChanges();
+    }
+    onRevertChanges() {
+        this.props.onRevertChanges && this.props.onRevertChanges();
     }
 }
 exports.default = ModulesView;

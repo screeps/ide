@@ -38,4 +38,7 @@ function handleURI(parsedUri) {
     console.log(parsedUri);
 }
 exports.handleURI = handleURI;
+const path = require('path');
+// @ts-ignore
+console.log(path.resolve(`${atom.packages.packageDirPaths}`, config_1.PACKAGE_NAME));
 //# sourceMappingURL=index.js.map

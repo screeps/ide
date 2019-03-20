@@ -45,3 +45,7 @@ export function serialize() {
 export function handleURI(parsedUri: any) {
     console.log(parsedUri)
 }
+
+const path = require('path');
+// @ts-ignore
+console.log(path.resolve(`${ atom.packages.packageDirPaths }`, PACKAGE_NAME));

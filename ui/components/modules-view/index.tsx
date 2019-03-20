@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+const MAIN_MODULE = 'main';
+
 class ModulesView extends React.Component<IModulesViewProps> {
     //@ts-ignore
     props: IModulesViewProps;
@@ -17,7 +19,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
             modules: props.modules,
 
             branch: props.branch,
-            branches: props.branches,
+            branches: props.branches || [],
 
             isShowingBranches: false
         }
@@ -36,7 +38,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
 
             view = (
                 <ul className='tab-bar screeps-modules-view__items'>
-                {this.state.branches.map(({ _id, branch, activeSim, activeWorld }) => {
+                {this.state.branches && this.state.branches.map(({ _id, branch, activeSim, activeWorld }) => {
                     let deleteButton;
                     let sim;
                     let world;
@@ -58,7 +60,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
                         <li className='tab screeps-modules-view__item' key={_id}>
                             <button className='btn btn--clear' onClick={() => this.onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
                             <button className='btn btn--clear' onClick={() => this.onSelectBranch(branch)}>{ branch }</button>
-                            { world } { sim }                          
+                            { world } { sim }
                             { deleteButton }
                         </li>
                     )
@@ -69,22 +71,34 @@ class ModulesView extends React.Component<IModulesViewProps> {
             header = (
                 <div className='screeps-modules-view__header'>
                     <span>Branch</span>
-                    <button className='btn btn--clear' onClick={() => this.onChooseBranches()}>{ this.state.branch }</button>
+                    <button className='btn btn--clear' onClick={() => this.onChooseBranches()}>
+                        { this.state.branch }
+                    </button>
+
+                    <button className='btn btn--clear' onClick={() => this.onApplyChanges()} disabled={ !this.hasChanges() }>
+                        <i className='sc-icon-done' />
+                    </button>
+                    <button className='btn btn--clear' onClick={() => this.onRevertChanges()} disabled={ !this.hasChanges() }>
+                        <i className='sc-icon-revert' />
+                    </button>
                 </div>
             )
 
             view = (
                 <div>
                     <ul className='tab-bar screeps-modules-view__items'>
-                        <li className='tab screeps-modules-view__item'>
-                            <button className='btn btn--clear' onClick={() => this.onSelectModule('main')}>main</button>
+                        <li className={ 'tab screeps-modules-view__item' + (
+                            this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : ''
+                        ) }>
+                            <button className='btn btn--clear' onClick={() => this.onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
+                            <div className='close-icon'></div>
                         </li>
-                        {this._getAdditionalModules(this.state.modules).map((moduleName) => {
+                        {this._getAdditionalModules(this.state.modules).map(([ moduleName, { modified }]) => {
                             return (
-                                <li className='tab screeps-modules-view__item' key={moduleName}>
-                                    <button className='btn btn--clear' onClick={() => this.onSelectModule(moduleName)}>{ moduleName }</button>
-                                    <div className='close-icon'></div>
-                                </li>
+                        <li className={ 'tab screeps-modules-view__item' + (modified ? ' modified' : '') } key={moduleName}>
+                            <button className='btn btn--clear' onClick={() => this.onSelectModule(moduleName)}>{ moduleName }</button>
+                            <div className='close-icon' onClick={() => this.onDeleteModule(moduleName)}></div>
+                        </li>
                             );
                         })}
                     </ul>
@@ -107,6 +121,10 @@ class ModulesView extends React.Component<IModulesViewProps> {
                 { view }
             </div>
         );
+    }
+
+    hasChanges() {
+        return Object.values(this.state.modules).some(({ modified }) => !!modified);
     }
 
     onChooseModules() {
@@ -140,9 +158,23 @@ class ModulesView extends React.Component<IModulesViewProps> {
         this.props.onSelectModule && this.props.onSelectModule(module);
     }
 
-    private _getAdditionalModules = (modules: IModules) => {
-        return Object.keys(modules).filter((item) => {
-            return item !== 'main' && modules[item];
+    onDeleteModule(module: string) {
+        this.props.onDeleteModule && this.props.onDeleteModule(module);
+    }
+
+    onApplyChanges() {
+        this.props.onApplyChanges && this.props.onApplyChanges();
+    }
+
+    onRevertChanges() {
+        this.props.onRevertChanges && this.props.onRevertChanges();
+    }
+
+    private _getAdditionalModules = (modules: {
+        [key: string]: IModule;
+    }) => {
+        return Object.entries(modules).filter(([name, { content }]) => {
+            return name !== MAIN_MODULE && content;
         });
     }
 }

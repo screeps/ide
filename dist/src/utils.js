@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = require('path');
+const atom_1 = require("atom");
 const api_1 = require("./api");
 const socket_1 = require("./socket");
 const config_1 = require("./config");
@@ -90,4 +92,31 @@ async function getUser() {
     return user;
 }
 exports.getUser = getUser;
+function getBranchPath(branch) {
+    // @ts-ignore
+    return path.resolve(`${atom.packages.packageDirPaths}`, config_1.PACKAGE_NAME, `.branches/${branch}`);
+}
+exports.getBranchPath = getBranchPath;
+function getModulePath(branch, module) {
+    // @ts-ignore
+    const branchPath = getBranchPath(branch);
+    return path.resolve(`${branchPath}/${module}.js`);
+}
+exports.getModulePath = getModulePath;
+async function readUserCode(fullPath) {
+    const dir = new atom_1.Directory(fullPath);
+    const entries = dir.getEntriesSync();
+    const files = entries.filter((entry) => {
+        return entry.isFile();
+    });
+    const modules = {};
+    for (let file of files) {
+        const content = await file.read(true);
+        const fileName = file.getBaseName()
+            .replace('.js', '');
+        modules[fileName] = content;
+    }
+    return modules;
+}
+exports.readUserCode = readUserCode;
 //# sourceMappingURL=utils.js.map

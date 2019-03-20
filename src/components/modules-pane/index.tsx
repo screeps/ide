@@ -1,3 +1,4 @@
+import { File, TextEditor } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Subject, Observable } from 'rxjs';
@@ -8,7 +9,7 @@ import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { Api } from '../../api';
 import { progress } from '../../decoratos';
-// import { AtomModal } from '../atom-modal';
+import { getModulePath, getBranchPath, readUserCode } from '../../utils';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 
@@ -22,11 +23,11 @@ export class ModulesPane {
     private _eventsSbj = new Subject();
     public events$: Observable<any> = this._eventsSbj.asObservable();
 
-    public get state() {
+    public get state(): any {
         if (!this.viewRef.current) {
             return {
                 branch: 'default',
-                modules: []
+                modules: {}
             };
         }
 
@@ -78,7 +79,7 @@ export class ModulesPane {
         this.onSelectBranch('default');
     }
 
-    render({ modules = {}, branch = '', branches = [] }) {
+    render({ modules = {}, branch = '', branches = [] }: IModulesViewState) {
         ReactDOM.render(
             <div>
                 <ModulesView ref={ this.viewRef }
@@ -93,7 +94,12 @@ export class ModulesPane {
                     onCopyBranch={(...args) => this.onCopyBranch(...args)}
                     onSelectBranch={(...args) => this.onSelectBranch(...args)}
                     onDeleteBranch={(...args) => this.onDeleteBranch(...args)}
+
                     onSelectModule={(...args) => this.onSelectModule(...args)}
+                    onDeleteModule={(...args) => this.onDeleteModule(...args)}
+
+                    onApplyChanges={() => this.onApplyChanges()}
+                    onRevertChanges={() => this.onRevertChanges()}
                 />
             </div>,
             this.element as HTMLElement
@@ -134,9 +140,35 @@ export class ModulesPane {
 
     @progress
     async onSelectBranch(_branch?: string): Promise<void> {
-        const { branch, modules } = await this._api.getUserCode(_branch);
+        const { branch, modules: _modules } = await this._api.getUserCode(_branch);
 
-        this.state = { branch, modules };
+        const modules:  {
+            [key: string]: IModule;
+        } = {};
+
+        const __modules = Object.entries(_modules);
+        for(let i = 0; i < __modules.length; i++) {
+            const [module, content] = __modules[i];
+
+            const moduleFile = new File(getModulePath(branch, module));
+            let modified = false;
+
+            const isExist = await moduleFile.exists();
+            if (isExist) {
+                const _content = await moduleFile.read();
+                modified = content !== _content;
+            }
+
+            modules[module] = {
+                content,
+                modified
+            };
+        }
+
+        this.state = {
+            branch,
+            modules
+        };
     }
 
     async onDeleteBranch(branch: string): Promise<void> {
@@ -154,38 +186,90 @@ export class ModulesPane {
         }
     }
 
-    async onSelectModule(module: any): Promise<void> {
-        if (!this.viewRef.current) {
-            return;
-        }
+    async onSelectModule(module: string): Promise<void> {
+        const { branch, modules } = this.state;
 
-        const { branch, modules } = this.viewRef.current.state;
-        const title = `@${ branch }/${ module }.js`;
-
-        const textEditors = atom.workspace.getTextEditors();
-        let textEditor = textEditors.find((textEditor) => {
-            return textEditor.getTitle() === title;
-        });
-
-        if (textEditor) {
-            atom.workspace.open(textEditor);
-            return;
-        }
-
-        textEditor = atom.workspace.buildTextEditor({ autoHeight: false });
-
-        textEditor.setText(modules[module]);
-        textEditor.getTitle = () => `${ title }`;
         // @ts-ignore
-        textEditor.readOnly = true;
+        const modulePath = getModulePath(branch, module);
+        const moduleFile = new File(modulePath);
+        const isExist = await moduleFile.exists();
+        const content = modules[module].content;
 
-        const grammar = atom.grammars.grammarForScopeName('source.js');
-        if (grammar) {
-            atom.textEditors.setGrammarOverride(textEditor, grammar.scopeName);
+        if (!isExist) {
+            await moduleFile.create();
+            await moduleFile.write(content);
         }
 
-        atom.workspace.open(textEditor, {
+        // @ts-ignore
+        const textEditor: TextEditor = await atom.workspace.open(moduleFile.getPath(), {
+            searchAllPanes: true
         });
+        console.log(textEditor);
+        textEditor.onDidChange(() => {
+            console.log(1.1);
+            const { branch: _branch, modules } = this.state;
+            console.log(1.2);
+            if (_branch !== branch) {
+                return;
+            }
+
+            console.log(1.3);
+            let modified = false;
+            if (content !== textEditor.getText()) {
+                modified = true;
+            }
+
+            modules[module] = {
+                ...modules[module],
+                modified
+            };
+
+            console.log(1.4, modules);
+            this.state = { modules };
+        })
+    }
+
+    async onDeleteModule(module: string): Promise<void> {
+        try {
+            const modules = this.state.modules;
+            delete modules[module];
+
+            this.state = { modules }
+        } catch(err) {
+            // Ignore.
+        }
+    }
+
+    async onApplyChanges(): Promise<void> {
+        const { branch, modules: _modules } = this.state;
+
+        const __modules: {
+            [key: string]: string;
+        } = {};
+
+        // @ts-ignore
+        Object.entries(_modules).reduce((modules, [module, { content }]) => {
+            modules[module] = content;
+            return modules;
+        }, __modules);
+
+        let modules = await readUserCode(getBranchPath(branch));
+        modules = {
+            ...__modules,
+            ...modules
+        };
+
+        try {
+            await this._api.updateUserCode({ branch, modules });
+            await this.onSelectBranch(branch);
+        } catch(err) {
+            // Noop.
+        }
+
+    }
+
+    async onRevertChanges(): Promise<void> {
+
     }
 
     // Atom pane required interface's methods

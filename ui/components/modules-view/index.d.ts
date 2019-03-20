@@ -5,8 +5,15 @@ interface IBranches {
     activeSim: boolean;
 }
 
+interface IModule {
+    content: string;
+    modified?: boolean;
+}
+
 interface IModulesViewProps {
-    modules: IModules;
+    modules: {
+        [key: string]: IModule;
+    };
 
     branch: string;
     branches: IBranches[];
@@ -16,18 +23,25 @@ interface IModulesViewProps {
     onChooseModules?(): Promise<void>;
     onChooseBranches?(): Promise<void>;
     onCopyBranch?(branch: string): Promise<void>;
+
     onSelectBranch?(branch: string): Promise<void>;
     onDeleteBranch?(branch: string): Promise<void>;
-    onSelectModule?(branch: string): Promise<void>;
+
+    onSelectModule?(module: string): Promise<void>;
+    onDeleteModule?(module: string): Promise<void>;
+
+    onApplyChanges?(): Promise<void>;
+    onRevertChanges?(): Promise<void>;
 }
 
 interface IModulesViewState {
-    isProgressing: boolean;
-
-    modules: IModules;
+    modules: {
+        [key: string]: IModule;
+    };
 
     branch: string;
-    branches: IBranches[];
+    branches?: IBranches[];
 
-    isShowingBranches: boolean;
+    isProgressing?: boolean;
+    isShowingBranches?: boolean;
 }

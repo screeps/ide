@@ -1,5 +1,3 @@
-const path = require('path');
-
 import { File, Directory } from 'atom';
 
 import { getApi } from '../utils';
@@ -14,10 +12,7 @@ export async function commitCommand(branch: string) {
     return api.updateUserCode({ branch, modules });
 }
 
-async function readUserCode(srcDir: string) {
-    const projectPath = atom.project.getPaths()[0];
-    const fullPath = path.resolve(projectPath, srcDir);
-
+export async function readUserCode(fullPath: string) {
     const dir = new Directory(fullPath);
     const entries = dir.getEntriesSync();
 
@@ -25,10 +20,10 @@ async function readUserCode(srcDir: string) {
         return entry.isFile();
     }) as File[];
 
-    const modules: { [key: string]: String } = {};
+    const modules: { [key: string]: string } = {};
 
     for (let file of files) {
-        const content = await file.read(true) as String;
+        const content = await file.read(true) as string;
         const fileName = file.getBaseName()
             .replace('.js', '');
 
@@ -37,28 +32,3 @@ async function readUserCode(srcDir: string) {
 
     return modules;
 }
-
-// (function() {
-//   return 1;
-//
-//   if (!/mycode/.test(atom.project.getPaths()[0])) {
-//     return 0;
-//   }
-//
-//   atom.project.onDidChangeFiles(async (events) => {
-//     console.log(1, events);
-//
-//     for (const { action } of events) { // action, path
-//       if (action === 'modified') {
-//         changeFilesSbj.next({ type: action });
-//       }
-//     }
-//   });
-//
-//   changeFiles$
-//     .pipe(filter(({ type }) => type === 'modified'))
-//     .pipe(switchMap(readCode))
-//     .pipe(map((modules) => ({ branch: 'default', modules })))
-//     .pipe(tap((data) => api.updateUserCode(data)))
-//     .subscribe();
-// })();

@@ -1,6 +1,9 @@
+const path = require('path');
+import { File, Directory } from 'atom';
+
 import { Api } from './api';
 import { Socket } from './socket';
-import { configGetter } from './config';
+import { PACKAGE_NAME, configGetter } from './config';
 import { User } from './services/user';
 
 import { authCommand } from './commands/auth';
@@ -101,4 +104,36 @@ export async function getUser(): Promise<User> {
     }
 
     return user;
+}
+
+export function getBranchPath(branch: string): string {
+    // @ts-ignore
+    return path.resolve(`${ atom.packages.packageDirPaths }`, PACKAGE_NAME, `.branches/${ branch }`);
+}
+
+export function getModulePath(branch: string, module: string): string {
+    // @ts-ignore
+    const branchPath = getBranchPath(branch);
+    return path.resolve(`${ branchPath }/${ module }.js`);
+}
+
+export async function readUserCode(fullPath: string) {
+    const dir = new Directory(fullPath);
+    const entries = dir.getEntriesSync();
+
+    const files = entries.filter((entry) => {
+        return entry.isFile();
+    }) as File[];
+
+    const modules: { [key: string]: string } = {};
+
+    for (let file of files) {
+        const content = await file.read(true) as string;
+        const fileName = file.getBaseName()
+            .replace('.js', '');
+
+        modules[fileName] = content;
+    }
+
+    return modules;
 }

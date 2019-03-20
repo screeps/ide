@@ -99,23 +99,29 @@
     padding-right: 5px;
 
     line-height: 32px;
-}
 
-.screeps-modules-view__header span {
-    text-transform: uppercase;
-}
+    span {
+        text-transform: uppercase;
+    }
 
-.screeps-modules-view__header button {
-    cursor: pointer;
-    color: #4A5FD2 !important;
-    font-weight: bold;
+    button:nth-child(2) {
+        cursor: pointer;
+        color: #4A5FD2 !important;
+        font-weight: bold;
+    }
+
+    button:nth-child(3) {
+        margin-left: auto;
+    }
+
+    button {
+        position: relative;
+        z-index: 1;
+    }
 }
 
 .screeps-modules-view__header button:focus {
     outline: none;
-}
-
-.screeps-modules-view__item {
 }
 
 .screeps-modules-view__new {

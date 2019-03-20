@@ -55,11 +55,12 @@ export class TreeViewDir {
     }
 
     _diff() {
-        Object.entries(this._modulesPane.state.modules).forEach(async ([moduleName, moduleContent]) => {
+        // @ts-ignore
+        Object.entries(this._modulesPane.state.modules).forEach(async ([moduleName, { content }]) => {
             const file = this._dir.getFile(`${ moduleName }.js`);
-            const content = await file.read(true) as String;
+            const _content = await file.read(true) as String;
 
-            if (moduleContent !== content && this._btnRef) {
+            if (_content !== content && this._btnRef) {
                 this._btnRef.disabled = false;
             }
         });
