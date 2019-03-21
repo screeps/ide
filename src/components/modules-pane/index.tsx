@@ -51,31 +51,7 @@ export class ModulesPane {
         this.element = document.createElement('div');
         this.render(this.state);
 
-        atom.workspace.open(this, {
-            searchAllPanes: true,
-            activatePane: true,
-            activateItem: true,
-            split: 'down',
-            location: 'left'
-        })
-            .then(() => {
-                const pane = atom.workspace.paneForItem(this);
-
-                if (!pane) {
-                    return;
-                }
-
-                pane.onDidDestroy(() => {
-                    this._eventsSbj.next({ type: ACTION_CLOSE });
-                });
-
-                // @ts-ignore
-                const insetPanel = pane.element.firstChild;
-                insetPanel.style.position = 'absolute';
-                insetPanel.style.right = 0;
-                insetPanel.style.zIndex = 1;
-            });
-
+        this.open();
         this.onSelectBranch('default');
     }
 
@@ -140,30 +116,10 @@ export class ModulesPane {
 
     @progress
     async onSelectBranch(_branch?: string): Promise<void> {
-        const { branch, modules: _modules } = await this._api.getUserCode(_branch);
 
-        const modules:  {
-            [key: string]: IModule;
-        } = {};
+        const { branch, modules: branchModules } = await this._api.getUserCode(_branch);
 
-        const __modules = Object.entries(_modules);
-        for(let i = 0; i < __modules.length; i++) {
-            const [module, content] = __modules[i];
-
-            const moduleFile = new File(getModulePath(branch, module));
-            let modified = false;
-
-            const isExist = await moduleFile.exists();
-            if (isExist) {
-                const _content = await moduleFile.read();
-                modified = content !== _content;
-            }
-
-            modules[module] = {
-                content,
-                modified
-            };
-        }
+        const modules = await this.toModulesView(branch, branchModules); 
 
         this.state = {
             branch,
@@ -200,21 +156,26 @@ export class ModulesPane {
             await moduleFile.write(content);
         }
 
-        // @ts-ignore
-        const textEditor: TextEditor = await atom.workspace.open(moduleFile.getPath(), {
+        let textEditor = atom.workspace.getTextEditors()
+            .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
+
+        if (textEditor) {
+            return;
+        }
+
+        textEditor = await atom.workspace.open(moduleFile.getPath(), {
             searchAllPanes: true
-        });
-        console.log(textEditor);
+        }) as TextEditor;
+
         textEditor.onDidChange(() => {
-            console.log(1.1);
             const { branch: _branch, modules } = this.state;
-            console.log(1.2);
+
             if (_branch !== branch) {
                 return;
             }
 
-            console.log(1.3);
             let modified = false;
+            // @ts-ignore
             if (content !== textEditor.getText()) {
                 modified = true;
             }
@@ -224,7 +185,6 @@ export class ModulesPane {
                 modified
             };
 
-            console.log(1.4, modules);
             this.state = { modules };
         })
     }
@@ -240,36 +200,119 @@ export class ModulesPane {
         }
     }
 
+    @progress
     async onApplyChanges(): Promise<void> {
-        const { branch, modules: _modules } = this.state;
+        const {
+            branch, modules: _modules
+        }: {
+            branch: string, modules: IModulesViewModules
+        } = this.state;
 
-        const __modules: {
-            [key: string]: string;
-        } = {};
+        let modules: IModules = Object.entries(_modules).reduce((modules, [module, { content }]) => ({
+            ...modules,
+            [module]: content
+        }), {});
 
-        // @ts-ignore
-        Object.entries(_modules).reduce((modules, [module, { content }]) => {
-            modules[module] = content;
-            return modules;
-        }, __modules);
+        let changes = await readUserCode(getBranchPath(branch));
 
-        let modules = await readUserCode(getBranchPath(branch));
         modules = {
-            ...__modules,
-            ...modules
+            ...modules,
+            ...changes
         };
 
         try {
             await this._api.updateUserCode({ branch, modules });
-            await this.onSelectBranch(branch);
         } catch(err) {
-            // Noop.
+            return;
         }
 
+        const modulesView = await this.toModulesView(branch, modules);
+        this.state = { modules: modulesView };
     }
 
     async onRevertChanges(): Promise<void> {
+        const {
+            branch, modules
+        }: {
+            branch: string, modules: IModulesViewModules
+        } = this.state;
 
+        const entries = Object.entries(modules);
+
+        for(let i = 0, l = entries.length; i < l; i++) {
+            const [module, { content, modified }] = entries[i];
+
+            if (!modified) {
+                continue;
+            }
+
+            const moduleFile = new File(getModulePath(branch, module));
+
+            try {
+                await moduleFile.write(content);
+            } catch (err) {
+                // Noop.
+            }
+
+            modules[module] = {
+                content,
+                modified: false
+            };
+        }
+
+        this.state = { modules }
+    }
+
+    async open() {
+        await atom.workspace.open(this, {
+            searchAllPanes: true,
+            activatePane: true,
+            activateItem: true,
+            split: 'down',
+            location: 'left'
+        });
+
+        const pane = atom.workspace.paneForItem(this);
+
+        if (!pane) {
+            return;
+        }
+
+        pane.onDidDestroy(() => {
+            this._eventsSbj.next({ type: ACTION_CLOSE });
+        });
+
+        // @ts-ignore
+        const insetPanel = pane.element.firstChild;
+        insetPanel.style.position = 'absolute';
+        insetPanel.style.right = 0;
+        insetPanel.style.zIndex = 1;
+
+    }
+
+    async toModulesView(branch: string, _modules: IModules): Promise<IModulesViewModules> {
+        const modules: IModulesViewModules = {};
+
+        const entries = Object.entries(_modules);
+        for(let i = 0, l = entries.length; i < l; i++) {
+            const [module, content] = entries[i];
+
+            const moduleFile = new File(getModulePath(branch, module));
+            let modified = false;
+
+            const isExist = await moduleFile.exists();
+            if (isExist) {
+                const _content = await moduleFile.read();
+                modified = content !== _content;
+            }
+
+            modules[module] = {
+                content,
+                modified
+            };
+        }
+
+        return modules;
     }
 
     // Atom pane required interface's methods

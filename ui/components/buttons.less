@@ -82,7 +82,8 @@
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
     }
 
-    .close-icon {
+    .close-icon,
+    .modified-icon {
         z-index: 2;
         position: absolute;
         top: 0.5em;
@@ -102,7 +103,9 @@
 
         transform: scale(0);
         transition: transform .08s;
+    }
 
+    .close-icon {
         &::before {
             content: "\f081";
 
@@ -112,7 +115,7 @@
             height: 12px;
 
             font-family: 'Octicons Regular';
-            font-size: 12px;
+            font-size: 1.1em;
             font-weight: normal;
             font-style: normal;
             line-height: 1;
@@ -127,5 +130,31 @@
 
             color: #001133;
         }
+    }
+}
+
+.tab {
+    &.modified .modified-icon {
+        top: 0.5em;
+        right: 0.5em;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.5;
+        color: #568af2;
+        border-radius: 3px;
+        border: none;
+        transform: scale(1);
+    }
+
+    &.modified .modified-icon::before {
+        content: "\f052";
+
+        display: inline-block;
+
+        font-family: 'Octicons Regular';
+        font-size: 1.1em;
+        font-weight: normal;
+        font-style: normal;
+        line-height: 1;
     }
 }

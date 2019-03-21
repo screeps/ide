@@ -60,7 +60,7 @@ class ModulesView extends React.Component {
                 React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' },
                     React.createElement("li", { className: 'tab screeps-modules-view__item' + (this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : '') },
                         React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(MAIN_MODULE) }, MAIN_MODULE),
-                        React.createElement("div", { className: 'close-icon' })),
+                        React.createElement("div", { className: 'modified-icon' })),
                     this._getAdditionalModules(this.state.modules).map(([moduleName, { modified }]) => {
                         return (React.createElement("li", { className: 'tab screeps-modules-view__item' + (modified ? ' modified' : ''), key: moduleName },
                             React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(moduleName) }, moduleName),

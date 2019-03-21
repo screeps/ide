@@ -104,19 +104,27 @@
         text-transform: uppercase;
     }
 
-    button:nth-child(2) {
-        cursor: pointer;
-        color: #4A5FD2 !important;
-        font-weight: bold;
-    }
-
-    button:nth-child(3) {
-        margin-left: auto;
-    }
-
     button {
         position: relative;
         z-index: 1;
+    }
+
+    button:nth-child(2) {
+        overflow: hidden;
+
+        cursor: pointer;
+        color: #4A5FD2 !important;
+        font-weight: bold;
+        text-overflow: ellipsis;
+    }
+
+    button:nth-child(3),
+    button:nth-child(4) {
+        font-size: 16px;
+    }
+
+    button:last-child {
+        margin-right: 40px;
     }
 }
 

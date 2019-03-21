@@ -10,10 +10,12 @@ interface IModule {
     modified?: boolean;
 }
 
+interface IModulesViewModules {
+    [key: string]: IModule;
+}
+
 interface IModulesViewProps {
-    modules: {
-        [key: string]: IModule;
-    };
+    modules: IModulesViewModules;
 
     branch: string;
     branches: IBranches[];
@@ -35,9 +37,7 @@ interface IModulesViewProps {
 }
 
 interface IModulesViewState {
-    modules: {
-        [key: string]: IModule;
-    };
+    modules: IModulesViewModules;
 
     branch: string;
     branches?: IBranches[];

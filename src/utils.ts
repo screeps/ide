@@ -117,7 +117,7 @@ export function getModulePath(branch: string, module: string): string {
     return path.resolve(`${ branchPath }/${ module }.js`);
 }
 
-export async function readUserCode(fullPath: string) {
+export async function readUserCode(fullPath: string): Promise<IModules> {
     const dir = new Directory(fullPath);
     const entries = dir.getEntriesSync();
 

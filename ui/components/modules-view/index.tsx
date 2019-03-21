@@ -91,7 +91,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
                             this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : ''
                         ) }>
                             <button className='btn btn--clear' onClick={() => this.onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
-                            <div className='close-icon'></div>
+                            <div className='modified-icon'></div>
                         </li>
                         {this._getAdditionalModules(this.state.modules).map(([ moduleName, { modified }]) => {
                             return (
