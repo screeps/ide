@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+const fs = require('fs');
 const atom_1 = require("atom");
 const React = require("react");
 const ReactDOM = require("react-dom");
@@ -91,7 +92,7 @@ class ModulesPane {
         const { modules } = this.state;
         this.state = {
             modules: Object.assign({}, modules, { [module]: {
-                    content: '',
+                    content: null,
                     modified: true
                 } })
         };
@@ -103,7 +104,7 @@ class ModulesPane {
         const modulePath = utils_1.getModulePath(branch, module);
         const moduleFile = new atom_1.File(modulePath);
         const isExist = await moduleFile.exists();
-        const content = modules[module].content;
+        const content = modules[module].content || '';
         if (!isExist) {
             await moduleFile.create();
             await moduleFile.write(content);
@@ -121,10 +122,17 @@ class ModulesPane {
         });
     }
     async onDeleteModule(module) {
-        const { modules } = this.state;
+        const { branch, modules } = this.state;
         this.state = {
             modules: Object.assign({}, modules, { [module]: Object.assign({}, modules[module], { deleted: true }) })
         };
+        const modulePath = utils_1.getModulePath(branch, module);
+        try {
+            fs.unlink(modulePath, () => { });
+        }
+        catch (err) {
+            // Noop.
+        }
     }
     async onApplyChanges() {
         const { branch, modules: _modules } = this.state;
@@ -146,8 +154,8 @@ class ModulesPane {
         const { branch, modules } = this.state;
         const entries = Object.entries(modules);
         for (let i = 0, l = entries.length; i < l; i++) {
-            const [module, { content, modified }] = entries[i];
-            if (!modified) {
+            const [module, { content, modified, deleted }] = entries[i];
+            if (!modified && !deleted) {
                 continue;
             }
             const modulePath = utils_1.getModulePath(branch, module);
@@ -167,7 +175,6 @@ class ModulesPane {
     }
     async onDidChange({ path }) {
         const module = utils_1.getModuleByPath(path);
-        console.log(module);
         if (!module) {
             return;
         }
@@ -183,7 +190,8 @@ class ModulesPane {
         this.state = {
             modules: Object.assign({}, modules, { [module]: {
                     content: modules[module].content,
-                    modified: modules[module].content !== content
+                    modified: modules[module].content !== content,
+                    deleted: modules[module].deleted
                 } })
         };
     }

@@ -1,3 +1,4 @@
+const fs = require('fs');
 import { File, TextEditor } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -165,7 +166,7 @@ export class ModulesPane {
             modules: {
                 ...modules,
                 [module]: {
-                    content: '',
+                    content: null,
                     modified: true
                 }
             }
@@ -181,7 +182,7 @@ export class ModulesPane {
         const modulePath = getModulePath(branch, module);
         const moduleFile = new File(modulePath);
         const isExist = await moduleFile.exists();
-        const content = modules[module].content;
+        const content = modules[module].content || '';
 
         if (!isExist) {
             await moduleFile.create();
@@ -206,7 +207,7 @@ export class ModulesPane {
     }
 
     async onDeleteModule(module: string): Promise<void> {
-        const { modules } = this.state;
+        const { branch, modules } = this.state;
 
         this.state = {
             modules: {
@@ -216,6 +217,14 @@ export class ModulesPane {
                     deleted: true
                 }
             }
+        }
+
+        const modulePath = getModulePath(branch, module);
+
+        try {
+            fs.unlink(modulePath, () => {})
+        } catch (err) {
+            // Noop.
         }
     }
 
@@ -262,9 +271,9 @@ export class ModulesPane {
         const entries = Object.entries(modules);
 
         for(let i = 0, l = entries.length; i < l; i++) {
-            const [module, { content, modified }] = entries[i];
+            const [module, { content, modified, deleted }] = entries[i];
 
-            if (!modified) {
+            if (!modified && !deleted) {
                 continue;
             }
 
@@ -289,8 +298,6 @@ export class ModulesPane {
     async onDidChange({ path }: { path: string }): Promise<void> {
         const module = getModuleByPath(path);
 
-        console.log(module);
-
         if (!module) {
             return;
         }
@@ -310,7 +317,8 @@ export class ModulesPane {
                 ...modules,
                 [module]: {
                     content: modules[module].content,
-                    modified: modules[module].content !== content
+                    modified: modules[module].content !== content,
+                    deleted: modules[module].deleted
                 }
             }
         }
