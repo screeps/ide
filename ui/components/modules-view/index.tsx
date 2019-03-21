@@ -105,7 +105,11 @@ class ModulesView extends React.Component<IModulesViewProps> {
                     <div className='screeps-modules-view__new'>
                         <form>
                             <fieldset className='screeps-field'>
-                                <input className='native-key-bindings' placeholder='New module name...' type='text' autoComplete='' required={ true } onChange={() => {}} />
+                                <input className='native-key-bindings' type='text' placeholder='New module name...'
+
+                                    autoComplete=''
+
+                                    onKeyPress={ this.onKeyPressHandler }/>
                                 <div className='underline' />
                             </fieldset>
                         </form>
@@ -124,7 +128,8 @@ class ModulesView extends React.Component<IModulesViewProps> {
     }
 
     hasChanges() {
-        return Object.values(this.state.modules).some(({ modified }) => !!modified);
+        return Object.values(this.state.modules)
+            .some(({ modified, deleted }) => !!modified || !!deleted);
     }
 
     onChooseModules() {
@@ -154,6 +159,10 @@ class ModulesView extends React.Component<IModulesViewProps> {
         this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
     }
 
+    onCreateModule(module: string) {
+        this.props.onCreateModule && this.props.onCreateModule(module);
+    }
+
     onSelectModule(module: string) {
         this.props.onSelectModule && this.props.onSelectModule(module);
     }
@@ -170,11 +179,25 @@ class ModulesView extends React.Component<IModulesViewProps> {
         this.props.onRevertChanges && this.props.onRevertChanges();
     }
 
+    onKeyPressHandler = (event: any) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        if (!event.target.value) {
+            return;
+        }
+
+        this.props.onCreateModule && this.props.onCreateModule(event.target.value);
+
+        event.target.value = '';
+    }
+
     private _getAdditionalModules = (modules: {
         [key: string]: IModule;
     }) => {
-        return Object.entries(modules).filter(([name, { content }]) => {
-            return name !== MAIN_MODULE && content;
+        return Object.entries(modules).filter(([name, { deleted }]) => {
+            return name !== MAIN_MODULE && !deleted;
         });
     }
 }

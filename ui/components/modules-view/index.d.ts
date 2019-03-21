@@ -8,6 +8,7 @@ interface IBranches {
 interface IModule {
     content: string;
     modified?: boolean;
+    deleted?: boolean;
 }
 
 interface IModulesViewModules {
@@ -29,6 +30,7 @@ interface IModulesViewProps {
     onSelectBranch?(branch: string): Promise<void>;
     onDeleteBranch?(branch: string): Promise<void>;
 
+    onCreateModule?(module: string): Promise<void>;
     onSelectModule?(module: string): Promise<void>;
     onDeleteModule?(module: string): Promise<void>;
 

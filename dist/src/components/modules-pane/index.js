@@ -36,11 +36,12 @@ class ModulesPane {
         if (!this.viewRef.current) {
             return;
         }
-        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, state));
+        this.viewRef.current.state = Object.assign({}, this.viewRef.current.state, state);
+        this.viewRef.current.setState(this.viewRef.current.state);
     }
     render({ modules = {}, branch = '', branches = [] }) {
         ReactDOM.render(React.createElement("div", null,
-            React.createElement(ui_1.ModulesView, { ref: this.viewRef, branch: branch, branches: branches, modules: modules, onChooseModules: () => this.onChooseModules(), onChooseBranches: () => this.onChooseBranches(), onCopyBranch: (...args) => this.onCopyBranch(...args), onSelectBranch: (...args) => this.onSelectBranch(...args), onDeleteBranch: (...args) => this.onDeleteBranch(...args), onSelectModule: (...args) => this.onSelectModule(...args), onDeleteModule: (...args) => this.onDeleteModule(...args), onApplyChanges: () => this.onApplyChanges(), onRevertChanges: () => this.onRevertChanges() })), this.element);
+            React.createElement(ui_1.ModulesView, { ref: this.viewRef, branch: branch, branches: branches, modules: modules, onChooseModules: () => this.onChooseModules(), onChooseBranches: () => this.onChooseBranches(), onCopyBranch: (...args) => this.onCopyBranch(...args), onSelectBranch: (...args) => this.onSelectBranch(...args), onDeleteBranch: (...args) => this.onDeleteBranch(...args), onCreateModule: (...args) => this.onCreateModule(...args), onSelectModule: (...args) => this.onSelectModule(...args), onDeleteModule: (...args) => this.onDeleteModule(...args), onApplyChanges: () => this.onApplyChanges(), onRevertChanges: () => this.onRevertChanges() })), this.element);
     }
     async onChooseModules() {
     }
@@ -86,6 +87,16 @@ class ModulesPane {
             // Ignore.
         }
     }
+    async onCreateModule(module) {
+        const { modules } = this.state;
+        this.state = {
+            modules: Object.assign({}, modules, { [module]: {
+                    content: '',
+                    modified: true
+                } })
+        };
+        this.onSelectModule(module);
+    }
     async onSelectModule(module) {
         const { branch, modules } = this.state;
         // @ts-ignore
@@ -110,18 +121,16 @@ class ModulesPane {
         });
     }
     async onDeleteModule(module) {
-        try {
-            const modules = this.state.modules;
-            delete modules[module];
-            this.state = { modules };
-        }
-        catch (err) {
-            // Ignore.
-        }
+        const { modules } = this.state;
+        this.state = {
+            modules: Object.assign({}, modules, { [module]: Object.assign({}, modules[module], { deleted: true }) })
+        };
     }
     async onApplyChanges() {
         const { branch, modules: _modules } = this.state;
-        let modules = Object.entries(_modules).reduce((modules, [module, { content }]) => (Object.assign({}, modules, { [module]: content })), {});
+        let modules = Object.entries(_modules)
+            .filter(([, { deleted }]) => !deleted)
+            .reduce((modules, [module, { content }]) => (Object.assign({}, modules, { [module]: content })), {});
         let changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
         modules = Object.assign({}, modules, changes);
         try {
@@ -158,11 +167,18 @@ class ModulesPane {
     }
     async onDidChange({ path }) {
         const module = utils_1.getModuleByPath(path);
+        console.log(module);
         if (!module) {
             return;
         }
         const file = new atom_1.File(path);
-        const content = await file.read();
+        let content;
+        try {
+            content = await file.read();
+        }
+        catch (err) {
+            return;
+        }
         const { modules } = this.state;
         this.state = {
             modules: Object.assign({}, modules, { [module]: {

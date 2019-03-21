@@ -6,9 +6,19 @@ const MAIN_MODULE = 'main';
 class ModulesView extends React.Component {
     constructor(props) {
         super(props);
+        this.onKeyPressHandler = (event) => {
+            if (event.key !== 'Enter') {
+                return;
+            }
+            if (!event.target.value) {
+                return;
+            }
+            this.props.onCreateModule && this.props.onCreateModule(event.target.value);
+            event.target.value = '';
+        };
         this._getAdditionalModules = (modules) => {
-            return Object.entries(modules).filter(([name, { content }]) => {
-                return name !== MAIN_MODULE && content;
+            return Object.entries(modules).filter(([name, { deleted }]) => {
+                return name !== MAIN_MODULE && !deleted;
             });
         };
         this.state = {
@@ -69,7 +79,7 @@ class ModulesView extends React.Component {
                 React.createElement("div", { className: 'screeps-modules-view__new' },
                     React.createElement("form", null,
                         React.createElement("fieldset", { className: 'screeps-field' },
-                            React.createElement("input", { className: 'native-key-bindings', placeholder: 'New module name...', type: 'text', autoComplete: '', required: true, onChange: () => { } }),
+                            React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'New module name...', autoComplete: '', onKeyPress: this.onKeyPressHandler }),
                             React.createElement("div", { className: 'underline' }))))));
         }
         return (React.createElement("div", { className: 'screeps-ide screeps-modules-view' },
@@ -78,7 +88,8 @@ class ModulesView extends React.Component {
             view));
     }
     hasChanges() {
-        return Object.values(this.state.modules).some(({ modified }) => !!modified);
+        return Object.values(this.state.modules)
+            .some(({ modified, deleted }) => !!modified || !!deleted);
     }
     onChooseModules() {
         this.state.isShowingBranches = false;
@@ -101,6 +112,9 @@ class ModulesView extends React.Component {
     }
     onDeleteBranch(branch) {
         this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
+    }
+    onCreateModule(module) {
+        this.props.onCreateModule && this.props.onCreateModule(module);
     }
     onSelectModule(module) {
         this.props.onSelectModule && this.props.onSelectModule(module);

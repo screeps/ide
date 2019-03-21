@@ -45,10 +45,14 @@ export class ModulesPane {
             return;
         }
 
-        this.viewRef.current.setState({
+        this.viewRef.current.state = {
             ...this.viewRef.current.state,
             ...state
-        });
+        };
+
+        this.viewRef.current.setState(
+            this.viewRef.current.state
+        );
     }
 
     constructor(
@@ -77,6 +81,7 @@ export class ModulesPane {
                     onSelectBranch={(...args) => this.onSelectBranch(...args)}
                     onDeleteBranch={(...args) => this.onDeleteBranch(...args)}
 
+                    onCreateModule={(...args) => this.onCreateModule(...args)}
                     onSelectModule={(...args) => this.onSelectModule(...args)}
                     onDeleteModule={(...args) => this.onDeleteModule(...args)}
 
@@ -153,6 +158,22 @@ export class ModulesPane {
         }
     }
 
+    async onCreateModule(module: string): Promise<void> {
+        const { modules } = this.state;
+
+        this.state = {
+            modules: {
+                ...modules,
+                [module]: {
+                    content: '',
+                    modified: true
+                }
+            }
+        }
+
+        this.onSelectModule(module);
+    }
+
     async onSelectModule(module: string): Promise<void> {
         const { branch, modules } = this.state;
 
@@ -185,13 +206,16 @@ export class ModulesPane {
     }
 
     async onDeleteModule(module: string): Promise<void> {
-        try {
-            const modules = this.state.modules;
-            delete modules[module];
+        const { modules } = this.state;
 
-            this.state = { modules }
-        } catch(err) {
-            // Ignore.
+        this.state = {
+            modules: {
+                ...modules,
+                [module]: {
+                    ...modules[module],
+                    deleted: true
+                }
+            }
         }
     }
 
@@ -203,10 +227,12 @@ export class ModulesPane {
             branch: string, modules: IModulesViewModules
         } = this.state;
 
-        let modules: IModules = Object.entries(_modules).reduce((modules, [module, { content }]) => ({
-            ...modules,
-            [module]: content
-        }), {});
+        let modules: IModules = Object.entries(_modules)
+            .filter(([, { deleted }]) => !deleted)
+            .reduce((modules, [module, { content }]) => ({
+                ...modules,
+                [module]: content
+            }), {});
 
         let changes = await readUserCode(getBranchPath(branch));
 
@@ -263,12 +289,19 @@ export class ModulesPane {
     async onDidChange({ path }: { path: string }): Promise<void> {
         const module = getModuleByPath(path);
 
+        console.log(module);
+
         if (!module) {
             return;
         }
 
         const file = new File(path);
-        const content = await file.read();
+        let content;
+        try {
+            content = await file.read();
+        } catch (err) {
+            return;
+        }
 
         const { modules } = this.state;
 
