@@ -107,14 +107,42 @@ export async function getUser(): Promise<User> {
 }
 
 export function getBranchPath(branch: string): string {
+    const projectPath = atom.project.getPaths()[0];
+
+    if (projectPath) {
+        const srcDir = configGetter('src');
+        const fullPath = path.resolve(projectPath, srcDir);
+
+        return fullPath;
+    }
+
     // @ts-ignore
     return path.resolve(`${ atom.packages.packageDirPaths }`, PACKAGE_NAME, `.branches/${ branch }`);
 }
 
 export function getModulePath(branch: string, module: string): string {
+    const extension = /\.js/.test(module) ? '' : '.js';
+
     // @ts-ignore
     const branchPath = getBranchPath(branch);
-    return path.resolve(`${ branchPath }/${ module }.js`);
+    return path.resolve(`${ branchPath }/${ module }${ extension }`);
+}
+
+export function getModuleByPath(path: string): string | null {
+    const srcDir = getBranchPath('');
+
+    if (!path.includes(srcDir)) {
+        return null
+    }
+
+    const matches = path.match(/([^\\]+)$/gm);
+
+    if (matches && matches[0]) {
+        const match = matches[0];
+        return match.replace(/\.js$/, '');
+    }
+
+    return null;
 }
 
 export async function readUserCode(fullPath: string): Promise<IModules> {
@@ -130,7 +158,7 @@ export async function readUserCode(fullPath: string): Promise<IModules> {
     for (let file of files) {
         const content = await file.read(true) as string;
         const fileName = file.getBaseName()
-            .replace('.js', '');
+            .replace(/\.js$/, '');
 
         modules[fileName] = content;
     }

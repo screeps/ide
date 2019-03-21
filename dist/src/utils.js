@@ -93,16 +93,36 @@ async function getUser() {
 }
 exports.getUser = getUser;
 function getBranchPath(branch) {
+    const projectPath = atom.project.getPaths()[0];
+    if (projectPath) {
+        const srcDir = config_1.configGetter('src');
+        const fullPath = path.resolve(projectPath, srcDir);
+        return fullPath;
+    }
     // @ts-ignore
     return path.resolve(`${atom.packages.packageDirPaths}`, config_1.PACKAGE_NAME, `.branches/${branch}`);
 }
 exports.getBranchPath = getBranchPath;
 function getModulePath(branch, module) {
+    const extension = /\.js/.test(module) ? '' : '.js';
     // @ts-ignore
     const branchPath = getBranchPath(branch);
-    return path.resolve(`${branchPath}/${module}.js`);
+    return path.resolve(`${branchPath}/${module}${extension}`);
 }
 exports.getModulePath = getModulePath;
+function getModuleByPath(path) {
+    const srcDir = getBranchPath('');
+    if (!path.includes(srcDir)) {
+        return null;
+    }
+    const matches = path.match(/([^\\]+)$/gm);
+    if (matches && matches[0]) {
+        const match = matches[0];
+        return match.replace(/\.js$/, '');
+    }
+    return null;
+}
+exports.getModuleByPath = getModuleByPath;
 async function readUserCode(fullPath) {
     const dir = new atom_1.Directory(fullPath);
     const entries = dir.getEntriesSync();
@@ -113,7 +133,7 @@ async function readUserCode(fullPath) {
     for (let file of files) {
         const content = await file.read(true);
         const fileName = file.getBaseName()
-            .replace('.js', '');
+            .replace(/\.js$/, '');
         modules[fileName] = content;
     }
     return modules;

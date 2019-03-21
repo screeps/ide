@@ -65,7 +65,12 @@ class ModulesView extends React.Component {
                         return (React.createElement("li", { className: 'tab screeps-modules-view__item' + (modified ? ' modified' : ''), key: moduleName },
                             React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(moduleName) }, moduleName),
                             React.createElement("div", { className: 'close-icon', onClick: () => this.onDeleteModule(moduleName) })));
-                    }))));
+                    })),
+                React.createElement("div", { className: 'screeps-modules-view__new' },
+                    React.createElement("form", null,
+                        React.createElement("fieldset", { className: 'screeps-field' },
+                            React.createElement("input", { className: 'native-key-bindings', placeholder: 'New module name...', type: 'text', autoComplete: '', required: true, onChange: () => { } }),
+                            React.createElement("div", { className: 'underline' }))))));
         }
         return (React.createElement("div", { className: 'screeps-ide screeps-modules-view' },
             header,

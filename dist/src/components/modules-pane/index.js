@@ -65,8 +65,9 @@ class ModulesPane {
         }
     }
     async onSelectBranch(_branch) {
-        const { branch, modules: branchModules } = await this._api.getUserCode(_branch);
-        const modules = await this.toModulesView(branch, branchModules);
+        const { branch, modules: _modules } = await this._api.getUserCode(_branch);
+        const changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
+        const modules = await this.toModules(Object.assign({}, changes, _modules), changes);
         this.state = {
             branch,
             modules
@@ -104,18 +105,8 @@ class ModulesPane {
         textEditor = await atom.workspace.open(moduleFile.getPath(), {
             searchAllPanes: true
         });
-        textEditor.onDidChange(() => {
-            const { branch: _branch, modules } = this.state;
-            if (_branch !== branch) {
-                return;
-            }
-            let modified = false;
-            // @ts-ignore
-            if (content !== textEditor.getText()) {
-                modified = true;
-            }
-            modules[module] = Object.assign({}, modules[module], { modified });
-            this.state = { modules };
+        textEditor.onDidSave(({ path }) => {
+            this.onDidChange({ path });
         });
     }
     async onDeleteModule(module) {
@@ -139,7 +130,7 @@ class ModulesPane {
         catch (err) {
             return;
         }
-        const modulesView = await this.toModulesView(branch, modules);
+        const modulesView = await this.toModules(modules);
         this.state = { modules: modulesView };
     }
     async onRevertChanges() {
@@ -150,7 +141,8 @@ class ModulesPane {
             if (!modified) {
                 continue;
             }
-            const moduleFile = new atom_1.File(utils_1.getModulePath(branch, module));
+            const modulePath = utils_1.getModulePath(branch, module);
+            const moduleFile = new atom_1.File(modulePath);
             try {
                 await moduleFile.write(content);
             }
@@ -163,6 +155,21 @@ class ModulesPane {
             };
         }
         this.state = { modules };
+    }
+    async onDidChange({ path }) {
+        const module = utils_1.getModuleByPath(path);
+        if (!module) {
+            return;
+        }
+        const file = new atom_1.File(path);
+        const content = await file.read();
+        const { modules } = this.state;
+        this.state = {
+            modules: Object.assign({}, modules, { [module]: {
+                    content: modules[module].content,
+                    modified: modules[module].content !== content
+                } })
+        };
     }
     async open() {
         await atom.workspace.open(this, {
@@ -184,19 +191,17 @@ class ModulesPane {
         insetPanel.style.position = 'absolute';
         insetPanel.style.right = 0;
         insetPanel.style.zIndex = 1;
+        atom.project.onDidChangeFiles((events) => {
+            events.forEach(({ path }) => this.onDidChange({ path }));
+        });
     }
-    async toModulesView(branch, _modules) {
+    async toModules(origin, changes = {}) {
         const modules = {};
-        const entries = Object.entries(_modules);
+        const entries = Object.entries(origin);
         for (let i = 0, l = entries.length; i < l; i++) {
             const [module, content] = entries[i];
-            const moduleFile = new atom_1.File(utils_1.getModulePath(branch, module));
-            let modified = false;
-            const isExist = await moduleFile.exists();
-            if (isExist) {
-                const _content = await moduleFile.read();
-                modified = content !== _content;
-            }
+            const _content = changes[module];
+            const modified = !!(_content && _content !== content);
             modules[module] = {
                 content,
                 modified

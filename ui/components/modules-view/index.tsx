@@ -102,14 +102,14 @@ class ModulesView extends React.Component<IModulesViewProps> {
                             );
                         })}
                     </ul>
-                    {/* <div className='screeps-modules-view__new'>
+                    <div className='screeps-modules-view__new'>
                         <form>
                             <fieldset className='screeps-field'>
                                 <input className='native-key-bindings' placeholder='New module name...' type='text' autoComplete='' required={ true } onChange={() => {}} />
                                 <div className='underline' />
                             </fieldset>
                         </form>
-                    </div> */}
+                    </div>
                 </div>
             );
         }

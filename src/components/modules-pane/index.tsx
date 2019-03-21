@@ -9,7 +9,13 @@ import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { Api } from '../../api';
 import { progress } from '../../decoratos';
-import { getModulePath, getBranchPath, readUserCode } from '../../utils';
+import {
+    // isProjectExist,
+    getModulePath,
+    getModuleByPath,
+    getBranchPath, 
+    readUserCode
+} from '../../utils';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 
@@ -117,9 +123,14 @@ export class ModulesPane {
     @progress
     async onSelectBranch(_branch?: string): Promise<void> {
 
-        const { branch, modules: branchModules } = await this._api.getUserCode(_branch);
+        const { branch, modules: _modules } = await this._api.getUserCode(_branch);
 
-        const modules = await this.toModulesView(branch, branchModules); 
+        const changes = await readUserCode(getBranchPath(branch));
+
+        const modules = await this.toModules({
+            ...changes,
+            ..._modules
+        }, changes);
 
         this.state = {
             branch,
@@ -167,26 +178,10 @@ export class ModulesPane {
             searchAllPanes: true
         }) as TextEditor;
 
-        textEditor.onDidChange(() => {
-            const { branch: _branch, modules } = this.state;
+        textEditor.onDidSave(({ path }) => {
+            this.onDidChange({ path })
+        });
 
-            if (_branch !== branch) {
-                return;
-            }
-
-            let modified = false;
-            // @ts-ignore
-            if (content !== textEditor.getText()) {
-                modified = true;
-            }
-
-            modules[module] = {
-                ...modules[module],
-                modified
-            };
-
-            this.state = { modules };
-        })
     }
 
     async onDeleteModule(module: string): Promise<void> {
@@ -226,7 +221,8 @@ export class ModulesPane {
             return;
         }
 
-        const modulesView = await this.toModulesView(branch, modules);
+        const modulesView = await this.toModules(modules);
+
         this.state = { modules: modulesView };
     }
 
@@ -246,7 +242,8 @@ export class ModulesPane {
                 continue;
             }
 
-            const moduleFile = new File(getModulePath(branch, module));
+            const modulePath = getModulePath(branch, module);
+            const moduleFile = new File(modulePath);
 
             try {
                 await moduleFile.write(content);
@@ -261,6 +258,29 @@ export class ModulesPane {
         }
 
         this.state = { modules }
+    }
+
+    async onDidChange({ path }: { path: string }): Promise<void> {
+        const module = getModuleByPath(path);
+
+        if (!module) {
+            return;
+        }
+
+        const file = new File(path);
+        const content = await file.read();
+
+        const { modules } = this.state;
+
+        this.state = {
+            modules: {
+                ...modules,
+                [module]: {
+                    content: modules[module].content,
+                    modified: modules[module].content !== content
+                }
+            }
+        }
     }
 
     async open() {
@@ -288,23 +308,20 @@ export class ModulesPane {
         insetPanel.style.right = 0;
         insetPanel.style.zIndex = 1;
 
+        atom.project.onDidChangeFiles((events) => {
+            events.forEach(({ path }) => this.onDidChange({ path }));
+        });
     }
 
-    async toModulesView(branch: string, _modules: IModules): Promise<IModulesViewModules> {
+    async toModules(origin: IModules, changes: IModules = {}): Promise<IModulesViewModules> {
         const modules: IModulesViewModules = {};
+        const entries = Object.entries(origin);
 
-        const entries = Object.entries(_modules);
         for(let i = 0, l = entries.length; i < l; i++) {
             const [module, content] = entries[i];
+            const _content = changes[module];
 
-            const moduleFile = new File(getModulePath(branch, module));
-            let modified = false;
-
-            const isExist = await moduleFile.exists();
-            if (isExist) {
-                const _content = await moduleFile.read();
-                modified = content !== _content;
-            }
+            const modified = !!(_content && _content !== content);
 
             modules[module] = {
                 content,

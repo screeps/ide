@@ -4,8 +4,7 @@ import { PACKAGE_NAME, configGetter } from './config';
 
 import {
     authCommand,
-    startCommand,
-    commitCommand
+    startCommand
 } from './commands';
 import { WelcomePane } from './components/welcome-pane';
 
@@ -24,8 +23,7 @@ export function activate(state: any) {
     //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${ PACKAGE_NAME }:${ authCommand.name }`]: authCommand,
-        [`${ PACKAGE_NAME }:${ startCommand.name }`]: startCommand,
-        [`${ PACKAGE_NAME }:${ commitCommand.name }`]: commitCommand
+        [`${ PACKAGE_NAME }:${ startCommand.name }`]: startCommand
     }));
 
     if (configGetter('showOnStartup')) {

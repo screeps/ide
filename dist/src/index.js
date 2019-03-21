@@ -18,8 +18,7 @@ function activate(state) {
     //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.authCommand.name}`]: commands_1.authCommand,
-        [`${config_1.PACKAGE_NAME}:${commands_1.startCommand.name}`]: commands_1.startCommand,
-        [`${config_1.PACKAGE_NAME}:${commands_1.commitCommand.name}`]: commands_1.commitCommand
+        [`${config_1.PACKAGE_NAME}:${commands_1.startCommand.name}`]: commands_1.startCommand
     }));
     if (config_1.configGetter('showOnStartup')) {
         setTimeout(() => new welcome_pane_1.WelcomePane(), 500);
