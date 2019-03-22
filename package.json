@@ -38,6 +38,55 @@
   "uriHandler": {
     "method": "handleURI"
   },
+  "configSchema": {
+    "showOnStartup": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show welcome panes with useful information when opening a new Atom window."
+    },
+
+    "global": {
+      "title": "Common",
+      "type": "object",
+      "order": 1,
+      "properties": {
+        "authToken": {
+          "title": "Auth token",
+          "description": "",
+          "type": "string",
+          "default": "",
+          "order": 1
+        },
+
+        "apiUrl": {
+          "title": "Screep API Url",
+          "description": "",
+          "type": "string",
+          "default": "https://screeps.com/api",
+          "order": 1
+        },
+
+        "websocketUrl": {
+          "title": "Screep socket Url",
+          "description": "",
+          "type": "string",
+          "default": "https://screeps.com/socket",
+          "order": 1
+        },
+
+        "src": {
+          "title": "Project folder",
+          "description": "",
+          "type": "string",
+          "default": "./dist",
+          "order": 1
+        }
+      }
+    }
+  },
+  "deserializers": {
+    "ModulesPane": "deserializeModulesPane"
+  },
   "dependencies": {
     "jsoneditor": "^5.28.2",
     "pako": "^1.0.8",

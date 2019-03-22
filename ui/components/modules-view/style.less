@@ -16,6 +16,11 @@
     color: rgba(234, 237, 255, 0.7);
     font-family: 'Segoe UI';
     font-size: 12px;
+
+    button:focus {
+        outline: none;
+        box-shadow: inherit !important;
+    }
 }
 
 .screeps-modules-view ul {
@@ -35,61 +40,6 @@
     flex: 1 0 auto !important;
     min-height: 30px;
 }
-
-.screeps-modules-view ul li > * {
-    // flex-basis: 100%;
-}
-
-.screeps-modules-view ul li > *:nth-child(1) {
-    // order: 1;
-}
-
-.screeps-modules-view ul li > *:nth-child(2) {
-    // position: absolute;
-    // right: 0;
-
-    // min-width: 34px;
-    // flex-basis: 34px;
-    // justify-content: center;
-    // order: 2;
-}
-
-.screeps-modules-view ul li > *:nth-child(3) {
-    // position: absolute;
-    // right: 34px;
-
-    // min-width: 34px;
-    // flex-basis: 34px;
-    // justify-content: center;
-    // order: 3;
-}
-
-// .screeps-modules-view ul button:first-child {
-//     display: inline-flex;
-//     align-items: center;
-//     height: 32px;
-
-//     padding: 0;
-//     padding-left: 5px;
-//     padding-right: 5px;
-
-//     border: none;
-//     background: none;
-
-//     cursor: pointer;
-//     color: rgba(234, 237, 255, 0.7);
-//     line-height: 32px;
-//     text-align: left;
-//     white-space: nowrap;
-// }
-
-// .screeps-modules-view ul button:first-child:hover {
-//     box-shadow: inset 1px 1px 100px rgba(255, 255, 255, .5)
-// }
-
-// .screeps-modules-view ul button:first-child:focus {
-//     outline: none;
-// }
 
 .screeps-modules-view__header {
     display: flex;
@@ -126,10 +76,10 @@
     button:last-child {
         margin-right: 40px;
     }
-}
 
-.screeps-modules-view__header button:focus {
-    outline: none;
+    button:focus {
+        outline: none;
+    }
 }
 
 .screeps-modules-view__new {
@@ -141,6 +91,14 @@
     line-height: 32px;
 }
 
+.screeps-modules-view__module {
+    button {
+        width: 100%;
+
+        border-radius: 0 !important;
+    }
+}
+
 .screeps-modules-view__active {
     display: inline-block;
     margin-left: 10px;
@@ -150,6 +108,13 @@
     text-transform: uppercase;
 }
 
-.screeps-modules-view__branch:hover {
-    /* box-shadow: inset 1px 1px 100px rgba(255, 255, 255, .5) */
+.screeps-modules-view__item.active {
+    width: auto !important;
+
+    box-shadow: inherit !important;
+
+    & .btn {
+        color: rgba(234, 237, 255, 1);
+        font-style: italic;
+    }
 }

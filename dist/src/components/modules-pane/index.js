@@ -12,17 +12,33 @@ const confirm_modal_1 = require("../confirm-modal");
 const decoratos_1 = require("../../decoratos");
 const utils_1 = require("../../utils");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
+exports.MODULES_URI = 'atom://screeps-ide/modules';
 class ModulesPane {
-    constructor(_api) {
-        this._api = _api;
+    constructor(state = {}) {
         this.data = {};
         this.viewRef = React.createRef();
         this._eventsSbj = new rxjs_1.Subject();
         this.events$ = this._eventsSbj.asObservable();
+        console.log('create', exports.MODULES_URI);
         this.element = document.createElement('div');
-        this.render(this.state);
-        this.open();
-        this.onSelectBranch('default');
+        this.render(state);
+        // this.open();
+        atom.project.onDidChangeFiles((events) => {
+            events.forEach(({ path }) => this.onDidChange({ path }));
+        });
+        atom.workspace.onDidChangeActivePaneItem((pane) => {
+            if (!(pane instanceof atom_1.TextEditor)) {
+                return;
+            }
+            const path = pane.getPath();
+            this.onDidChangeActivePaneItem({ path });
+        });
+        (async () => {
+            const api = await utils_1.getApi();
+            await utils_1.getUser();
+            this._api = api;
+            this.onSelectBranch(state.branch);
+        })();
     }
     get state() {
         if (!this.viewRef.current) {
@@ -109,14 +125,14 @@ class ModulesPane {
             await moduleFile.create();
             await moduleFile.write(content);
         }
-        let textEditor = atom.workspace.getTextEditors()
+        let isTextEditor = atom.workspace.getTextEditors()
             .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
-        if (textEditor) {
-            return;
-        }
-        textEditor = await atom.workspace.open(moduleFile.getPath(), {
+        let textEditor = await atom.workspace.open(moduleFile.getPath(), {
             searchAllPanes: true
         });
+        if (isTextEditor) {
+            return;
+        }
         textEditor.onDidSave(({ path }) => {
             this.onDidChange({ path });
         });
@@ -187,37 +203,33 @@ class ModulesPane {
             return;
         }
         const { modules } = this.state;
+        let _module = modules[module];
+        if (_module) {
+            _module = {
+                content: _module.content,
+                modified: _module.content !== content,
+                deleted: _module.deleted
+            };
+        }
+        else {
+            _module = {
+                content: null,
+                modified: true,
+                deleted: false
+            };
+        }
         this.state = {
-            modules: Object.assign({}, modules, { [module]: {
-                    content: modules[module].content,
-                    modified: modules[module].content !== content,
-                    deleted: modules[module].deleted
-                } })
+            modules: Object.assign({}, modules, { [module]: _module })
         };
     }
-    async open() {
-        await atom.workspace.open(this, {
-            searchAllPanes: true,
-            activatePane: true,
-            activateItem: true,
-            split: 'down',
-            location: 'left'
-        });
-        const pane = atom.workspace.paneForItem(this);
-        if (!pane) {
+    async onDidChangeActivePaneItem({ path }) {
+        const module = utils_1.getModuleByPath(path);
+        if (!module) {
             return;
         }
-        pane.onDidDestroy(() => {
-            this._eventsSbj.next({ type: exports.ACTION_CLOSE });
-        });
-        // @ts-ignore
-        const insetPanel = pane.element.firstChild;
-        insetPanel.style.position = 'absolute';
-        insetPanel.style.right = 0;
-        insetPanel.style.zIndex = 1;
-        atom.project.onDidChangeFiles((events) => {
-            events.forEach(({ path }) => this.onDidChange({ path }));
-        });
+        let { modules } = this.state;
+        modules = Object.entries(modules).reduce((modules, [_module, data]) => (Object.assign({}, modules, { [_module]: Object.assign({}, data, { active: module === _module }) })), {});
+        this.state = { modules };
     }
     async toModules(origin, changes = {}) {
         const modules = {};
@@ -233,18 +245,28 @@ class ModulesPane {
         }
         return modules;
     }
+    // Implement serialization hook for view model
+    serialize() {
+        return {
+            deserializer: 'ModulesPane',
+            state: this.state
+        };
+    }
+    static deserialize({ state }) {
+        return new ModulesPane(state);
+    }
     // Atom pane required interface's methods
     getURI() {
-        return 'atom://screeps-ide-modules-view';
+        return exports.MODULES_URI;
     }
     getTitle() {
-        return '';
+        return 'Modules';
     }
-    isPermanentDockItem() {
-        return false;
+    getDefaultLocation() {
+        'left';
     }
     getAllowedLocations() {
-        return ['left'];
+        return ['left', 'right'];
     }
 }
 tslib_1.__decorate([

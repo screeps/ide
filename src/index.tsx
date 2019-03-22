@@ -4,9 +4,14 @@ import { PACKAGE_NAME, configGetter } from './config';
 
 import {
     authCommand,
-    startCommand
+    startCommand,
+    // showConsolePanelCommand,
+    // showMemoryPanelCommand,
+    // showModulesPaneCommand
 } from './commands';
 import { WelcomePane } from './components/welcome-pane';
+import { ModulesPane, MODULES_URI } from './components/modules-pane';
+// import { ModulesPane, MODULES_URI } from './components/modules-pane';
 
 const subscriptions = new CompositeDisposable();
 
@@ -19,6 +24,12 @@ export function initialize(state: any) {
 
 export function activate(state: any) {
     console.log('Screeps-IDE:activate', state);
+
+    subscriptions.add(atom.workspace.addOpener((uri): any => {
+        if (uri === MODULES_URI) {
+            return new ModulesPane();
+        }
+    }));
 
     //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
@@ -36,14 +47,14 @@ export function deactivate() {
 }
 
 export function serialize() {
-    return {
-    };
+    return { };
+}
+
+// @ts-ignore
+export function deserializeModulesPane({ state }) {
+    return ModulesPane.deserialize({ state });
 }
 
 export function handleURI(parsedUri: any) {
     console.log(parsedUri)
 }
-
-const path = require('path');
-// @ts-ignore
-console.log(path.resolve(`${ atom.packages.packageDirPaths }`, PACKAGE_NAME));

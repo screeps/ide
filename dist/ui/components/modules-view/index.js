@@ -68,11 +68,11 @@ class ModulesView extends React.Component {
                     React.createElement("i", { className: 'sc-icon-revert' }))));
             view = (React.createElement("div", null,
                 React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' },
-                    React.createElement("li", { className: 'tab screeps-modules-view__item' + (this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : '') },
+                    React.createElement("li", { className: 'tab screeps-modules-view__item screeps-modules-view__module' + (this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : '') + (this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].active ? ' active' : '') },
                         React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(MAIN_MODULE) }, MAIN_MODULE),
                         React.createElement("div", { className: 'modified-icon' })),
-                    this._getAdditionalModules(this.state.modules).map(([moduleName, { modified }]) => {
-                        return (React.createElement("li", { className: 'tab screeps-modules-view__item' + (modified ? ' modified' : ''), key: moduleName },
+                    this._getAdditionalModules(this.state.modules).map(([moduleName, { modified, active }]) => {
+                        return (React.createElement("li", { className: 'tab screeps-modules-view__item screeps-modules-view__module' + (modified ? ' modified' : '') + (active ? ' active' : ''), key: moduleName },
                             React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(moduleName) }, moduleName),
                             React.createElement("div", { className: 'close-icon', onClick: () => this.onDeleteModule(moduleName) })));
                     })),

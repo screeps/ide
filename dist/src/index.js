@@ -5,6 +5,8 @@ const atom_1 = require("atom");
 const config_1 = require("./config");
 const commands_1 = require("./commands");
 const welcome_pane_1 = require("./components/welcome-pane");
+const modules_pane_1 = require("./components/modules-pane");
+// import { ModulesPane, MODULES_URI } from './components/modules-pane';
 const subscriptions = new atom_1.CompositeDisposable();
 var config_2 = require("./config");
 exports.config = config_2.default;
@@ -15,6 +17,11 @@ function initialize(state) {
 exports.initialize = initialize;
 function activate(state) {
     console.log('Screeps-IDE:activate', state);
+    subscriptions.add(atom.workspace.addOpener((uri) => {
+        if (uri === modules_pane_1.MODULES_URI) {
+            return new modules_pane_1.ModulesPane();
+        }
+    }));
     //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.authCommand.name}`]: commands_1.authCommand,
@@ -33,11 +40,13 @@ function serialize() {
     return {};
 }
 exports.serialize = serialize;
+// @ts-ignore
+function deserializeModulesPane({ state }) {
+    return modules_pane_1.ModulesPane.deserialize({ state });
+}
+exports.deserializeModulesPane = deserializeModulesPane;
 function handleURI(parsedUri) {
     console.log(parsedUri);
 }
 exports.handleURI = handleURI;
-const path = require('path');
-// @ts-ignore
-console.log(path.resolve(`${atom.packages.packageDirPaths}`, config_1.PACKAGE_NAME));
 //# sourceMappingURL=index.js.map

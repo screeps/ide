@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const atom_1 = require("atom");
+const modules_pane_1 = require("../components/modules-pane");
 const commands_1 = require("../commands");
 // const PACKAGE_NAME = 'screeps-ide';
 function consumeStatusBar(statusBar) {
@@ -16,7 +17,13 @@ function consumeStatusBar(statusBar) {
     const modulesElementRef = document.createElement('div');
     modulesElementRef.innerText = 'Modules';
     modulesElementRef.classList.add('screeps-ide__status-bar', 'inline-block');
-    modulesElementRef.addEventListener('click', () => commands_1.showModulesPaneCommand());
+    // modulesElementRef.addEventListener('click', () => showModulesPaneCommand());
+    modulesElementRef.addEventListener('click', () => atom.workspace.open(modules_pane_1.MODULES_URI, {
+        activatePane: false,
+        activateItem: false,
+        // split: 'down',
+        location: 'left'
+    }));
     statusBar.addLeftTile({
         item: modulesElementRef,
         priority: 10000

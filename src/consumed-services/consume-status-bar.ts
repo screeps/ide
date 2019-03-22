@@ -1,9 +1,11 @@
 import { CompositeDisposable } from 'atom';
 
+import { MODULES_URI } from '../components/modules-pane';
+
 import {
     showConsolePanelCommand,
     showMemoryPanelCommand,
-    showModulesPaneCommand
+    // showModulesPaneCommand
 } from '../commands';
 
 // const PACKAGE_NAME = 'screeps-ide';
@@ -24,7 +26,13 @@ export function consumeStatusBar(statusBar: any) {
     const modulesElementRef = document.createElement('div');
     modulesElementRef.innerText = 'Modules';
     modulesElementRef.classList.add('screeps-ide__status-bar', 'inline-block');
-    modulesElementRef.addEventListener('click', () => showModulesPaneCommand());
+    // modulesElementRef.addEventListener('click', () => showModulesPaneCommand());
+    modulesElementRef.addEventListener('click', () => atom.workspace.open(MODULES_URI, {
+        activatePane: false,
+        activateItem: false,
+        // split: 'down',
+        location: 'left'
+    }));
 
     statusBar.addLeftTile({
         item: modulesElementRef,

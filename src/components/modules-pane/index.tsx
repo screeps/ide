@@ -1,5 +1,5 @@
 const fs = require('fs');
-import { File, TextEditor } from 'atom';
+import { File, TextEditor, ViewModel } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Subject, Observable } from 'rxjs';
@@ -15,12 +15,14 @@ import {
     getModulePath,
     getModuleByPath,
     getBranchPath, 
-    readUserCode
+    readUserCode,
+    getApi, getUser 
 } from '../../utils';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
+export const MODULES_URI = 'atom://screeps-ide/modules';
 
-export class ModulesPane {
+export class ModulesPane implements ViewModel {
     public element: HTMLElement;
 
     public data: any = {};
@@ -56,14 +58,38 @@ export class ModulesPane {
         );
     }
 
-    constructor(
-        private _api: Api
-    ) {
-        this.element = document.createElement('div');
-        this.render(this.state);
+    // @ts-ignore
+    private _api: Api;
 
-        this.open();
-        this.onSelectBranch('default');
+    constructor(
+        state: IModulesViewState = {} as IModulesViewState
+    ) {
+        console.log('create', MODULES_URI);
+
+        this.element = document.createElement('div');
+        this.render(state);
+
+        // this.open();
+
+        atom.project.onDidChangeFiles((events) => {
+            events.forEach(({ path }) => this.onDidChange({ path }));
+        });
+
+        atom.workspace.onDidChangeActivePaneItem((pane) => {
+            if (!(pane instanceof TextEditor)) {
+                return;
+            }
+
+            const path = pane.getPath() as string;
+            this.onDidChangeActivePaneItem({ path });
+        });
+
+        (async () => {
+            const api = await getApi();
+            await getUser();
+            this._api = api;
+            this.onSelectBranch(state.branch);
+        })()
     }
 
     render({ modules = {}, branch = '', branches = [] }: IModulesViewState) {
@@ -189,16 +215,16 @@ export class ModulesPane {
             await moduleFile.write(content);
         }
 
-        let textEditor = atom.workspace.getTextEditors()
+        let isTextEditor = atom.workspace.getTextEditors()
             .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
 
-        if (textEditor) {
-            return;
-        }
-
-        textEditor = await atom.workspace.open(moduleFile.getPath(), {
+        let textEditor = await atom.workspace.open(moduleFile.getPath(), {
             searchAllPanes: true
         }) as TextEditor;
+
+        if (isTextEditor) {
+            return;
+        }
 
         textEditor.onDidSave(({ path }) => {
             this.onDidChange({ path })
@@ -312,46 +338,48 @@ export class ModulesPane {
 
         const { modules } = this.state;
 
+        let _module = modules[module];
+
+        if (_module) {
+            _module = {
+                content: _module.content,
+                modified: _module.content !== content,
+                deleted: _module.deleted
+            }
+        } else {
+            _module = {
+                content: null,
+                modified: true,
+                deleted: false
+            }
+        }
+
         this.state = {
             modules: {
                 ...modules,
-                [module]: {
-                    content: modules[module].content,
-                    modified: modules[module].content !== content,
-                    deleted: modules[module].deleted
-                }
+                [module]: _module
             }
         }
     }
 
-    async open() {
-        await atom.workspace.open(this, {
-            searchAllPanes: true,
-            activatePane: true,
-            activateItem: true,
-            split: 'down',
-            location: 'left'
-        });
+    async onDidChangeActivePaneItem({ path }: { path: string }): Promise<void> {
+        const module = getModuleByPath(path);
 
-        const pane = atom.workspace.paneForItem(this);
-
-        if (!pane) {
+        if (!module) {
             return;
         }
 
-        pane.onDidDestroy(() => {
-            this._eventsSbj.next({ type: ACTION_CLOSE });
-        });
+        let { modules } = this.state;
 
-        // @ts-ignore
-        const insetPanel = pane.element.firstChild;
-        insetPanel.style.position = 'absolute';
-        insetPanel.style.right = 0;
-        insetPanel.style.zIndex = 1;
+        modules = Object.entries(modules).reduce((modules, [_module, data]) => ({
+            ...modules,
+            [_module]: {
+                ...data,
+                active: module === _module 
+            }
+        }), {})
 
-        atom.project.onDidChangeFiles((events) => {
-            events.forEach(({ path }) => this.onDidChange({ path }));
-        });
+        this.state = { modules };
     }
 
     async toModules(origin: IModules, changes: IModules = {}): Promise<IModulesViewModules> {
@@ -373,20 +401,32 @@ export class ModulesPane {
         return modules;
     }
 
+    // Implement serialization hook for view model
+    serialize() {
+        return {
+            deserializer: 'ModulesPane',
+            state: this.state
+        }
+    }
+
+    static deserialize({ state }: { state: IModulesViewState }) {
+        return new ModulesPane(state);
+    }
+
     // Atom pane required interface's methods
     getURI() {
-        return 'atom://screeps-ide-modules-view';
+        return MODULES_URI;
     }
 
     getTitle() {
-        return '';
+        return 'Modules';
     }
 
-    isPermanentDockItem() {
-        return false;
+    getDefaultLocation() {
+        'left';
     }
 
     getAllowedLocations() {
-        return ['left'];
+        return ['left', 'right'];
     }
 }

@@ -9,6 +9,7 @@ interface IModule {
     content: string;
     modified?: boolean;
     deleted?: boolean;
+    active?: boolean;
 }
 
 interface IModulesViewModules {

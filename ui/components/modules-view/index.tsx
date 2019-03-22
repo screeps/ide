@@ -87,15 +87,19 @@ class ModulesView extends React.Component<IModulesViewProps> {
             view = (
                 <div>
                     <ul className='tab-bar screeps-modules-view__items'>
-                        <li className={ 'tab screeps-modules-view__item' + (
-                            this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : ''
-                        ) }>
+                        <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
+                            this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
+                            this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].active ? ' active' : ''
+                        )}>
                             <button className='btn btn--clear' onClick={() => this.onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
                             <div className='modified-icon'></div>
                         </li>
-                        {this._getAdditionalModules(this.state.modules).map(([ moduleName, { modified }]) => {
+                        {this._getAdditionalModules(this.state.modules).map(([ moduleName, { modified, active }]) => {
                             return (
-                        <li className={ 'tab screeps-modules-view__item' + (modified ? ' modified' : '') } key={moduleName}>
+                        <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
+                            modified ? ' modified' : '' ) +  (
+                            active ? ' active' : ''
+                        )} key={moduleName}>
                             <button className='btn btn--clear' onClick={() => this.onSelectModule(moduleName)}>{ moduleName }</button>
                             <div className='close-icon' onClick={() => this.onDeleteModule(moduleName)}></div>
                         </li>
