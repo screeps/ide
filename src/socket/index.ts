@@ -80,4 +80,8 @@ export class Socket {
 
         return pipe$;
     }
+
+    off(channel: string) {
+        this._socket.send(`unsubscribe ${ channel }`);
+    }
 }

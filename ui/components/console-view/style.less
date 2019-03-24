@@ -65,10 +65,11 @@
         white-space: pre;
     }
 
-    .--input {
+    .--input,
+    .--output {
         color: #82a1d6;
 
-        &:before {
+        &::before {
             content: '';
 
             position: relative;
@@ -84,6 +85,12 @@
             background-repeat: no-repeat;
             background-position: center;
             background-size: 100%;
+        }
+    }
+
+    .--output {
+        &::before {
+            transform: rotate(180deg);
         }
     }
 

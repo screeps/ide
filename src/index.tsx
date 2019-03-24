@@ -11,6 +11,9 @@ import {
 } from './commands';
 import { WelcomePane } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
+import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
+import { MemoryPanel, MEMORY_URI } from './components/memory-panel';
+
 // import { ModulesPane, MODULES_URI } from './components/modules-pane';
 
 const subscriptions = new CompositeDisposable();
@@ -28,6 +31,18 @@ export function activate(state: any) {
     subscriptions.add(atom.workspace.addOpener((uri): any => {
         if (uri === MODULES_URI) {
             return new ModulesPane();
+        }
+    }));
+
+    subscriptions.add(atom.workspace.addOpener((uri): any => {
+        if (uri === CONSOLE_URI) {
+            return new ConsolePanel();
+        }
+    }));
+
+    subscriptions.add(atom.workspace.addOpener((uri): any => {
+        if (uri === MEMORY_URI) {
+            return new MemoryPanel();
         }
     }));
 
@@ -50,9 +65,16 @@ export function serialize() {
     return { };
 }
 
-// @ts-ignore
-export function deserializeModulesPane({ state }) {
+export function deserializeModulesPane({ state }: { state: any }) {
     return ModulesPane.deserialize({ state });
+}
+
+export function deserializeConsolePanel({ state }: { state: any }) {
+    return ConsolePanel.deserialize({ state });
+}
+
+export function deserializeMemoryPanel({ state }: { state: any }) {
+    return MemoryPanel.deserialize({ state });
 }
 
 export function handleURI(parsedUri: any) {

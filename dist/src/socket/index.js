@@ -59,6 +59,9 @@ class Socket {
         const pipe$ = this.messages$.pipe(operators_1.filter((msg) => isSubscribe(channel, msg)));
         return pipe$;
     }
+    off(channel) {
+        this._socket.send(`unsubscribe ${channel}`);
+    }
 }
 exports.Socket = Socket;
 //# sourceMappingURL=index.js.map

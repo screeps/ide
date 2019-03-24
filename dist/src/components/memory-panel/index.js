@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+// import { Panel, CompositeDisposable } from 'atom';
 const atom_1 = require("atom");
 const pako = require('pako');
 const React = require("react");
@@ -8,121 +9,103 @@ const ReactDOM = require("react-dom");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const ui_1 = require("../../../ui");
+const service_1 = require("../../service");
 const utils_1 = require("../../utils");
 const decoratos_1 = require("../../decoratos");
+const utils_2 = require("../../utils");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
+exports.MEMORY_URI = 'atom://screeps-ide/memory';
 class MemoryPanel {
-    constructor(_user, _api, _socket, _service) {
-        this._user = _user;
-        this._api = _api;
-        this._socket = _socket;
-        this._service = _service;
+    constructor(state = {}) {
         this.viewRef = React.createRef();
         this._memorySbj = new rxjs_1.Subject();
         this.memory$ = this._memorySbj.asObservable();
         this._tooltips = {};
         this._tooltipsDisposables = null;
-        this._pipe$ = null;
-        this._eventsSbj = new rxjs_1.Subject();
-        this.events$ = this._eventsSbj.asObservable();
         // Private component actions.
         this.onInput = (path) => {
-            if (!this.viewRef.current) {
-                return;
-            }
-            const memory = [...this.viewRef.current.state.memory, { path }];
+            const memory = [...this.state.memory, { path }];
             this._memorySbj.next(memory);
             utils_1.putWatches(memory);
             this.initMemoryPipeSubscription();
         };
         this.onClose = () => {
-            if (this._pipe$) {
-                this._pipe$.unsubscribe();
-            }
-            if (this._tooltipsDisposables) {
-                this._tooltipsDisposables.dispose();
-            }
-            this._panel.destroy();
+            this.destroy();
         };
         this.onShard = async () => {
             this.initMemoryPipeSubscription();
         };
         this.element = document.createElement('div');
-        this.element.style.height = '300px';
-        this.render({
-            shard: this._user.shard,
-            memory: utils_1.getWatches(),
-            segment: '0'
-        });
-        this._panel = atom.workspace.addBottomPanel({
-            item: this.element,
-            visible: true
-        });
-        this._panel.onDidDestroy(() => {
-            this._eventsSbj.next({ type: exports.ACTION_CLOSE });
-        });
-        this.initMemoryPipeSubscription();
-        this._service.shards$
-            .pipe(operators_1.tap((shards) => {
-            if (!this.viewRef.current) {
+        this.render(state);
+        setTimeout(() => {
+            const pane = atom.workspace.paneForItem(this);
+            if (!pane) {
                 return;
             }
-            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { shards }));
-        }))
-            .subscribe();
-        const subscriptions = new atom_1.CompositeDisposable();
-        this.memory$
-            .pipe(operators_1.tap((memory) => {
-            if (!this.viewRef.current) {
-                return;
-            }
-            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { memory }));
-        }))
-            .pipe(operators_1.tap(() => {
-            subscriptions.dispose();
-        }))
-            .pipe(operators_1.tap((memory) => {
-            memory.forEach(({ path }) => {
-                const ref = document.getElementById(`${ui_1.PATH_BTN_REMOVE}${path || 'root'}`);
-                if (!ref) {
-                    return;
-                }
-                const disposable = atom.tooltips.add(ref, {
-                    title: 'Delete watch'
+            pane.onDidDestroy(() => this.destroy());
+        });
+        (async () => {
+            this._api = await utils_2.getApi();
+            this._user = await utils_2.getUser();
+            this._socket = utils_2.getSocket();
+            this._service = new service_1.Service();
+            this.initMemoryPipeSubscription();
+            this._service.shards$
+                .pipe(operators_1.tap((shards) => this.state = { shards }))
+                .subscribe();
+            const subscriptions = new atom_1.CompositeDisposable();
+            this.memory$
+                .pipe(operators_1.tap((memory) => this.state = { memory }))
+                .pipe(operators_1.tap(() => {
+                subscriptions.dispose();
+            }))
+                .pipe(operators_1.tap((memory) => {
+                memory.forEach(({ path }) => {
+                    const ref = document.getElementById(`${ui_1.PATH_BTN_REMOVE}${path || 'root'}`);
+                    if (!ref) {
+                        return;
+                    }
+                    const disposable = atom.tooltips.add(ref, {
+                        title: 'Delete watch'
+                    });
+                    subscriptions.add(disposable);
                 });
-                subscriptions.add(disposable);
-            });
-        }))
-            .subscribe();
-        this._applyTooltips();
+            }))
+                .subscribe();
+            this._applyTooltips();
+        })();
     }
-    get isVisible() {
-        if (!this._panel) {
-            return false;
+    get state() {
+        if (!this.viewRef.current) {
+            return {};
         }
-        return this._panel.isVisible();
+        return this.viewRef.current.state;
     }
-    initMemoryPipeSubscription() {
-        if (this._pipe$) {
-            this._pipe$.unsubscribe();
-        }
+    set state(state) {
         if (!this.viewRef.current) {
             return;
         }
-        const state = this.viewRef.current.state;
-        const memory = utils_1.getWatches();
-        const paths$ = [];
-        memory.forEach(({ path }) => {
-            const pipe = this._socket.on(`user:${this._user.id}/memory/${state.shard}/${path}`);
-            paths$.push(pipe);
+        this.viewRef.current.state = Object.assign({}, this.viewRef.current.state, state);
+        this.viewRef.current.setState(this.viewRef.current.state);
+    }
+    initMemoryPipeSubscription() {
+        if (this._pipe$) {
+            this._pipe$.next();
+            this._pipe$.complete();
+            this._pipe$ = null;
+        }
+        this._pipe$ = new rxjs_1.Subject();
+        const { shard, memory } = this.state;
+        console.log(shard, memory);
+        const paths$ = memory.map(({ path }) => {
+            return this._socket.on(`user:${this._user.id}/memory/${shard}/${path}`);
         });
         const pipe$ = rxjs_1.merge(...paths$);
-        this._pipe$ = pipe$.subscribe(({ data: [channel, value] }) => {
+        pipe$
+            .pipe(operators_1.takeUntil(this._pipe$))
+            .pipe(operators_1.tap(({ data: [channel, value] }) => {
             const [, , , _path] = channel.match(/user\:(.+)\/memory\/(.+)\/(.+)/i);
-            if (!this.viewRef.current) {
-                return;
-            }
-            const memory = this.viewRef.current.state.memory;
+            const memory = this.state.memory;
             const path = memory.find(({ path }) => path === _path);
             if (!path || path.value === value) {
                 return;
@@ -131,14 +114,18 @@ class MemoryPanel {
             if (path.value && path.value.toString() === value) {
                 return;
             }
-            const idx = this.viewRef.current.state.memory.indexOf(path);
+            const idx = this.state.memory.indexOf(path);
             memory[idx] = Object.assign({}, path, { value });
             this._memorySbj.next([...memory]);
+        }))
+            .subscribe(undefined, undefined, () => {
+            memory.forEach(({ path }) => {
+                this._socket.off(`user:${this._user.id}/memory/${shard}/${path}`);
+            });
         });
     }
-    render({ shard, memory, segment }) {
-        ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
-            React.createElement(ui_1.MemoryView, { ref: this.viewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) })), this.element);
+    render({ shard = 'shard0', memory = utils_1.getWatches(), segment = '0' }) {
+        ReactDOM.render(React.createElement(ui_1.MemoryView, { ref: this.viewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) }), this.element);
     }
     async onMemory(path, shard) {
         let response;
@@ -148,14 +135,11 @@ class MemoryPanel {
         catch (err) {
             return;
         }
-        if (!this.viewRef.current) {
-            return;
-        }
         let value;
         if (response.data) {
             value = JSON.parse(pako.ungzip(atob(response.data.substring(3)), { to: 'string' }));
         }
-        const memory = this.viewRef.current.state.memory;
+        const memory = this.state.memory;
         const idx = memory.findIndex((item) => item.path === path);
         if (idx === -1) {
             return;
@@ -196,10 +180,7 @@ class MemoryPanel {
         catch (err) {
             return;
         }
-        if (!this.viewRef.current) {
-            return;
-        }
-        const memory = this.viewRef.current.state.memory;
+        const memory = this.state.memory;
         const idx = memory.findIndex((item) => item.path === path);
         if (idx === -1) {
             return;
@@ -214,15 +195,9 @@ class MemoryPanel {
         catch (err) {
             return;
         }
-        if (!this.viewRef.current) {
-            return;
-        }
     }
     async onMemoryDelete(path) {
-        if (!this.viewRef.current) {
-            return;
-        }
-        const memory = this.viewRef.current.state.memory;
+        const memory = this.state.memory;
         const idx = memory.findIndex((item) => item.path === path);
         if (idx === -1) {
             return;
@@ -244,10 +219,11 @@ class MemoryPanel {
         catch (err) {
             return;
         }
-        if (!this.viewRef.current) {
-            return;
-        }
-        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { segmentData: response.data, _segmentData: response.data, segmentHasChange: false }));
+        this.state = {
+            segmentData: response.data,
+            _segmentData: response.data,
+            segmentHasChange: false
+        };
     }
     async onSegmentUpdate(segment, data, shard) {
         try {
@@ -256,16 +232,11 @@ class MemoryPanel {
         catch (err) {
             return;
         }
-        if (!this.viewRef.current) {
-            return;
-        }
-        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { segmentData: data, _segmentData: data, segmentHasChange: false }));
-    }
-    show() {
-        this._panel.show();
-    }
-    hide() {
-        this._panel.hide();
+        this.state = {
+            segmentData: data,
+            _segmentData: data,
+            segmentHasChange: false
+        };
     }
     _applyTooltips() {
         setTimeout(() => {
@@ -290,18 +261,38 @@ class MemoryPanel {
             }
         });
     }
+    destroy() {
+        if (this._pipe$) {
+            this._pipe$.next();
+            this._pipe$.complete();
+            this._pipe$ = null;
+        }
+        if (this._tooltipsDisposables) {
+            this._tooltipsDisposables.dispose();
+        }
+    }
+    // Implement serialization hook for view model
+    serialize() {
+        return {
+            deserializer: 'MemoryPanel',
+            state: this.state
+        };
+    }
+    static deserialize({ state }) {
+        return new MemoryPanel(state);
+    }
     // Atom pane required interface's methods
     getURI() {
-        return 'atom://screeps-ide-memory-view';
+        return exports.MEMORY_URI;
     }
     getTitle() {
-        return '';
+        return 'Memory';
     }
-    isPermanentDockItem() {
-        return true;
-    }
+    // isPermanentDockItem() {
+    //     return true;
+    // }
     getAllowedLocations() {
-        return ['top'];
+        return ['bottom', 'top'];
     }
 }
 tslib_1.__decorate([

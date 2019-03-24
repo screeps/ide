@@ -1,71 +1,65 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// import { Panel, CompositeDisposable } from 'atom';
 const atom_1 = require("atom");
 const React = require("react");
 const ReactDOM = require("react-dom");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const ui_1 = require("../../../ui");
+const service_1 = require("../../service");
+const utils_1 = require("../../utils");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
+exports.CONSOLE_URI = 'atom://screeps-ide/console';
 class ConsolePanel {
-    constructor(_user, _api, _socket, _service) {
-        this._user = _user;
-        this._api = _api;
-        this._socket = _socket;
-        this._service = _service;
+    constructor(state = {}) {
         this.viewRef = React.createRef();
-        this._eventsSbj = new rxjs_1.Subject();
-        this.events$ = this._eventsSbj.asObservable();
-        this._console$ = null;
         this._tooltipsDisposables = null;
         this.element = document.createElement('div');
-        this.element.style.height = '300px';
-        this.render({
-            shard: this._user.shard
-        });
-        this._panel = atom.workspace.addBottomPanel({
-            item: this.element,
-            visible: true
-        });
-        this._panel.onDidDestroy(() => {
-            this._eventsSbj.next({ type: exports.ACTION_CLOSE });
-        });
-        this._service.shards$
-            .pipe(operators_1.tap((shards) => {
-            if (!this.viewRef.current) {
+        this.render(state);
+        setTimeout(() => {
+            const pane = atom.workspace.paneForItem(this);
+            if (!pane) {
                 return;
             }
-            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { shards }));
-        }))
-            .subscribe();
-        this.onResume();
+            pane.onDidDestroy(() => this.destroy());
+        });
+        (async () => {
+            this._api = await utils_1.getApi();
+            this._user = await utils_1.getUser();
+            this._socket = utils_1.getSocket();
+            this._service = new service_1.Service();
+            // this.state = { shard: this._user.shard };
+            this._service.shards$
+                .pipe(operators_1.tap((shards) => this.state = { shards }))
+                .subscribe();
+            this.onResume();
+        })();
     }
-    get isVisible() {
-        if (!this._panel) {
-            return false;
+    get state() {
+        if (!this.viewRef.current) {
+            return {};
         }
-        return this._panel.isVisible();
+        return this.viewRef.current.state;
+    }
+    set state(state) {
+        if (!this.viewRef.current) {
+            return;
+        }
+        this.viewRef.current.state = Object.assign({}, this.viewRef.current.state, state);
+        this.viewRef.current.setState(this.viewRef.current.state);
     }
     render({ shard }) {
-        ReactDOM.render(React.createElement(ui_1.ResizablePanel, null,
-            React.createElement(ui_1.ConsoleView, { ref: this.viewRef, shard: shard, onShard: () => this.onShard(), onInput: (expression) => this.onInput(expression), onClose: () => this.onClose(), onPause: () => this.onPause(), onResume: () => this.onResume() })), this.element);
+        ReactDOM.render(React.createElement(ui_1.ConsoleView, { ref: this.viewRef, shard: shard, onShard: () => this.onShard(), onInput: (expression) => this.onInput(expression), onClose: () => this.onClose(), onPause: () => this.onPause(), onResume: () => this.onResume() }), this.element);
     }
     // Private component actions.
     async onInput(expression) {
-        if (!this.viewRef.current) {
-            return;
-        }
-        const msg = {
-            log: expression
-        };
-        if (!this.viewRef.current) {
-            return;
-        }
-        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { messages: [...this.viewRef.current.state.messages, msg] }));
+        const messages = [...this.state.messages, { expression }];
+        this.state = { messages };
         try {
             await this._api.sendUserConsole({
                 expression,
-                shard: this.viewRef.current.state.shard
+                shard: this.state.shard
             });
         }
         catch (err) {
@@ -75,25 +69,21 @@ class ConsolePanel {
     async onShard() {
     }
     async onClose() {
-        if (this._console$) {
-            this._console$.unsubscribe();
-            this._console$ = null;
-        }
-        if (this._tooltipsDisposables) {
-            this._tooltipsDisposables.dispose();
-        }
-        this._panel.destroy();
+        this.destroy();
     }
     async onPause() {
         if (this._console$) {
-            this._console$.unsubscribe();
+            this._console$.next();
+            this._console$.complete();
             this._console$ = null;
         }
         this._applyTooltips();
     }
     async onResume() {
         this.onPause();
-        this._console$ = this._socket.on(`user:${this._user.id}/console`)
+        this._console$ = new rxjs_1.Subject();
+        this._socket.on(`user:${this._user.id}/console`)
+            .pipe(operators_1.takeUntil(this._console$))
             .pipe(operators_1.filter((msg) => {
             if (msg.data && msg.data[1].messages && msg.data[1].messages.log.length) {
                 return true;
@@ -104,9 +94,6 @@ class ConsolePanel {
             return false;
         }))
             .pipe(operators_1.tap((msg) => {
-            if (!this.viewRef.current) {
-                return;
-            }
             const timeStamp = msg.timeStamp;
             const shard = msg.data[1].shard;
             const messages = [];
@@ -123,6 +110,17 @@ class ConsolePanel {
             catch (err) {
                 // Noop.
             }
+            try {
+                msg.data[1].messages.results.reduce((messages, result) => {
+                    messages.push({
+                        result
+                    });
+                    return messages;
+                }, messages);
+            }
+            catch (err) {
+                // Noop.
+            }
             if (msg.data[1].error) {
                 messages.push({
                     error: msg.data[1].error,
@@ -130,16 +128,14 @@ class ConsolePanel {
                     shard
                 });
             }
-            this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { messages: [...this.viewRef.current.state.messages, ...messages] }));
+            this.state = {
+                messages: [...this.state.messages, ...messages]
+            };
         }))
-            .subscribe();
+            .subscribe(undefined, undefined, () => {
+            this._socket.off(`user:${this._user.id}/console`);
+        });
         this._applyTooltips();
-    }
-    show() {
-        this._panel.show();
-    }
-    hide() {
-        this._panel.hide();
     }
     _applyTooltips() {
         setTimeout(() => {
@@ -169,18 +165,35 @@ class ConsolePanel {
             }
         });
     }
+    destroy() {
+        if (this._console$) {
+            this._console$.next();
+            this._console$.complete();
+            this._console$ = null;
+        }
+        if (this._tooltipsDisposables) {
+            this._tooltipsDisposables.dispose();
+        }
+    }
+    // Implement serialization hook for view model
+    serialize() {
+        return {
+            deserializer: 'ConsolePanel',
+            state: this.state
+        };
+    }
+    static deserialize({ state }) {
+        return new ConsolePanel(state);
+    }
     // Atom pane required interface's methods
     getURI() {
-        return 'atom://screeps-ide-console-view';
+        return exports.CONSOLE_URI;
     }
     getTitle() {
-        return '';
-    }
-    isPermanentDockItem() {
-        return true;
+        return 'Console';
     }
     getAllowedLocations() {
-        return ['top'];
+        return ['bottom', 'top'];
     }
 }
 exports.ConsolePanel = ConsolePanel;

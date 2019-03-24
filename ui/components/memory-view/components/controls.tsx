@@ -60,10 +60,10 @@ export default class MemoryControlsView extends React.Component<IMemoryControlsV
                         className='btn icon' onClick={ this.onSegments }>
                         <i className='sc-icon-view' />
                     </button>
-                    <button id='screeps-memory__control-close'
+                    {/* <button id='screeps-memory__control-close'
                         className='btn icon' onClick={ this.onClose }>
                         <i className='sc-icon-clear' />
-                    </button>
+                    </button> */}
                 </div>
             </div>
         );

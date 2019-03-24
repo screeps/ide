@@ -56,9 +56,9 @@ class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
                         className='btn icon' onClick={ this.onDelete }><i className='sc-icon-delete' />
                     </button>
                     { toggle }
-                    <button id='screeps-console__close'
+                    {/* <button id='screeps-console__close'
                         className='btn icon' onClick={ this.onClose }><i className='sc-icon-clear' />
-                    </button>
+                    </button> */}
                 </div>
             </div>
         );

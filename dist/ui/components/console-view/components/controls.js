@@ -45,9 +45,7 @@ class ConsoleControlsView extends React.Component {
             React.createElement("div", { className: 'btn-group' },
                 React.createElement("button", { id: 'screeps-console__delete', className: 'btn icon', onClick: this.onDelete },
                     React.createElement("i", { className: 'sc-icon-delete' })),
-                toggle,
-                React.createElement("button", { id: 'screeps-console__close', className: 'btn icon', onClick: this.onClose },
-                    React.createElement("i", { className: 'sc-icon-clear' })))));
+                toggle)));
     }
 }
 exports.default = ConsoleControlsView;

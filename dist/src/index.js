@@ -6,6 +6,8 @@ const config_1 = require("./config");
 const commands_1 = require("./commands");
 const welcome_pane_1 = require("./components/welcome-pane");
 const modules_pane_1 = require("./components/modules-pane");
+const console_panel_1 = require("./components/console-panel");
+const memory_panel_1 = require("./components/memory-panel");
 // import { ModulesPane, MODULES_URI } from './components/modules-pane';
 const subscriptions = new atom_1.CompositeDisposable();
 var config_2 = require("./config");
@@ -20,6 +22,16 @@ function activate(state) {
     subscriptions.add(atom.workspace.addOpener((uri) => {
         if (uri === modules_pane_1.MODULES_URI) {
             return new modules_pane_1.ModulesPane();
+        }
+    }));
+    subscriptions.add(atom.workspace.addOpener((uri) => {
+        if (uri === console_panel_1.CONSOLE_URI) {
+            return new console_panel_1.ConsolePanel();
+        }
+    }));
+    subscriptions.add(atom.workspace.addOpener((uri) => {
+        if (uri === memory_panel_1.MEMORY_URI) {
+            return new memory_panel_1.MemoryPanel();
         }
     }));
     //@ts-ignore
@@ -40,11 +52,18 @@ function serialize() {
     return {};
 }
 exports.serialize = serialize;
-// @ts-ignore
 function deserializeModulesPane({ state }) {
     return modules_pane_1.ModulesPane.deserialize({ state });
 }
 exports.deserializeModulesPane = deserializeModulesPane;
+function deserializeConsolePanel({ state }) {
+    return console_panel_1.ConsolePanel.deserialize({ state });
+}
+exports.deserializeConsolePanel = deserializeConsolePanel;
+function deserializeMemoryPanel({ state }) {
+    return memory_panel_1.MemoryPanel.deserialize({ state });
+}
+exports.deserializeMemoryPanel = deserializeMemoryPanel;
 function handleURI(parsedUri) {
     console.log(parsedUri);
 }

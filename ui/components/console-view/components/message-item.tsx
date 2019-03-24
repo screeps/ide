@@ -36,7 +36,19 @@ class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProp
 
         if (this.props.message.log) {
             message = (
-                <span className={timestamp ? '' : '--input'}>{ this.props.message.log }</span>
+                <span>{ this.props.message.log }</span>
+            );
+        }
+
+        if (this.props.message.expression) {
+            message = (
+                <span className='--input'>{ this.props.message.expression }</span>
+            );
+        }
+
+        if (this.props.message.result) {
+            message = (
+                <span className='--output'>{ this.props.message.result }</span>
             );
         }
 

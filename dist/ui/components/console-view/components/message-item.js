@@ -18,7 +18,13 @@ class ConsoleMessageItemView extends React.Component {
                 "\u00A0"));
         }
         if (this.props.message.log) {
-            message = (React.createElement("span", { className: timestamp ? '' : '--input' }, this.props.message.log));
+            message = (React.createElement("span", null, this.props.message.log));
+        }
+        if (this.props.message.expression) {
+            message = (React.createElement("span", { className: '--input' }, this.props.message.expression));
+        }
+        if (this.props.message.result) {
+            message = (React.createElement("span", { className: '--output' }, this.props.message.result));
         }
         if (this.props.message.error) {
             error = (React.createElement("span", { className: '--error' }, this.props.message.error));

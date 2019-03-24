@@ -5,7 +5,7 @@ const fs = require('fs');
 const atom_1 = require("atom");
 const React = require("react");
 const ReactDOM = require("react-dom");
-const rxjs_1 = require("rxjs");
+// import { Subject, Observable } from 'rxjs';
 const ui_1 = require("../../../ui");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
@@ -15,14 +15,9 @@ exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.MODULES_URI = 'atom://screeps-ide/modules';
 class ModulesPane {
     constructor(state = {}) {
-        this.data = {};
         this.viewRef = React.createRef();
-        this._eventsSbj = new rxjs_1.Subject();
-        this.events$ = this._eventsSbj.asObservable();
-        console.log('create', exports.MODULES_URI);
         this.element = document.createElement('div');
         this.render(state);
-        // this.open();
         atom.project.onDidChangeFiles((events) => {
             events.forEach(({ path }) => this.onDidChange({ path }));
         });
@@ -40,6 +35,8 @@ class ModulesPane {
             this.onSelectBranch(state.branch);
         })();
     }
+    // private _eventsSbj = new Subject();
+    // public events$: Observable<any> = this._eventsSbj.asObservable();
     get state() {
         if (!this.viewRef.current) {
             return {

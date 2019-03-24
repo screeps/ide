@@ -30,9 +30,7 @@ class MemoryControlsView extends React.Component {
                 React.createElement("button", { id: 'screeps-memory__control-main', className: 'btn icon', onClick: this.onMainMemory },
                     React.createElement("i", { className: 'sc-icon-dehaze' })),
                 React.createElement("button", { id: 'screeps-memory__control-segments', className: 'btn icon', onClick: this.onSegments },
-                    React.createElement("i", { className: 'sc-icon-view' })),
-                React.createElement("button", { id: 'screeps-memory__control-close', className: 'btn icon', onClick: this.onClose },
-                    React.createElement("i", { className: 'sc-icon-clear' })))));
+                    React.createElement("i", { className: 'sc-icon-view' })))));
     }
 }
 exports.default = MemoryControlsView;

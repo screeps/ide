@@ -2,7 +2,7 @@ const fs = require('fs');
 import { File, TextEditor, ViewModel } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Subject, Observable } from 'rxjs';
+// import { Subject, Observable } from 'rxjs';
 
 import { ModulesView } from '../../../ui';
 
@@ -24,13 +24,10 @@ export const MODULES_URI = 'atom://screeps-ide/modules';
 
 export class ModulesPane implements ViewModel {
     public element: HTMLElement;
+    public viewRef = React.createRef<ModulesView>();
 
-    public data: any = {};
-
-    viewRef = React.createRef<ModulesView>();
-
-    private _eventsSbj = new Subject();
-    public events$: Observable<any> = this._eventsSbj.asObservable();
+    // private _eventsSbj = new Subject();
+    // public events$: Observable<any> = this._eventsSbj.asObservable();
 
     public get state(): any {
         if (!this.viewRef.current) {
@@ -64,12 +61,8 @@ export class ModulesPane implements ViewModel {
     constructor(
         state: IModulesViewState = {} as IModulesViewState
     ) {
-        console.log('create', MODULES_URI);
-
         this.element = document.createElement('div');
         this.render(state);
-
-        // this.open();
 
         atom.project.onDidChangeFiles((events) => {
             events.forEach(({ path }) => this.onDidChange({ path }));
