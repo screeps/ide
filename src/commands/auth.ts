@@ -34,7 +34,7 @@ export function createTokenCommand(api: Api) {
 }
 
 export function authCommand(): Promise<any> {
-    const apiUrl = configGetter('apiUrl');
+    const apiUrl = configGetter('apiUrl') as string;
     const api = new Api({ url: apiUrl });
 
     return new Promise((resolve) => {

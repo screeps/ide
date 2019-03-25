@@ -16,14 +16,14 @@ export async function getApi(): Promise<any> {
         return api;
     }
 
-    const token = configGetter('authToken');
+    const token = configGetter('authToken') as string;
 
     if (!token) {
         api = await authCommand();
         return api;
     }
 
-    const apiUrl = configGetter('apiUrl');
+    const apiUrl = configGetter('apiUrl') as string;
 
     api = new Api({
         url: apiUrl,
@@ -38,8 +38,8 @@ export function getSocket() {
         return socket;
     }
 
-    const websocketUrl = configGetter('websocketUrl');
-    const token = configGetter('authToken');
+    const websocketUrl = configGetter('websocketUrl') as string;
+    const token = configGetter('authToken') as string;
 
     socket = new Socket({
         url: websocketUrl,

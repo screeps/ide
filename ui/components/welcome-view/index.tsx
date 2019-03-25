@@ -5,9 +5,14 @@ import * as React from 'react';
 export default class WelcomeView extends React.Component<IWelcomeViewProps> {
     //@ts-ignore
     props: IWelcomeViewProps;
+    state: IWelcomeViewState;
 
     constructor(props: IWelcomeViewProps) {
         super(props);
+
+        this.state = {
+            showOnStartup: props.showOnStartup
+        }
     }
 
     public render() {
@@ -43,7 +48,7 @@ export default class WelcomeView extends React.Component<IWelcomeViewProps> {
 
                     <section className='screeps-welcome__section'>
                         <label>
-                            <input className='input-checkbox' type='checkbox' checked={ true } onChange={() => this.onChange()} />
+                            <input className='input-checkbox' type='checkbox' checked={ this.state.showOnStartup } onChange={() => this.onChangeShowOnStartup()} />
                             Show Welcome Guide when opening Atom
                         </label>
                     </section>
@@ -52,7 +57,10 @@ export default class WelcomeView extends React.Component<IWelcomeViewProps> {
         );
     }
 
-    onChange() {
+    onChangeShowOnStartup() {
+        this.state.showOnStartup = !this.state.showOnStartup;
+        this.setState({ ...this.state });
 
+        this.props.onChangeShowOnStartup && this.props.onChangeShowOnStartup(this.state.showOnStartup);
     }
 }

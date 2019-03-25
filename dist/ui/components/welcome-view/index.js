@@ -5,6 +5,9 @@ const React = require("react");
 class WelcomeView extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            showOnStartup: props.showOnStartup
+        };
     }
     render() {
         return (React.createElement("div", { className: 'screeps-ide screeps-welcome' },
@@ -27,10 +30,13 @@ class WelcomeView extends React.Component {
                             " - Join the game community in our Slack chat network"))),
                 React.createElement("section", { className: 'screeps-welcome__section' },
                     React.createElement("label", null,
-                        React.createElement("input", { className: 'input-checkbox', type: 'checkbox', checked: true, onChange: () => this.onChange() }),
+                        React.createElement("input", { className: 'input-checkbox', type: 'checkbox', checked: this.state.showOnStartup, onChange: () => this.onChangeShowOnStartup() }),
                         "Show Welcome Guide when opening Atom")))));
     }
-    onChange() {
+    onChangeShowOnStartup() {
+        this.state.showOnStartup = !this.state.showOnStartup;
+        this.setState(Object.assign({}, this.state));
+        this.props.onChangeShowOnStartup && this.props.onChangeShowOnStartup(this.state.showOnStartup);
     }
 }
 exports.default = WelcomeView;

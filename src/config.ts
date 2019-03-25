@@ -139,7 +139,7 @@ if (local) {
 
 export default config;
 
-export function configGetter(name: string): string {
+export function configGetter(name: string): string | boolean {
     let value = atom.config.get(`${ PACKAGE_NAME }.${ name }`);
 
     if (!value) {
@@ -153,6 +153,6 @@ export function configGetter(name: string): string {
     return value;
 }
 
-export function configSetter(name: string, value: string) {
+export function configSetter(name: string, value: string | boolean) {
     atom.config.set(`${ PACKAGE_NAME }.${ name }`, value);
 }
