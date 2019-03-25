@@ -96,7 +96,6 @@ class MemoryPanel {
         }
         this._pipe$ = new rxjs_1.Subject();
         const { shard, memory } = this.state;
-        console.log(shard, memory);
         const paths$ = memory.map(({ path }) => {
             return this._socket.on(`user:${this._user.id}/memory/${shard}/${path}`);
         });

@@ -136,8 +136,7 @@ export class MemoryPanel {
 
         this._pipe$ = new Subject();
 
-        const { shard, memory }: { shard: string, memory: IMemoryPath[]}= this.state;
-        console.log(shard, memory);
+        const { shard, memory }: { shard: string, memory: IMemoryPath[] } = this.state;
         const paths$ = memory.map(({ path }) => {
             return this._socket.on(`user:${ this._user.id }/memory/${ shard }/${ path }`);
         });

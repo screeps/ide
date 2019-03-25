@@ -36,7 +36,7 @@ class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProp
 
         if (this.props.message.log) {
             message = (
-                <span>{ this.props.message.log }</span>
+                <span className='--log'>{ this.props.message.log }</span>
             );
         }
 

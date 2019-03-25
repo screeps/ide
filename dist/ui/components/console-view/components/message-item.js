@@ -18,7 +18,7 @@ class ConsoleMessageItemView extends React.Component {
                 "\u00A0"));
         }
         if (this.props.message.log) {
-            message = (React.createElement("span", null, this.props.message.log));
+            message = (React.createElement("span", { className: '--log' }, this.props.message.log));
         }
         if (this.props.message.expression) {
             message = (React.createElement("span", { className: '--input' }, this.props.message.expression));
