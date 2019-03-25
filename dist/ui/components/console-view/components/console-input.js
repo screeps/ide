@@ -8,7 +8,6 @@ class ConsoleInputView extends React.Component {
         this._history = [];
         this._historyIndex = 0;
         this.onKeyUpHandler = (event) => {
-            console.log(event.key, this._historyIndex);
             if (event.key !== 'ArrowUp') {
                 return;
             }
@@ -24,7 +23,6 @@ class ConsoleInputView extends React.Component {
             this._historyIndex = this._history.length;
         };
         this.onKeyDownHandler = (event) => {
-            console.log(event.key, this._historyIndex);
             if (event.key !== 'ArrowDown') {
                 return;
             }

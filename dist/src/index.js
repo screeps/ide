@@ -34,13 +34,21 @@ function activate(state) {
             return new memory_panel_1.MemoryPanel();
         }
     }));
+    subscriptions.add(atom.workspace.addOpener((uri) => {
+        if (uri === welcome_pane_1.WELCOME_URI) {
+            return new welcome_pane_1.WelcomePane();
+        }
+    }));
     //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.authCommand.name}`]: commands_1.authCommand,
         [`${config_1.PACKAGE_NAME}:${commands_1.startCommand.name}`]: commands_1.startCommand
     }));
     if (config_1.configGetter('showOnStartup')) {
-        setTimeout(() => new welcome_pane_1.WelcomePane(), 500);
+        setTimeout(() => atom.workspace.open(welcome_pane_1.WELCOME_URI, {
+            activateItem: true,
+            split: 'left'
+        }), 500);
     }
 }
 exports.activate = activate;

@@ -9,7 +9,7 @@ import {
     // showMemoryPanelCommand,
     // showModulesPaneCommand
 } from './commands';
-import { WelcomePane } from './components/welcome-pane';
+import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
 import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
 import { MemoryPanel, MEMORY_URI } from './components/memory-panel';
@@ -46,6 +46,12 @@ export function activate(state: any) {
         }
     }));
 
+    subscriptions.add(atom.workspace.addOpener((uri): any => {
+        if (uri === WELCOME_URI) {
+            return new WelcomePane();
+        }
+    }));
+
     //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${ PACKAGE_NAME }:${ authCommand.name }`]: authCommand,
@@ -53,7 +59,10 @@ export function activate(state: any) {
     }));
 
     if (configGetter('showOnStartup')) {
-        setTimeout(() => new WelcomePane(), 500);
+        setTimeout(() => atom.workspace.open(WELCOME_URI, {
+            activateItem: true,
+            split: 'left'
+        }), 500);
     }
 }
 

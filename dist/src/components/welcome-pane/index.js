@@ -8,7 +8,6 @@ class WelcomePane {
     constructor() {
         this.element = document.createElement('div');
         this.render();
-        atom.workspace.open(this, { split: 'left' });
     }
     render() {
         ReactDOM.render(React.createElement(ui_1.WelcomeView, null), this.element);

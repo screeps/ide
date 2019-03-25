@@ -11,8 +11,6 @@ export class WelcomePane {
     constructor() {
         this.element = document.createElement('div');
         this.render();
-
-        atom.workspace.open(this, {split: 'left'});
     }
 
     render() {
