@@ -52,10 +52,15 @@ export function activate(state: any) {
         }
     }));
 
-    //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${ PACKAGE_NAME }:${ authCommand.name }`]: authCommand,
         [`${ PACKAGE_NAME }:${ startCommand.name }`]: startCommand
+    }));
+
+    subscriptions.add(atom.commands.add('tree-view', {
+        'tree-view:expand-item': () => {
+            console.log(123);
+        }
     }));
 
     if (configGetter('showOnStartup')) {

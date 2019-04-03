@@ -1,3 +1,2 @@
-export * from './consume-tool-bar';
+export * from './consume-tree-view';
 export * from './consume-status-bar';
-export * from './consume-element-icons';

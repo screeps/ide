@@ -39,10 +39,14 @@ function activate(state) {
             return new welcome_pane_1.WelcomePane();
         }
     }));
-    //@ts-ignore
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.authCommand.name}`]: commands_1.authCommand,
         [`${config_1.PACKAGE_NAME}:${commands_1.startCommand.name}`]: commands_1.startCommand
+    }));
+    subscriptions.add(atom.commands.add('tree-view', {
+        'tree-view:expand-item': () => {
+            console.log(123);
+        }
     }));
     if (config_1.configGetter('showOnStartup')) {
         setTimeout(() => atom.workspace.open(welcome_pane_1.WELCOME_URI, {

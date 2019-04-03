@@ -19,19 +19,14 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "consumedServices": {
-    "file-icons.element-icons": {
-      "versions": {
-        "1.0.0": "consumeElementIcons"
-      }
-    },
-    "tool-bar": {
-      "versions": {
-        "^0 || ^1": "consumeToolBar"
-      }
-    },
     "status-bar": {
       "versions": {
         "^1.0.0": "consumeStatusBar"
+      }
+    },
+    "tree-view": {
+      "versions": {
+        "^1.0.0": "consumeTreeView"
       }
     }
   },
