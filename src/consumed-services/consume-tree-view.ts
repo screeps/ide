@@ -14,6 +14,4 @@ export function consumeTreeView(treeView: any) {
 
     const entry = treeView.entryForPath(fullPath) as HTMLElement;
     entry.setAttribute('screeps-dist', 'screeps-dist');
-
-    console.log(entry);
 }

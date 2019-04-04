@@ -55,7 +55,7 @@ export class AtomModal {
     }
 
     onCancel = () => {
-        this._eventsSbj.next({ type: 'MODAL_CANCEL '});
+        this._eventsSbj.next({ type: 'MODAL_CANCEL'});
         this.destroy();
     }
 

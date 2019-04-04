@@ -1,7 +1,9 @@
 "use strict";
+/// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const atom_1 = require("atom");
+const state_1 = require("./state");
 const config_1 = require("./config");
 const commands_1 = require("./commands");
 const welcome_pane_1 = require("./components/welcome-pane");
@@ -15,6 +17,7 @@ exports.config = config_2.default;
 tslib_1.__exportStar(require("./consumed-services"), exports);
 function initialize(state) {
     console.log('Screeps-IDE:initialize', state);
+    state_1.default.next(state);
 }
 exports.initialize = initialize;
 function activate(state) {
@@ -40,13 +43,8 @@ function activate(state) {
         }
     }));
     subscriptions.add(atom.commands.add('atom-workspace', {
-        [`${config_1.PACKAGE_NAME}:${commands_1.authCommand.name}`]: commands_1.authCommand,
-        [`${config_1.PACKAGE_NAME}:${commands_1.startCommand.name}`]: commands_1.startCommand
-    }));
-    subscriptions.add(atom.commands.add('tree-view', {
-        'tree-view:expand-item': () => {
-            console.log(123);
-        }
+        [`${config_1.PACKAGE_NAME}:${commands_1.commit.name}`]: commands_1.commit,
+        [`${config_1.PACKAGE_NAME}:${commands_1.revert.name}`]: commands_1.revert
     }));
     if (config_1.configGetter('showOnStartup')) {
         setTimeout(() => atom.workspace.open(welcome_pane_1.WELCOME_URI, {
@@ -61,7 +59,7 @@ function deactivate() {
 }
 exports.deactivate = deactivate;
 function serialize() {
-    return {};
+    return state_1.default.getValue();
 }
 exports.serialize = serialize;
 function deserializeModulesPane({ state }) {

@@ -5,7 +5,8 @@ const fs = require('fs');
 const atom_1 = require("atom");
 const React = require("react");
 const ReactDOM = require("react-dom");
-// import { Subject, Observable } from 'rxjs';
+const operators_1 = require("rxjs/operators");
+const state_1 = require("../../state");
 const ui_1 = require("../../../ui");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
@@ -28,6 +29,12 @@ class ModulesPane {
             const path = pane.getPath();
             this.onDidChangeActivePaneItem({ path });
         });
+        // TODO: need to destory subscribtion
+        state_1.default
+            .pipe(operators_1.map(({ branch }) => branch))
+            .pipe(operators_1.distinctUntilChanged())
+            .pipe(operators_1.tap((branch) => this.onSelectBranch(branch)))
+            .subscribe();
         (async () => {
             const api = await utils_1.getApi();
             await utils_1.getUser();
@@ -35,8 +42,6 @@ class ModulesPane {
             this.onSelectBranch(state.branch);
         })();
     }
-    // private _eventsSbj = new Subject();
-    // public events$: Observable<any> = this._eventsSbj.asObservable();
     get state() {
         if (!this.viewRef.current) {
             return {
@@ -60,12 +65,8 @@ class ModulesPane {
     async onChooseModules() {
     }
     async onChooseBranches() {
-        if (!this.viewRef.current) {
-            return;
-        }
         const { list: branches } = await this._api.getUserBranches();
-        //@ts-ignore
-        this.viewRef.current.setState(Object.assign({}, this.viewRef.current.state, { branches }));
+        this.state = { branches };
     }
     async onCopyBranch(branch) {
         try {
@@ -87,6 +88,7 @@ class ModulesPane {
             branch,
             modules
         };
+        state_1.default.next(Object.assign({}, state_1.default.getValue(), { branch }));
     }
     async onDeleteBranch(branch) {
         try {

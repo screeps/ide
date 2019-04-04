@@ -15,6 +15,9 @@
 @import '../ui/components/memory-view/style.less';
 @import '../ui/components/resizable-panel/style.less';
 @import '../ui/components/welcome-view/style.less';
+@import '../ui/components/branches-view/style.less';
+
+@import '../src/components/screeps-status-bar/style.less';
 
 .atom-package {
 }
@@ -38,7 +41,7 @@
   }
 }
 
-.directory[screeps-dist='screeps-dist'] .icon-file-directory::before {
+.directory[screeps-dist] .icon-file-directory::before {
     content: "\e900";
 
     position: relative;
@@ -63,25 +66,10 @@
   }
 }
 
-.icon-screeps__1::before {
-  background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0'%3F%3E%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:%231d2027;%7D.cls-2%7Bfill:%23eaedff;%7D.cls-3%7Bfill:%235973ff;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3E48x48%3C/title%3E%3Cg id='Layer_2' data-name='Layer 2'%3E%3Cg id='&%23x421;&%23x43B;&%23x43E;&%23x439;_1' data-name='&%23x421;&%23x43B;&%23x43E;&%23x439; 1'%3E%3Cg id='_48x48' data-name='48x48'%3E%3C!-- %3Crect class='cls-1' width='48' height='48' rx='2'/%3E --%3E%3Cpolygon class='cls-2' points='19.4 31.75 19.39 31.75 11.72 24 19.39 16.25 19.4 16.25 19.4 10.46 12.94 16.99 12.94 16.99 6 24 16.53 34.64 16.53 34.64 19.4 37.53 19.4 31.75'/%3E%3Cpolygon class='cls-3' points='28.6 31.75 28.61 31.75 36.28 24 28.61 16.25 28.6 16.25 28.6 10.46 35.06 16.99 35.06 16.99 42 24 31.47 34.64 31.47 34.64 28.6 37.53 28.6 31.75'/%3E%3Crect class='cls-3' x='21' y='21' width='6' height='6'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E%0A");
-}
-
-.icon-screeps__2::before {
-  background-image: url("atom://screeps-ide/images/logo.svg");
-}
-
 .screeps-ide__status-bar {
   float: left;
-  display: block;
   max-height: 30px;
-  // width: 50px;
-  // height: 14px;
   margin: 0 10px;
-
-  // background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64.45 18'%3E%3Cdefs%3E%3Cstyle%3E .cls-1,.cls-4%7B opacity:0.5; %7D .cls-2,.cls-4%7B fill:%235973ff; %7D.cls-3%7B fill:%23eaedff; %7D .line%7B animation: line 1.3s linear 0s infinite; %7D @keyframes line%7B 20%25,80%25%7B opacity: 0.5; %7D 25%25,75%25%7B opacity: 0; %7D %7D .c%7B animation: c 7s ease 0s infinite; transform-origin: center; transform-box: fill-box; %7D @keyframes c%7B 20%25,40%25,60%25,80%25%7B transform: rotate(0deg); %7D 27%25,33%25%7B transform: rotate(-45deg); %7D 67%25,73%25%7B transform: rotate(45deg); %7D %7D %3C/style%3E%3C/defs%3E%3Ctitle%3Elogotype_mini%3C/title%3E%3Crect class='cls-1 cls-2 line' x='53.45' y='16' width='11' height='2'/%3E%3Cg class='c'%3E%3Cpath class='cls-3' d='M39.69,13.95a7,7,0,1,1,0-9.94h2.57a8.95,8.95,0,1,0,0,9.94Z'/%3E%3Crect class='cls-2' x='41.28' y='7.44' width='3' height='3'/%3E%3C/g%3E%3Cpolygon class='cls-4' points='6.59 12.74 6.58 12.74 2.81 8.97 6.58 5.2 6.59 5.2 6.59 2.38 3.41 5.56 3.41 5.56 0 8.97 5.18 14.15 5.18 14.15 6.59 15.56 6.59 12.74'/%3E%3Cpolygon class='cls-4' points='47.75 12.74 47.76 12.74 51.53 8.97 47.76 5.2 47.75 5.2 47.75 2.38 50.93 5.56 50.93 5.56 54.34 8.97 49.16 14.15 49.16 14.15 47.75 15.56 47.75 12.74'/%3E%3Cpath class='cls-2' d='M15.71,17.93a26.59,26.59,0,0,1-5.61-.77l.49-1.93s4,1,6.35.62,3.13-1.25,3.23-3c.07-1.26-.35-2.75-4.23-3.12-1.59-.15-3.83-.53-5-2a4,4,0,0,1-.77-3.12C10.65.47,14.31.17,15.88,0a20.75,20.75,0,0,1,6.05.63l-.51,1.92A19,19,0,0,0,16,2c-2.35.19-3.67.69-3.94,2.8a2.08,2.08,0,0,0,.35,1.63c.55.69,1.75,1.11,3.67,1.29,2.86.27,6.23,1.4,6,5.2-.22,4.07-3.72,4.67-4.88,4.87A9.37,9.37,0,0,1,15.71,17.93Z'/%3E%3C/svg%3E");
-  // background-size: contain;
-  // background-position: center;
 
   cursor: pointer;
 
@@ -91,8 +79,22 @@
   }
 }
 
-.btn-commit {
-    float: right;
-    position: relative;
-    top: -1px;
+.tooltip.screeps-ide__tooltip {
+    .tooltip-inner {
+        padding: 5px;
+        background-color: #21252b;
+        border: 1px solid #181a1f;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: #9da5b4;
+    }
+
+    .tooltip-arrow {
+        width: 10px;
+        height: 10px;
+        border-width: 0 0 1px 1px;
+        border-color: #181a1f;
+        background-color: #21252b;
+        border-bottom-right-radius: 2px;
+        transform: rotate(-45deg);
+    }
 }

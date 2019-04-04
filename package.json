@@ -73,7 +73,7 @@
           "title": "Project folder",
           "description": "",
           "type": "string",
-          "default": "./dist",
+          "default": "./",
           "order": 1
         }
       }

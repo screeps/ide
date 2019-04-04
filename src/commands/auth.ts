@@ -37,8 +37,9 @@ export function authCommand(): Promise<any> {
     const apiUrl = configGetter('apiUrl') as string;
     const api = new Api({ url: apiUrl });
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const authModalRef = new AtomModal(AuthView);
+
         authModalRef.events$
             .pipe(filter(({ type }) => type === 'MODAL_SUBMIT'))
             .pipe(switchMap(({ payload }) => {
@@ -58,6 +59,13 @@ export function authCommand(): Promise<any> {
             }))
             .pipe(tap(() => {
                 resolve(api);
+            }))
+            .subscribe();
+
+        authModalRef.events$
+            .pipe(filter(({ type }) => type === 'MODAL_CANCEL'))
+            .pipe(tap(() => {
+                reject();
             }))
             .subscribe();
     })

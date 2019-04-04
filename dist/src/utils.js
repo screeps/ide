@@ -15,7 +15,12 @@ async function getApi() {
     }
     const token = config_1.configGetter('authToken');
     if (!token) {
-        api = await auth_1.authCommand();
+        try {
+            api = await auth_1.authCommand();
+        }
+        catch (err) {
+            throw new Error(err);
+        }
         return api;
     }
     const apiUrl = config_1.configGetter('apiUrl');

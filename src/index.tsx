@@ -1,13 +1,13 @@
+/// <reference path='./index.d.ts' />
+
 import { CompositeDisposable } from 'atom';
 
+import { default as State } from './state';
 import { PACKAGE_NAME, configGetter } from './config';
 
 import {
-    authCommand,
-    startCommand,
-    // showConsolePanelCommand,
-    // showMemoryPanelCommand,
-    // showModulesPaneCommand
+    commit,
+    revert
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
@@ -23,6 +23,7 @@ export * from './consumed-services';
 
 export function initialize(state: any) {
     console.log('Screeps-IDE:initialize', state);
+    State.next(state);
 }
 
 export function activate(state: any) {
@@ -53,14 +54,8 @@ export function activate(state: any) {
     }));
 
     subscriptions.add(atom.commands.add('atom-workspace', {
-        [`${ PACKAGE_NAME }:${ authCommand.name }`]: authCommand,
-        [`${ PACKAGE_NAME }:${ startCommand.name }`]: startCommand
-    }));
-
-    subscriptions.add(atom.commands.add('tree-view', {
-        'tree-view:expand-item': () => {
-            console.log(123);
-        }
+        [`${ PACKAGE_NAME }:${ commit.name }`]: commit,
+        [`${ PACKAGE_NAME }:${ revert.name }`]: revert
     }));
 
     if (configGetter('showOnStartup')) {
@@ -76,10 +71,10 @@ export function deactivate() {
 }
 
 export function serialize() {
-    return { };
+    return State.getValue();
 }
 
-export function deserializeModulesPane({ state }: { state: any }) {
+export function deserializeModulesPane({ state }: { state: IModulesViewState }) {
     return ModulesPane.deserialize({ state });
 }
 

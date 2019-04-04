@@ -8,7 +8,7 @@ class AtomModal {
         this._eventsSbj = new rxjs_1.Subject();
         this.ref = React.createRef();
         this.onCancel = () => {
-            this._eventsSbj.next({ type: 'MODAL_CANCEL ' });
+            this._eventsSbj.next({ type: 'MODAL_CANCEL' });
             this.destroy();
         };
         this.onSubmit = (payload) => {

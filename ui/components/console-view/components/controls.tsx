@@ -45,7 +45,7 @@ class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
         return (
             <div className='screeps-console__controls'>
                 <div className=''>
-                    <select className='btn' onChange={ this.onShard } value={ this.props.shard }>
+                    <select className='input-select' onChange={ this.onShard } value={ this.props.shard }>
                         { this.props.shards.map(({ name }: { name: string }) => {
                             return (<option key={ name } value={ name }>{ name }</option>);
                         })}

@@ -1,4 +1,4 @@
-interface IBranches {
+interface IBranch {
     _id: string;
     branch: string;
     activeWorld?: boolean;
@@ -20,7 +20,7 @@ interface IModulesViewProps {
     modules: IModulesViewModules;
 
     branch: string;
-    branches: IBranches[];
+    branches: IBranch[];
 
     onClose?(): Promise<void>;
 
@@ -43,7 +43,7 @@ interface IModulesViewState {
     modules: IModulesViewModules;
 
     branch: string;
-    branches?: IBranches[];
+    branches?: IBranch[];
 
     isProgressing?: boolean;
     isShowingBranches?: boolean;

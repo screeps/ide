@@ -11,7 +11,6 @@ function consumeTreeView(treeView) {
     const fullPath = path.resolve(projectPath, srcDir);
     const entry = treeView.entryForPath(fullPath);
     entry.setAttribute('screeps-dist', 'screeps-dist');
-    console.log(entry);
 }
 exports.consumeTreeView = consumeTreeView;
 //# sourceMappingURL=consume-tree-view.js.map

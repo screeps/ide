@@ -74,18 +74,32 @@ export class ConsolePanel implements ViewModel {
         });
 
         (async () => {
-            this._api = await getApi();
-            this._user = await getUser();
-            this._socket = getSocket();
-            this._service = new Service()
+            try {
+                this._api = await getApi();
+                this._user = await getUser();
+                this._socket = getSocket();
+                this._service = new Service()
 
-            // this.state = { shard: this._user.shard };
+                // this.state = { shard: this._user.shard };
 
-            this._service.shards$
-                .pipe(tap((shards: any) => this.state = { shards }))
-                .subscribe();
+                this._service.shards$
+                    .pipe(tap((shards: any) => this.state = { shards }))
+                    .subscribe();
 
-            this.onResume();
+                this.onResume();
+            } catch (err) {
+                setTimeout(() => {
+                    const pane = atom.workspace.paneForItem(this);
+        
+                    if (!pane) {
+                        return;
+                    }
+        
+                    pane.destroyItem(this);
+                });
+
+                this.destroy();
+            }
         })()
     }
 

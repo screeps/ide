@@ -31,7 +31,7 @@ interface IAuthResponse extends IResponse {
     token: string;
 }
 
-interface IBranches {
+interface IBranch {
     _id: string;
     branch: string;
     activeWorld?: boolean;
@@ -39,7 +39,7 @@ interface IBranches {
 }
 
 interface IUserBranchesResponse extends IResponse {
-    list: IBranches[];
+    list: IBranch[];
 }
 
 interface IUserConsoleParams {

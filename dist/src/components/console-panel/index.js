@@ -25,15 +25,27 @@ class ConsolePanel {
             pane.onDidDestroy(() => this.destroy());
         });
         (async () => {
-            this._api = await utils_1.getApi();
-            this._user = await utils_1.getUser();
-            this._socket = utils_1.getSocket();
-            this._service = new service_1.Service();
-            // this.state = { shard: this._user.shard };
-            this._service.shards$
-                .pipe(operators_1.tap((shards) => this.state = { shards }))
-                .subscribe();
-            this.onResume();
+            try {
+                this._api = await utils_1.getApi();
+                this._user = await utils_1.getUser();
+                this._socket = utils_1.getSocket();
+                this._service = new service_1.Service();
+                // this.state = { shard: this._user.shard };
+                this._service.shards$
+                    .pipe(operators_1.tap((shards) => this.state = { shards }))
+                    .subscribe();
+                this.onResume();
+            }
+            catch (err) {
+                setTimeout(() => {
+                    const pane = atom.workspace.paneForItem(this);
+                    if (!pane) {
+                        return;
+                    }
+                    pane.destroyItem(this);
+                });
+                this.destroy();
+            }
         })();
     }
     get state() {

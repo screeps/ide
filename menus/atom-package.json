@@ -1,13 +1,23 @@
 {
-  "context-menu": {
-    "atom-text-editor": [
-    ]
-  },
-  "menu": [
-    {
-      "label": "Packages",
-      "submenu": [
-      ]
-    }
-  ]
+    "context-menu": {
+        ".tree-view .full-menu [screeps-dist][is='tree-view-directory']": [
+            { "type": "separator" },
+
+            { "label": "Screeps Commit All", "command": "screeps-ide:commit" },
+            { "label": "Screeps Revert All", "command": "screeps-ide:revert" },
+
+            { "type": "separator" }
+        ],
+
+        ".tree-view .full-menu [screeps-dist] [is='tree-view-file']": [
+            { "type": "separator" },
+
+            { "label": "Screeps Commit", "command": "screeps-ide:commit" },
+            { "label": "Screeps Revert", "command": "screeps-ide:revert" },
+
+            { "type": "separator" }
+        ]
+    },
+
+    "menu": [ ]
 }

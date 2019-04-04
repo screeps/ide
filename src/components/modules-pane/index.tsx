@@ -2,8 +2,10 @@ const fs = require('fs');
 import { File, TextEditor, ViewModel } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-// import { Subject, Observable } from 'rxjs';
 
+import { tap, distinctUntilChanged, map } from 'rxjs/operators';
+
+import { default as __state } from '../../state';
 import { ModulesView } from '../../../ui';
 
 import { default as prompt } from '../prompt-modal';
@@ -25,9 +27,6 @@ export const MODULES_URI = 'atom://screeps-ide/modules';
 export class ModulesPane implements ViewModel {
     public element: HTMLElement;
     public viewRef = React.createRef<ModulesView>();
-
-    // private _eventsSbj = new Subject();
-    // public events$: Observable<any> = this._eventsSbj.asObservable();
 
     public get state(): any {
         if (!this.viewRef.current) {
@@ -77,6 +76,13 @@ export class ModulesPane implements ViewModel {
             this.onDidChangeActivePaneItem({ path });
         });
 
+        // TODO: need to destory subscribtion
+        __state
+            .pipe(map(({ branch }) => branch))
+            .pipe(distinctUntilChanged())
+            .pipe(tap((branch) => this.onSelectBranch(branch)))
+            .subscribe();
+
         (async () => {
             const api = await getApi();
             await getUser();
@@ -118,17 +124,9 @@ export class ModulesPane implements ViewModel {
 
     @progress
     async onChooseBranches(): Promise<void> {
-        if (!this.viewRef.current) {
-            return;
-        }
-
         const { list: branches } = await this._api.getUserBranches();
 
-        //@ts-ignore
-        this.viewRef.current.setState({
-            ...this.viewRef.current.state,
-            branches
-        });
+        this.state = { branches };
     }
 
     async onCopyBranch(branch: string): Promise<void> {
@@ -147,7 +145,6 @@ export class ModulesPane implements ViewModel {
 
     @progress
     async onSelectBranch(_branch?: string): Promise<void> {
-
         const { branch, modules: _modules } = await this._api.getUserCode(_branch);
 
         const changes = await readUserCode(getBranchPath(branch));
@@ -161,6 +158,11 @@ export class ModulesPane implements ViewModel {
             branch,
             modules
         };
+
+        __state.next({
+            ...__state.getValue(),
+            branch
+        });
     }
 
     async onDeleteBranch(branch: string): Promise<void> {

@@ -11,7 +11,7 @@ import { authCommand } from './commands/auth';
 let api: Api;
 let socket: Socket;
 
-export async function getApi(): Promise<any> {
+export async function getApi(): Promise<Api> {
     if (api) {
         return api;
     }
@@ -19,7 +19,11 @@ export async function getApi(): Promise<any> {
     const token = configGetter('authToken') as string;
 
     if (!token) {
-        api = await authCommand();
+        try {
+            api = await authCommand();
+        } catch (err) {
+            throw new Error(err);
+        }
         return api;
     }
 

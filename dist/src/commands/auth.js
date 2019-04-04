@@ -33,7 +33,7 @@ exports.createTokenCommand = createTokenCommand;
 function authCommand() {
     const apiUrl = config_1.configGetter('apiUrl');
     const api = new api_1.Api({ url: apiUrl });
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const authModalRef = new atom_modal_1.AtomModal(ui_1.AuthView);
         authModalRef.events$
             .pipe(operators_1.filter(({ type }) => type === 'MODAL_SUBMIT'))
@@ -53,6 +53,12 @@ function authCommand() {
         }))
             .pipe(operators_1.tap(() => {
             resolve(api);
+        }))
+            .subscribe();
+        authModalRef.events$
+            .pipe(operators_1.filter(({ type }) => type === 'MODAL_CANCEL'))
+            .pipe(operators_1.tap(() => {
+            reject();
         }))
             .subscribe();
     });
