@@ -7,4 +7,5 @@ interface IBranchesViewProps {
 
 interface IBranchesViewState {
     branch: string;
+    view: 'SELECT' | 'CREATE'
 }
