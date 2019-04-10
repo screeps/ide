@@ -12,6 +12,7 @@ const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const decoratos_1 = require("../../decoratos");
 const utils_1 = require("../../utils");
+const commands_1 = require("../../commands");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.MODULES_URI = 'atom://screeps-ide/modules';
 class ModulesPane {
@@ -19,9 +20,9 @@ class ModulesPane {
         this.viewRef = React.createRef();
         this.element = document.createElement('div');
         this.render(state);
-        atom.project.onDidChangeFiles((events) => {
-            events.forEach(({ path }) => this.onDidChange({ path }));
-        });
+        // atom.project.onDidChangeFiles((events) => {
+        //     events.forEach(({ path }) => this.onDidChange({ path }));
+        // });
         atom.workspace.onDidChangeActivePaneItem((pane) => {
             if (!(pane instanceof atom_1.TextEditor)) {
                 return;
@@ -29,17 +30,21 @@ class ModulesPane {
             const path = pane.getPath();
             this.onDidChangeActivePaneItem({ path });
         });
-        // TODO: need to destory subscribtion
-        state_1.default
-            .pipe(operators_1.map(({ branch }) => branch))
-            .pipe(operators_1.distinctUntilChanged())
-            .pipe(operators_1.tap((branch) => this.onSelectBranch(branch)))
-            .subscribe();
         (async () => {
             const api = await utils_1.getApi();
             await utils_1.getUser();
             this._api = api;
-            this.onSelectBranch(state.branch);
+            // TODO: need to destory subscribtion
+            state_1.default
+                .pipe(operators_1.map(({ branch }) => branch))
+                .pipe(operators_1.distinctUntilChanged())
+                .pipe(operators_1.tap((branch) => this.onSelectBranch(branch)))
+                .subscribe();
+            state_1.default
+                .pipe(operators_1.map(({ modules }) => modules))
+                .pipe(operators_1.distinctUntilChanged())
+                .pipe(operators_1.tap((modules) => this.state = { modules }))
+                .subscribe();
         })();
     }
     get state() {
@@ -83,12 +88,10 @@ class ModulesPane {
     async onSelectBranch(_branch) {
         const { branch, modules: _modules } = await this._api.getUserCode(_branch);
         const changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
-        const modules = await this.toModules(Object.assign({}, changes, _modules), changes);
-        this.state = {
-            branch,
-            modules
-        };
-        state_1.default.next(Object.assign({}, state_1.default.getValue(), { branch }));
+        const modules = utils_1.combineModules(Object.assign({}, changes, _modules), changes);
+        state_1.default.next(Object.assign({}, state_1.default.getValue(), { branch,
+            modules }));
+        this.state = { branch };
     }
     async onDeleteBranch(branch) {
         try {
@@ -124,17 +127,19 @@ class ModulesPane {
             await moduleFile.create();
             await moduleFile.write(content);
         }
-        let isTextEditor = atom.workspace.getTextEditors()
-            .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
-        let textEditor = await atom.workspace.open(moduleFile.getPath(), {
+        // let isTextEditor = 
+        // atom.workspace.getTextEditors()
+        //     .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
+        // let textEditor = 
+        await atom.workspace.open(moduleFile.getPath(), {
             searchAllPanes: true
         });
-        if (isTextEditor) {
-            return;
-        }
-        textEditor.onDidSave(({ path }) => {
-            this.onDidChange({ path });
-        });
+        // if (isTextEditor) {
+        //     return;
+        // }
+        // textEditor.onDidSave(({ path }) => {
+        //     this.onDidChange({ path })
+        // });
     }
     async onDeleteModule(module) {
         const { branch, modules } = this.state;
@@ -150,20 +155,7 @@ class ModulesPane {
         }
     }
     async onApplyChanges() {
-        const { branch, modules: _modules } = this.state;
-        let modules = Object.entries(_modules)
-            .filter(([, { deleted }]) => !deleted)
-            .reduce((modules, [module, { content }]) => (Object.assign({}, modules, { [module]: content })), {});
-        let changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
-        modules = Object.assign({}, modules, changes);
-        try {
-            await this._api.updateUserCode({ branch, modules });
-        }
-        catch (err) {
-            return;
-        }
-        const modulesView = await this.toModules(modules);
-        this.state = { modules: modulesView };
+        commands_1.commitAll();
     }
     async onRevertChanges() {
         const { branch, modules } = this.state;
@@ -176,7 +168,7 @@ class ModulesPane {
             const modulePath = utils_1.getModulePath(branch, module);
             const moduleFile = new atom_1.File(modulePath);
             try {
-                await moduleFile.write(content);
+                await moduleFile.write(content || '');
             }
             catch (err) {
                 // Noop.
@@ -188,39 +180,6 @@ class ModulesPane {
         }
         this.state = { modules };
     }
-    async onDidChange({ path }) {
-        const module = utils_1.getModuleByPath(path);
-        if (!module) {
-            return;
-        }
-        const file = new atom_1.File(path);
-        let content;
-        try {
-            content = await file.read();
-        }
-        catch (err) {
-            return;
-        }
-        const { modules } = this.state;
-        let _module = modules[module];
-        if (_module) {
-            _module = {
-                content: _module.content,
-                modified: _module.content !== content,
-                deleted: _module.deleted
-            };
-        }
-        else {
-            _module = {
-                content: null,
-                modified: true,
-                deleted: false
-            };
-        }
-        this.state = {
-            modules: Object.assign({}, modules, { [module]: _module })
-        };
-    }
     async onDidChangeActivePaneItem({ path }) {
         const module = utils_1.getModuleByPath(path);
         if (!module) {
@@ -229,20 +188,6 @@ class ModulesPane {
         let { modules } = this.state;
         modules = Object.entries(modules).reduce((modules, [_module, data]) => (Object.assign({}, modules, { [_module]: Object.assign({}, data, { active: module === _module }) })), {});
         this.state = { modules };
-    }
-    async toModules(origin, changes = {}) {
-        const modules = {};
-        const entries = Object.entries(origin);
-        for (let i = 0, l = entries.length; i < l; i++) {
-            const [module, content] = entries[i];
-            const _content = changes[module];
-            const modified = !!(_content && _content !== content);
-            modules[module] = {
-                content,
-                modified
-            };
-        }
-        return modules;
     }
     // Implement serialization hook for view model
     serialize() {

@@ -16,8 +16,20 @@ var config_2 = require("./config");
 exports.config = config_2.default;
 tslib_1.__exportStar(require("./consumed-services"), exports);
 function initialize(state) {
-    console.log('Screeps-IDE:initialize', state);
     state_1.default.next(state);
+    atom.project.onDidChangeFiles((events) => {
+        const paths = events.map(({ path }) => path);
+        const uniqPaths = new Set(paths);
+        uniqPaths.forEach(async (path) => {
+            try {
+                const module = await commands_1.onDidChange({ path });
+                commands_1.changeTreeViewItemStatus(path, module);
+            }
+            catch (err) {
+                console.error(err);
+            }
+        });
+    });
 }
 exports.initialize = initialize;
 function activate(state) {
@@ -44,6 +56,7 @@ function activate(state) {
     }));
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.commit.name}`]: commands_1.commit,
+        [`${config_1.PACKAGE_NAME}:${commands_1.commitAll.name}`]: commands_1.commitAll,
         [`${config_1.PACKAGE_NAME}:${commands_1.revert.name}`]: commands_1.revert
     }));
     if (config_1.configGetter('showOnStartup')) {
@@ -59,6 +72,7 @@ function deactivate() {
 }
 exports.deactivate = deactivate;
 function serialize() {
+    // return {};
     return state_1.default.getValue();
 }
 exports.serialize = serialize;

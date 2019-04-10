@@ -2,12 +2,15 @@
 
 import { CompositeDisposable } from 'atom';
 
-import { default as State } from './state';
+import { default as __state } from './state';
 import { PACKAGE_NAME, configGetter } from './config';
 
 import {
     commit,
-    revert
+    commitAll,
+    revert,
+    onDidChange,
+    changeTreeViewItemStatus
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
@@ -21,12 +24,26 @@ const subscriptions = new CompositeDisposable();
 export { default as config } from './config';
 export * from './consumed-services';
 
-export function initialize(state: any) {
-    console.log('Screeps-IDE:initialize', state);
-    State.next(state);
+export function initialize(state: IState) {
+    __state.next(state);
+
+    atom.project.onDidChangeFiles((events) => {
+        const paths = events.map(({ path }) => path);
+        const uniqPaths = new Set(paths);
+
+        uniqPaths.forEach(async (path) => {
+            try {
+                const module = await onDidChange({ path });
+                changeTreeViewItemStatus(path, module);
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    });
+
 }
 
-export function activate(state: any) {
+export function activate(state: IState) {
     console.log('Screeps-IDE:activate', state);
 
     subscriptions.add(atom.workspace.addOpener((uri): any => {
@@ -55,6 +72,7 @@ export function activate(state: any) {
 
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${ PACKAGE_NAME }:${ commit.name }`]: commit,
+        [`${ PACKAGE_NAME }:${ commitAll.name }`]: commitAll,
         [`${ PACKAGE_NAME }:${ revert.name }`]: revert
     }));
 
@@ -71,7 +89,8 @@ export function deactivate() {
 }
 
 export function serialize() {
-    return State.getValue();
+    // return {};
+    return __state.getValue();
 }
 
 export function deserializeModulesPane({ state }: { state: IModulesViewState }) {

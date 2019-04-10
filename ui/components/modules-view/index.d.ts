@@ -6,7 +6,7 @@ interface IBranch {
 }
 
 interface IModule {
-    content: string;
+    content: string | null;
     modified?: boolean;
     deleted?: boolean;
     active?: boolean;

@@ -169,3 +169,25 @@ export async function readUserCode(fullPath: string): Promise<IModules> {
 
     return modules;
 }
+
+export function combineModules(
+    origin: IModules,
+    changes: IModules = {}
+): { [key: string]: IModule; } {
+    const modules: { [key: string]: IModule; } = {};
+    const entries = Object.entries(origin);
+
+    for(let i = 0, l = entries.length; i < l; i++) {
+        const [module, content] = entries[i];
+        const _content = changes[module];
+
+        const modified = !!(_content && _content !== content);
+
+        modules[module] = {
+            content,
+            modified
+        };
+    }
+
+    return modules;
+}

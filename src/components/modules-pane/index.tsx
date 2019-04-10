@@ -18,8 +18,13 @@ import {
     getModuleByPath,
     getBranchPath, 
     readUserCode,
-    getApi, getUser 
+    getApi, getUser,
+    combineModules
 } from '../../utils';
+
+import {
+    commitAll
+} from '../../commands';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const MODULES_URI = 'atom://screeps-ide/modules';
@@ -63,9 +68,9 @@ export class ModulesPane implements ViewModel {
         this.element = document.createElement('div');
         this.render(state);
 
-        atom.project.onDidChangeFiles((events) => {
-            events.forEach(({ path }) => this.onDidChange({ path }));
-        });
+        // atom.project.onDidChangeFiles((events) => {
+        //     events.forEach(({ path }) => this.onDidChange({ path }));
+        // });
 
         atom.workspace.onDidChangeActivePaneItem((pane) => {
             if (!(pane instanceof TextEditor)) {
@@ -76,18 +81,23 @@ export class ModulesPane implements ViewModel {
             this.onDidChangeActivePaneItem({ path });
         });
 
-        // TODO: need to destory subscribtion
-        __state
-            .pipe(map(({ branch }) => branch))
-            .pipe(distinctUntilChanged())
-            .pipe(tap((branch) => this.onSelectBranch(branch)))
-            .subscribe();
-
         (async () => {
             const api = await getApi();
             await getUser();
             this._api = api;
-            this.onSelectBranch(state.branch);
+
+            // TODO: need to destory subscribtion
+            __state
+                .pipe(map(({ branch }) => branch))
+                .pipe(distinctUntilChanged())
+                .pipe(tap((branch) => this.onSelectBranch(branch)))
+                .subscribe();
+
+            __state
+                .pipe(map(({ modules }) => modules))
+                .pipe(distinctUntilChanged())
+                .pipe(tap((modules) => this.state = { modules }))
+                .subscribe();
         })()
     }
 
@@ -149,20 +159,18 @@ export class ModulesPane implements ViewModel {
 
         const changes = await readUserCode(getBranchPath(branch));
 
-        const modules = await this.toModules({
+        const modules = combineModules({
             ...changes,
             ..._modules
         }, changes);
 
-        this.state = {
-            branch,
-            modules
-        };
-
         __state.next({
             ...__state.getValue(),
-            branch
+            branch,
+            modules
         });
+
+        this.state = { branch };
     }
 
     async onDeleteBranch(branch: string): Promise<void> {
@@ -210,20 +218,22 @@ export class ModulesPane implements ViewModel {
             await moduleFile.write(content);
         }
 
-        let isTextEditor = atom.workspace.getTextEditors()
-            .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
+        // let isTextEditor = 
+        // atom.workspace.getTextEditors()
+        //     .find((textEditor) => textEditor.getPath() === moduleFile.getPath());
 
-        let textEditor = await atom.workspace.open(moduleFile.getPath(), {
+        // let textEditor = 
+        await atom.workspace.open(moduleFile.getPath(), {
             searchAllPanes: true
         }) as TextEditor;
 
-        if (isTextEditor) {
-            return;
-        }
+        // if (isTextEditor) {
+        //     return;
+        // }
 
-        textEditor.onDidSave(({ path }) => {
-            this.onDidChange({ path })
-        });
+        // textEditor.onDidSave(({ path }) => {
+        //     this.onDidChange({ path })
+        // });
 
     }
 
@@ -251,35 +261,7 @@ export class ModulesPane implements ViewModel {
 
     @progress
     async onApplyChanges(): Promise<void> {
-        const {
-            branch, modules: _modules
-        }: {
-            branch: string, modules: IModulesViewModules
-        } = this.state;
-
-        let modules: IModules = Object.entries(_modules)
-            .filter(([, { deleted }]) => !deleted)
-            .reduce((modules, [module, { content }]) => ({
-                ...modules,
-                [module]: content
-            }), {});
-
-        let changes = await readUserCode(getBranchPath(branch));
-
-        modules = {
-            ...modules,
-            ...changes
-        };
-
-        try {
-            await this._api.updateUserCode({ branch, modules });
-        } catch(err) {
-            return;
-        }
-
-        const modulesView = await this.toModules(modules);
-
-        this.state = { modules: modulesView };
+        commitAll();
     }
 
     async onRevertChanges(): Promise<void> {
@@ -302,7 +284,7 @@ export class ModulesPane implements ViewModel {
             const moduleFile = new File(modulePath);
 
             try {
-                await moduleFile.write(content);
+                await moduleFile.write(content || '');
             } catch (err) {
                 // Noop.
             }
@@ -314,47 +296,6 @@ export class ModulesPane implements ViewModel {
         }
 
         this.state = { modules }
-    }
-
-    async onDidChange({ path }: { path: string }): Promise<void> {
-        const module = getModuleByPath(path);
-
-        if (!module) {
-            return;
-        }
-
-        const file = new File(path);
-        let content;
-        try {
-            content = await file.read();
-        } catch (err) {
-            return;
-        }
-
-        const { modules } = this.state;
-
-        let _module = modules[module];
-
-        if (_module) {
-            _module = {
-                content: _module.content,
-                modified: _module.content !== content,
-                deleted: _module.deleted
-            }
-        } else {
-            _module = {
-                content: null,
-                modified: true,
-                deleted: false
-            }
-        }
-
-        this.state = {
-            modules: {
-                ...modules,
-                [module]: _module
-            }
-        }
     }
 
     async onDidChangeActivePaneItem({ path }: { path: string }): Promise<void> {
@@ -375,25 +316,6 @@ export class ModulesPane implements ViewModel {
         }), {})
 
         this.state = { modules };
-    }
-
-    async toModules(origin: IModules, changes: IModules = {}): Promise<IModulesViewModules> {
-        const modules: IModulesViewModules = {};
-        const entries = Object.entries(origin);
-
-        for(let i = 0, l = entries.length; i < l; i++) {
-            const [module, content] = entries[i];
-            const _content = changes[module];
-
-            const modified = !!(_content && _content !== content);
-
-            modules[module] = {
-                content,
-                modified
-            };
-        }
-
-        return modules;
     }
 
     // Implement serialization hook for view model

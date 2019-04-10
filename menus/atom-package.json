@@ -3,8 +3,8 @@
         ".tree-view .full-menu [screeps-dist][is='tree-view-directory']": [
             { "type": "separator" },
 
-            { "label": "Screeps Commit All", "command": "screeps-ide:commit" },
-            { "label": "Screeps Revert All", "command": "screeps-ide:revert" },
+            { "label": "Screeps Commit All", "command": "screeps-ide:commitAll" },
+            { "label": "Screeps Revert All", "command": "screeps-ide:revertAll" },
 
             { "type": "separator" }
         ],

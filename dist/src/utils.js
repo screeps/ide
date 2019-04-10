@@ -144,4 +144,19 @@ async function readUserCode(fullPath) {
     return modules;
 }
 exports.readUserCode = readUserCode;
+function combineModules(origin, changes = {}) {
+    const modules = {};
+    const entries = Object.entries(origin);
+    for (let i = 0, l = entries.length; i < l; i++) {
+        const [module, content] = entries[i];
+        const _content = changes[module];
+        const modified = !!(_content && _content !== content);
+        modules[module] = {
+            content,
+            modified
+        };
+    }
+    return modules;
+}
+exports.combineModules = combineModules;
 //# sourceMappingURL=utils.js.map
