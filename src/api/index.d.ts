@@ -22,6 +22,11 @@ interface IUserCodeRequest {
     modules: IModules;
 }
 
+interface ICloneUserBranchBodyRequest {
+    branch: string;
+    newName: string;
+}
+
 interface IUserCodeResponse extends IResponse {
     branch: string;
     modules: IModules;

@@ -4,8 +4,8 @@ import * as ReactDOM from 'react-dom';
 import { BehaviorSubject } from 'rxjs';
 
 import { BranchesView  } from '../../../ui';
-
 import { getApi, getUser } from '../../utils';
+import { copyBranch } from '../../commands';
 
 export class ScreepsStatusBar {
     public element: HTMLElement = document.createElement('div');
@@ -58,6 +58,7 @@ export class ScreepsStatusBar {
                         branches={ branches }
 
                         onBranch={(...args) => this.onBranch(...args)}
+                        onCopyBranch={(...args) => this.onCopyBranch(...args)}
                     />,
                     this._tooltip
                 )
@@ -82,4 +83,13 @@ export class ScreepsStatusBar {
         });
     }
 
+    async onCopyBranch(branch: string): Promise<void> {
+        try {
+            const newBranch = await copyBranch(branch)
+
+            this.onBranch(newBranch);
+        } catch(err) {
+            console.error(err);
+        }
+    }
 }

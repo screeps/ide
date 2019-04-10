@@ -5,3 +5,4 @@ export * from './commitAll';
 export * from './revert';
 export * from './onDidChange';
 export * from './changeTreeViewItemStatus';
+export * from './copyBranch';

@@ -169,7 +169,7 @@ export class Api {
         return data;
     }
 
-    async cloneUserBranch(body: { [key: string]: string }): Promise<IResponse> {
+    async cloneUserBranch(body: ICloneUserBranchBodyRequest): Promise<IResponse> {
         let data: IResponse;
 
         try {

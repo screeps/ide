@@ -8,7 +8,6 @@ const ReactDOM = require("react-dom");
 const operators_1 = require("rxjs/operators");
 const state_1 = require("../../state");
 const ui_1 = require("../../../ui");
-const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const decoratos_1 = require("../../decoratos");
 const utils_1 = require("../../utils");
@@ -45,6 +44,11 @@ class ModulesPane {
                 .pipe(operators_1.distinctUntilChanged())
                 .pipe(operators_1.tap((modules) => this.state = { modules }))
                 .subscribe();
+            state_1.default
+                .pipe(operators_1.map(({ branches }) => branches))
+                .pipe(operators_1.distinctUntilChanged())
+                .pipe(operators_1.tap((branches) => this.state = { branches }))
+                .subscribe();
         })();
     }
     get state() {
@@ -75,14 +79,10 @@ class ModulesPane {
     }
     async onCopyBranch(branch) {
         try {
-            const newName = await prompt_modal_1.default({
-                legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
-            });
-            await this._api.cloneUserBranch({ branch, newName });
-            this.onChooseBranches();
+            await commands_1.copyBranch(branch);
         }
         catch (err) {
-            // Ignore.
+            console.error(err);
         }
     }
     async onSelectBranch(_branch) {
@@ -216,6 +216,9 @@ class ModulesPane {
 tslib_1.__decorate([
     decoratos_1.progress
 ], ModulesPane.prototype, "onChooseBranches", null);
+tslib_1.__decorate([
+    decoratos_1.progress
+], ModulesPane.prototype, "onCopyBranch", null);
 tslib_1.__decorate([
     decoratos_1.progress
 ], ModulesPane.prototype, "onSelectBranch", null);

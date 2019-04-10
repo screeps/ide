@@ -3,9 +3,9 @@ interface IBranchesViewProps {
     branches: IBranch[];
 
     onBranch?(branch: string): void;
+    onCopyBranch?(branch: string): void;
 }
 
 interface IBranchesViewState {
-    branch: string;
-    view: 'SELECT' | 'CREATE'
+    branch: string
 }

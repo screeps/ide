@@ -8,7 +8,6 @@ import { tap, distinctUntilChanged, map } from 'rxjs/operators';
 import { default as __state } from '../../state';
 import { ModulesView } from '../../../ui';
 
-import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { Api } from '../../api';
 import { progress } from '../../decoratos';
@@ -23,7 +22,8 @@ import {
 } from '../../utils';
 
 import {
-    commitAll
+    commitAll,
+    copyBranch
 } from '../../commands';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
@@ -98,6 +98,12 @@ export class ModulesPane implements ViewModel {
                 .pipe(distinctUntilChanged())
                 .pipe(tap((modules) => this.state = { modules }))
                 .subscribe();
+
+            __state
+                .pipe(map(({ branches }) => branches))
+                .pipe(distinctUntilChanged())
+                .pipe(tap((branches) => this.state = { branches }))
+                .subscribe();
         })()
     }
 
@@ -139,17 +145,12 @@ export class ModulesPane implements ViewModel {
         this.state = { branches };
     }
 
+    @progress
     async onCopyBranch(branch: string): Promise<void> {
         try {
-            const newName = await prompt({
-                legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
-            });
-
-            await this._api.cloneUserBranch({ branch, newName });
-
-            this.onChooseBranches();
+            await copyBranch(branch)
         } catch(err) {
-            // Ignore.
+            console.error(err);
         }
     }
 

@@ -4,6 +4,7 @@ const React = require("react");
 const ReactDOM = require("react-dom");
 const ui_1 = require("../../../ui");
 const utils_1 = require("../../utils");
+const commands_1 = require("../../commands");
 class ScreepsStatusBar {
     constructor(_state) {
         this._state = _state;
@@ -31,7 +32,7 @@ class ScreepsStatusBar {
                 const { list: branches } = await _api.getUserBranches();
                 const branch = this._state.getValue().branch;
                 // TODO: check destroy instance of React.Component
-                ReactDOM.render(React.createElement(ui_1.BranchesView, { ref: this.branchedVewRef, branch: branch, branches: branches, onBranch: (...args) => this.onBranch(...args) }), this._tooltip);
+                ReactDOM.render(React.createElement(ui_1.BranchesView, { ref: this.branchedVewRef, branch: branch, branches: branches, onBranch: (...args) => this.onBranch(...args), onCopyBranch: (...args) => this.onCopyBranch(...args) }), this._tooltip);
             }
             catch (err) {
             }
@@ -43,6 +44,15 @@ class ScreepsStatusBar {
         }
         this.branchedVewRef.current.setState(Object.assign({}, this.branchedVewRef.current.state, { branch }));
         this._state.next(Object.assign({}, this._state.getValue(), { branch }));
+    }
+    async onCopyBranch(branch) {
+        try {
+            const newBranch = await commands_1.copyBranch(branch);
+            this.onBranch(newBranch);
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
 }
 exports.ScreepsStatusBar = ScreepsStatusBar;
