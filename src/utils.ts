@@ -136,7 +136,7 @@ export function getModuleByPath(path: string): string | null {
     const srcDir = getBranchPath('');
 
     if (!path.includes(srcDir)) {
-        return null
+        return null;
     }
 
     const matches = path.match(/([^\\]+)$/gm);

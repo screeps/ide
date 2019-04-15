@@ -37,6 +37,17 @@ export async function commitAll(...args) {
     };
 
     try {
+        Object.entries(__state.getValue().modules)
+            .forEach(([module, { deleted }]) => {
+                if (deleted) {
+                    delete modules[module];
+                }
+            });
+    } catch(err) {
+        console.error('Try to delete deleted modules');
+    }
+
+    try {
         await api.updateUserCode({ branch, modules });
     } catch(err) {
         throw new Error('Error update user code');

@@ -14,7 +14,7 @@ class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProp
 
         if (this.props.message.timeStamp) {
             timestamp = (
-                <span>
+                <span className='--timestamp'>
                     <span className='brackets'>
                         { new Date(this.props.message.timeStamp) .toLocaleTimeString() }
                     </span>

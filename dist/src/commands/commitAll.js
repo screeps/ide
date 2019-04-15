@@ -23,6 +23,17 @@ async function commitAll(...args) {
     const changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
     modules = Object.assign({}, modules, changes);
     try {
+        Object.entries(state_1.default.getValue().modules)
+            .forEach(([module, { deleted }]) => {
+            if (deleted) {
+                delete modules[module];
+            }
+        });
+    }
+    catch (err) {
+        console.error('Try to delete deleted modules');
+    }
+    try {
         await api.updateUserCode({ branch, modules });
     }
     catch (err) {

@@ -19,7 +19,7 @@ class ScreepsStatusBar {
         });
         this.render(_state.getValue());
     }
-    render({ branch } = { branch: '' }) {
+    render({ branch }) {
         ReactDOM.render(React.createElement("div", { onClick: () => this.tooltip() },
             React.createElement("b", { className: 'sc-icon-screeps' }),
             React.createElement("i", null, branch)), this.element);

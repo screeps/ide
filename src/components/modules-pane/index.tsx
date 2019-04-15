@@ -156,6 +156,7 @@ export class ModulesPane implements ViewModel {
 
     @progress
     async onSelectBranch(_branch?: string): Promise<void> {
+        console.log('ModulesPane::onSelectBranch');
         const { branch, modules: _modules } = await this._api.getUserCode(_branch);
 
         const changes = await readUserCode(getBranchPath(branch));
@@ -241,7 +242,8 @@ export class ModulesPane implements ViewModel {
     async onDeleteModule(module: string): Promise<void> {
         const { branch, modules } = this.state;
 
-        this.state = {
+        __state.next({
+            ...__state.getValue(),
             modules: {
                 ...modules,
                 [module]: {
@@ -249,7 +251,7 @@ export class ModulesPane implements ViewModel {
                     deleted: true
                 }
             }
-        }
+        });
 
         const modulePath = getModulePath(branch, module);
 

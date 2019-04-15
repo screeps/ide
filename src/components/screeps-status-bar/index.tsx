@@ -31,7 +31,7 @@ export class ScreepsStatusBar {
         this.render(_state.getValue());
     }
 
-    render({ branch }: IState = { branch: '' }) {
+    render({ branch }: IState) {
         ReactDOM.render(
             <div onClick={() => this.tooltip()}>
                 <b className='sc-icon-screeps'></b>

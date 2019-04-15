@@ -59,9 +59,14 @@
         line-height: 20px;
     }
 
+    .--timestamp {
+        white-space: nowrap;
+    }
+
     .--log,
     .--error {
-        white-space: pre;
+        white-space: pre-wrap;
+        word-break: break-word;
     }
 
     .--error {

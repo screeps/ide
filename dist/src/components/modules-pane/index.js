@@ -86,6 +86,7 @@ class ModulesPane {
         }
     }
     async onSelectBranch(_branch) {
+        console.log('ModulesPane::onSelectBranch');
         const { branch, modules: _modules } = await this._api.getUserCode(_branch);
         const changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
         const modules = utils_1.combineModules(Object.assign({}, changes, _modules), changes);
@@ -143,9 +144,7 @@ class ModulesPane {
     }
     async onDeleteModule(module) {
         const { branch, modules } = this.state;
-        this.state = {
-            modules: Object.assign({}, modules, { [module]: Object.assign({}, modules[module], { deleted: true }) })
-        };
+        state_1.default.next(Object.assign({}, state_1.default.getValue(), { modules: Object.assign({}, modules, { [module]: Object.assign({}, modules[module], { deleted: true }) }) }));
         const modulePath = utils_1.getModulePath(branch, module);
         try {
             fs.unlink(modulePath, () => { });

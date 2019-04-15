@@ -8,7 +8,7 @@ class ConsoleMessageItemView extends React.Component {
     render() {
         let timestamp, shard, message, error;
         if (this.props.message.timeStamp) {
-            timestamp = (React.createElement("span", null,
+            timestamp = (React.createElement("span", { className: '--timestamp' },
                 React.createElement("span", { className: 'brackets' }, new Date(this.props.message.timeStamp).toLocaleTimeString()),
                 "\u00A0"));
         }
