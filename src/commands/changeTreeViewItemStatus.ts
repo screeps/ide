@@ -9,7 +9,7 @@ export function changeTreeViewItemStatus(path: string, { modified }: IModule) {
         entry.classList.add('status-modified--screeps');
 
         // @ts-ignore
-        console.log(entry.parentElement.parentElement);
+        console.log(entry);
         // @ts-ignore
         entry.parentElement.parentElement.classList.add('status-modified--screeps');
         return;

@@ -6,7 +6,7 @@ const utils_1 = require("../utils");
 async function onDidChange({ path }) {
     const module = utils_1.getModuleByPath(path);
     if (!module) {
-        throw 'Error get module';
+        throw new Error('Error get module');
     }
     console.log(module);
     const file = new atom_1.File(path);
@@ -15,13 +15,11 @@ async function onDidChange({ path }) {
         content = await file.read();
     }
     catch (err) {
-        throw 'Error read file';
-        ;
+        throw new Error('Error read file');
     }
     const { modules } = state_1.default.getValue();
     if (!modules) {
-        throw 'Error read modules';
-        ;
+        throw new Error('Error read modules');
     }
     let _module = modules[module];
     _module = {

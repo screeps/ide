@@ -8,7 +8,7 @@ export async function onDidChange({ path }: { path: string }): Promise<IModule> 
     const module = getModuleByPath(path);
 
     if (!module) {
-        throw 'Error get module';
+        throw new Error('Error get module');
     }
 
     console.log(module);
@@ -19,13 +19,13 @@ export async function onDidChange({ path }: { path: string }): Promise<IModule> 
     try {
         content = await file.read();
     } catch (err) {
-        throw 'Error read file';;
+        throw new Error('Error read file');
     }
 
     const { modules } = __state.getValue();
 
     if (!modules) {
-        throw 'Error read modules';;
+        throw new Error('Error read modules');
     }
 
     let _module = modules[module];

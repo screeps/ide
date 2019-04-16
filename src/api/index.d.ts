@@ -14,7 +14,7 @@ interface ICredentials {
 }
 
 interface IModules {
-    [key: string]: string;
+    [key: string]: string | null;
 }
 
 interface IUserCodeRequest {
