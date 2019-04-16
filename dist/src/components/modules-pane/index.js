@@ -157,27 +157,7 @@ class ModulesPane {
         commands_1.commitAll();
     }
     async onRevertChanges() {
-        const { branch, modules } = this.state;
-        const entries = Object.entries(modules);
-        for (let i = 0, l = entries.length; i < l; i++) {
-            const [module, { content, modified, deleted }] = entries[i];
-            if (!modified && !deleted) {
-                continue;
-            }
-            const modulePath = utils_1.getModulePath(branch, module);
-            const moduleFile = new atom_1.File(modulePath);
-            try {
-                await moduleFile.write(content || '');
-            }
-            catch (err) {
-                // Noop.
-            }
-            modules[module] = {
-                content,
-                modified: false
-            };
-        }
-        this.state = { modules };
+        commands_1.revertAll();
     }
     async onDidChangeActivePaneItem({ path }) {
         const module = utils_1.getModuleByPath(path);

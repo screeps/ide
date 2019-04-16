@@ -9,6 +9,7 @@ import {
     commit,
     commitAll,
     revert,
+    revertAll,
     onDidChange,
     changeTreeViewItemStatus
 } from './commands';
@@ -73,7 +74,8 @@ export function activate(state: IState) {
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${ PACKAGE_NAME }:${ commit.name }`]: commit,
         [`${ PACKAGE_NAME }:${ commitAll.name }`]: commitAll,
-        [`${ PACKAGE_NAME }:${ revert.name }`]: revert
+        [`${ PACKAGE_NAME }:${ revert.name }`]: revert,
+        [`${ PACKAGE_NAME }:${ revertAll.name }`]: revertAll
     }));
 
     if (configGetter('showOnStartup')) {

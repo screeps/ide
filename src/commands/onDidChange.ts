@@ -32,7 +32,7 @@ export async function onDidChange({ path }: { path: string }): Promise<IModule> 
 
     _module = {
         content: _module && _module.content || null,
-        modified: _module && _module.content !== content || true,
+        modified: _module && _module.content !== content || false,
         deleted: _module && _module.deleted || false
     }
 

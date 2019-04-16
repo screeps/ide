@@ -23,6 +23,7 @@ import {
 
 import {
     commitAll,
+    revertAll,
     copyBranch
 } from '../../commands';
 
@@ -268,37 +269,7 @@ export class ModulesPane implements ViewModel {
     }
 
     async onRevertChanges(): Promise<void> {
-        const {
-            branch, modules
-        }: {
-            branch: string, modules: IModulesViewModules
-        } = this.state;
-
-        const entries = Object.entries(modules);
-
-        for(let i = 0, l = entries.length; i < l; i++) {
-            const [module, { content, modified, deleted }] = entries[i];
-
-            if (!modified && !deleted) {
-                continue;
-            }
-
-            const modulePath = getModulePath(branch, module);
-            const moduleFile = new File(modulePath);
-
-            try {
-                await moduleFile.write(content || '');
-            } catch (err) {
-                // Noop.
-            }
-
-            modules[module] = {
-                content,
-                modified: false
-            };
-        }
-
-        this.state = { modules }
+        revertAll();
     }
 
     async onDidChangeActivePaneItem({ path }: { path: string }): Promise<void> {

@@ -3,6 +3,7 @@ export * from './auth';
 export * from './commit';
 export * from './commitAll';
 export * from './revert';
+export * from './revertAll';
 export * from './onDidChange';
 export * from './changeTreeViewItemStatus';
 export * from './copyBranch';
