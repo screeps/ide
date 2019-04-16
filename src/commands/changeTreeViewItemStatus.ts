@@ -5,10 +5,15 @@ export function changeTreeViewItemStatus(path: string, { modified }: IModule) {
 
     const entry = treeView.entryForPath(path) as HTMLElement;
 
-    if (!modified) {
-        entry.classList.remove('status-modified');
+    if (modified) {
+        entry.classList.add('status-modified--screeps');
+
+        // @ts-ignore
+        console.log(entry.parentElement.parentElement);
+        // @ts-ignore
+        entry.parentElement.parentElement.classList.add('status-modified--screeps');
         return;
     }
 
-    entry.classList.add('status-modified');
+    entry.classList.remove('status-modified--screeps');
 }

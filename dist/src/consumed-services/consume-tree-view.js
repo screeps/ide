@@ -26,7 +26,9 @@ function consumeTreeView(treeView) {
         return;
     }
     state_1.default.pipe(operators_1.map(({ modules }) => modules))
-        .pipe(operators_1.switchMap(() => rxjs_1.from(Object.entries(modules))))
+        .pipe(operators_1.distinctUntilChanged())
+        .pipe(operators_1.switchMap(() => rxjs_1.from(Object.entries(modules))
+        .pipe(operators_1.filter(([, { modified }]) => !!modified))))
         .pipe(operators_1.tap(([name, data]) => {
         const modulePath = utils_1.getModulePath(branch, name);
         commands_1.changeTreeViewItemStatus(modulePath, data);

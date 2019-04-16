@@ -10,8 +10,7 @@ import {
     commitAll,
     revert,
     revertAll,
-    onDidChange,
-    changeTreeViewItemStatus
+    onDidChange
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
@@ -34,8 +33,7 @@ export function initialize(state: IState) {
 
         uniqPaths.forEach(async (path) => {
             try {
-                const module = await onDidChange({ path });
-                changeTreeViewItemStatus(path, module);
+                await onDidChange({ path });
             } catch (err) {
                 console.error(err);
             }

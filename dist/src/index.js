@@ -22,8 +22,7 @@ function initialize(state) {
         const uniqPaths = new Set(paths);
         uniqPaths.forEach(async (path) => {
             try {
-                const module = await commands_1.onDidChange({ path });
-                commands_1.changeTreeViewItemStatus(path, module);
+                await commands_1.onDidChange({ path });
             }
             catch (err) {
                 console.error(err);
