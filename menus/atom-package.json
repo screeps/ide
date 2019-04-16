@@ -1,6 +1,6 @@
 {
     "context-menu": {
-        ".tree-view .full-menu [screeps-dist][is='tree-view-directory']": [
+        ".tree-view [screeps-dist] > div": [
             { "type": "separator" },
 
             { "label": "Screeps Commit All", "command": "screeps-ide:commitAll" },
@@ -9,7 +9,7 @@
             { "type": "separator" }
         ],
 
-        ".tree-view .full-menu [screeps-dist] [is='tree-view-file']": [
+        ".tree-view [screeps-dist] .file": [
             { "type": "separator" },
 
             { "label": "Screeps Commit", "command": "screeps-ide:commit" },
