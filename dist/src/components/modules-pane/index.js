@@ -38,6 +38,7 @@ class ModulesPane {
                 .pipe(operators_1.map(({ branch }) => branch))
                 .pipe(operators_1.distinctUntilChanged())
                 .pipe(operators_1.tap((branch) => this.onSelectBranch(branch)))
+                .pipe(operators_1.tap((branch) => this.state = { branch }))
                 .subscribe();
             state_1.default
                 .pipe(operators_1.map(({ modules }) => modules))
@@ -86,13 +87,13 @@ class ModulesPane {
         }
     }
     async onSelectBranch(_branch) {
-        console.log('ModulesPane::onSelectBranch');
         const { branch, modules: _modules } = await this._api.getUserCode(_branch);
         const changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
-        const modules = utils_1.combineModules(Object.assign({}, changes, _modules), changes);
+        const files = Object.entries(changes)
+            .reduce((acc, [name]) => (Object.assign({}, acc, { [name]: null })), {});
+        const modules = utils_1.combineModules(Object.assign({}, files, _modules), changes);
         state_1.default.next(Object.assign({}, state_1.default.getValue(), { branch,
             modules }));
-        this.state = { branch };
     }
     async onDeleteBranch(branch) {
         try {

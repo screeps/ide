@@ -150,7 +150,7 @@ function combineModules(origin, changes = {}) {
     for (let i = 0, l = entries.length; i < l; i++) {
         const [module, content] = entries[i];
         const _content = changes[module];
-        const modified = !!(_content && _content !== content);
+        const modified = !!(_content !== content);
         modules[module] = {
             content,
             modified

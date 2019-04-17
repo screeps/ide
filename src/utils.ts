@@ -181,7 +181,7 @@ export function combineModules(
         const [module, content] = entries[i];
         const _content = changes[module];
 
-        const modified = !!(_content && _content !== content);
+        const modified = !!(_content !== content);
 
         modules[module] = {
             content,

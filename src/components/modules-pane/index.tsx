@@ -92,6 +92,7 @@ export class ModulesPane implements ViewModel {
                 .pipe(map(({ branch }) => branch))
                 .pipe(distinctUntilChanged())
                 .pipe(tap((branch) => this.onSelectBranch(branch)))
+                .pipe(tap((branch) => this.state = { branch }))
                 .subscribe();
 
             __state
@@ -157,13 +158,14 @@ export class ModulesPane implements ViewModel {
 
     @progress
     async onSelectBranch(_branch?: string): Promise<void> {
-        console.log('ModulesPane::onSelectBranch');
         const { branch, modules: _modules } = await this._api.getUserCode(_branch);
 
         const changes = await readUserCode(getBranchPath(branch));
+        const files = Object.entries(changes)
+            .reduce((acc, [name]) => ({ ...acc, [name]: null }), {});
 
         const modules = combineModules({
-            ...changes,
+            ...files,
             ..._modules
         }, changes);
 
@@ -172,8 +174,6 @@ export class ModulesPane implements ViewModel {
             branch,
             modules
         });
-
-        this.state = { branch };
     }
 
     async onDeleteBranch(branch: string): Promise<void> {
