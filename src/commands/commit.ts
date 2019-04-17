@@ -6,7 +6,6 @@ import {
 } from '../utils';
 import { default as __state } from '../state';
 
-// @ts-ignore
 export async function commit(event: CustomEvent) {
     let api;
     try {

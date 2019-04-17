@@ -10,17 +10,13 @@ import {
 
 import { default as __state } from '../state';
 
-// @ts-ignore
-export async function revertAll(...args) {
-    console.log('command:revertAll', ...args);
-
+export async function revertAll() {
     let api;
     try {
         api = await getApi();
         await getUser();
     } catch (err) {
-        console.error(err);
-        return;
+        throw new Error(err);
     }
 
     const { branch } = __state.getValue();

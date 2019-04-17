@@ -2,17 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
 const state_1 = require("../state");
-// @ts-ignore
-async function commitAll(...args) {
-    console.log('command:commitAll', ...args);
+async function commitAll() {
     let api;
     try {
         api = await utils_1.getApi();
         await utils_1.getUser();
     }
     catch (err) {
-        console.error(err);
-        return;
+        throw new Error(err);
     }
     const { branch } = state_1.default.getValue();
     if (!branch) {
@@ -30,7 +27,7 @@ async function commitAll(...args) {
         });
     }
     catch (err) {
-        console.error('Try to delete deleted modules');
+        throw new Error(err);
     }
     try {
         await api.updateUserCode({ branch, modules });

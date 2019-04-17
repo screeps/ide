@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const atom_1 = require("atom");
 const utils_1 = require("../utils");
 const state_1 = require("../state");
-// @ts-ignore
 async function commit(event) {
     let api;
     try {

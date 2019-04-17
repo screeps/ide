@@ -7,17 +7,13 @@ import {
 
 import { default as __state } from '../state';
 
-// @ts-ignore
-export async function commitAll(...args) {
-    console.log('command:commitAll', ...args);
-
+export async function commitAll() {
     let api;
     try {
         api = await getApi();
         await getUser();
     } catch (err) {
-        console.error(err);
-        return;
+        throw new Error(err);
     }
 
     const { branch } = __state.getValue();
@@ -43,7 +39,7 @@ export async function commitAll(...args) {
                 }
             });
     } catch(err) {
-        console.error('Try to delete deleted modules');
+        throw new Error(err);
     }
 
     try {
