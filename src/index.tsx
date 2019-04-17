@@ -10,7 +10,7 @@ import {
     commitAll,
     revert,
     revertAll,
-    onDidChange
+    onDidChangeFiles
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
@@ -27,19 +27,7 @@ export * from './consumed-services';
 export function initialize(state: IState) {
     __state.next(state);
 
-    atom.project.onDidChangeFiles((events) => {
-        const paths = events.map(({ path }) => path);
-        const uniqPaths = new Set(paths);
-
-        uniqPaths.forEach(async (path) => {
-            try {
-                await onDidChange({ path });
-            } catch (err) {
-                console.error(err);
-            }
-        });
-    });
-
+    atom.project.onDidChangeFiles(onDidChangeFiles);
 }
 
 export function activate(state: IState) {

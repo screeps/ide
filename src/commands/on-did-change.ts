@@ -2,22 +2,14 @@ import { File } from 'atom';
 
 import { default as __state } from '../state';
 
-import { getModuleByPath } from '../utils';
-
-export async function onDidChange({ path }: { path: string }): Promise<IModule> {
-    const module = getModuleByPath(path);
-
-    if (!module) {
-        throw new Error('Error get module');
-    }
-
+export async function onDidChange(path: string, module: string): Promise<IModule> {
     const file = new File(path);
 
     let content;
     try {
         content = await file.read();
     } catch (err) {
-        throw new Error('Error read file');
+        throw new Error(err);
     }
 
     const { modules } = __state.getValue();

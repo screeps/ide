@@ -17,18 +17,7 @@ exports.config = config_2.default;
 tslib_1.__exportStar(require("./consumed-services"), exports);
 function initialize(state) {
     state_1.default.next(state);
-    atom.project.onDidChangeFiles((events) => {
-        const paths = events.map(({ path }) => path);
-        const uniqPaths = new Set(paths);
-        uniqPaths.forEach(async (path) => {
-            try {
-                await commands_1.onDidChange({ path });
-            }
-            catch (err) {
-                console.error(err);
-            }
-        });
-    });
+    atom.project.onDidChangeFiles(commands_1.onDidChangeFiles);
 }
 exports.initialize = initialize;
 function activate(state) {

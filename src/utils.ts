@@ -135,7 +135,7 @@ export function getModulePath(branch: string, module: string): string {
 export function getModuleByPath(path: string): string | null {
     const srcDir = getBranchPath('');
 
-    if (!path.includes(srcDir)) {
+    if (!path.includes(srcDir) || path === srcDir) {
         return null;
     }
 

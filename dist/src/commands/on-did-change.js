@@ -2,13 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const atom_1 = require("atom");
 const state_1 = require("../state");
-const utils_1 = require("../utils");
-async function onDidChange({ path }) {
-    const module = utils_1.getModuleByPath(path);
-    console.log(module);
-    if (!module) {
-        throw new Error('Error get module');
-    }
+async function onDidChange(path, module) {
     const file = new atom_1.File(path);
     let content;
     try {
@@ -31,4 +25,4 @@ async function onDidChange({ path }) {
     return _module;
 }
 exports.onDidChange = onDidChange;
-//# sourceMappingURL=onDidChange.js.map
+//# sourceMappingURL=on-did-change.js.map

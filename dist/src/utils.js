@@ -117,7 +117,7 @@ function getModulePath(branch, module) {
 exports.getModulePath = getModulePath;
 function getModuleByPath(path) {
     const srcDir = getBranchPath('');
-    if (!path.includes(srcDir)) {
+    if (!path.includes(srcDir) || path === srcDir) {
         return null;
     }
     const matches = path.match(/([^\\]+)$/gm);
