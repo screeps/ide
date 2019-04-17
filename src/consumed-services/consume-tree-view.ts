@@ -7,8 +7,6 @@ import { default as __state } from '../state';
 import { configGetter } from '../config';
 import { getModulePath } from '../utils';
 
-import { changeTreeViewItemStatus } from '../commands';
-
 export function consumeTreeView(treeView: any) {
     // Choose first project as screeps folder.
     const projectPath = atom.project.getPaths()[0];
@@ -38,9 +36,15 @@ export function consumeTreeView(treeView: any) {
 
     modules$
         .pipe(switchMap((modules) => from(Object.entries(modules))))
-        .pipe(tap(([name, data]) => {
-            const modulePath = getModulePath(branch, name);
-            changeTreeViewItemStatus(modulePath, data);
+        .pipe(tap(([name, { modified }]) => {
+            const path = getModulePath(branch, name);
+            const entry = treeView.entryForPath(path) as HTMLElement;
+
+            if (modified) {
+                entry.classList.add('status-modified--screeps');
+            } else {
+                entry.classList.remove('status-modified--screeps');
+            }
         }))
         .subscribe();
 

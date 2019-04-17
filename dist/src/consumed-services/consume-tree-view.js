@@ -6,7 +6,6 @@ const operators_1 = require("rxjs/operators");
 const state_1 = require("../state");
 const config_1 = require("../config");
 const utils_1 = require("../utils");
-const commands_1 = require("../commands");
 function consumeTreeView(treeView) {
     // Choose first project as screeps folder.
     const projectPath = atom.project.getPaths()[0];
@@ -29,9 +28,15 @@ function consumeTreeView(treeView) {
         .pipe(operators_1.distinctUntilChanged());
     modules$
         .pipe(operators_1.switchMap((modules) => rxjs_1.from(Object.entries(modules))))
-        .pipe(operators_1.tap(([name, data]) => {
-        const modulePath = utils_1.getModulePath(branch, name);
-        commands_1.changeTreeViewItemStatus(modulePath, data);
+        .pipe(operators_1.tap(([name, { modified }]) => {
+        const path = utils_1.getModulePath(branch, name);
+        const entry = treeView.entryForPath(path);
+        if (modified) {
+            entry.classList.add('status-modified--screeps');
+        }
+        else {
+            entry.classList.remove('status-modified--screeps');
+        }
     }))
         .subscribe();
     modules$

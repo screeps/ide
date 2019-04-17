@@ -5,6 +5,5 @@ export * from './commitAll';
 export * from './revert';
 export * from './revertAll';
 export * from './on-did-change';
-export * from './changeTreeViewItemStatus';
 export * from './copyBranch';
 export * from './on-did-change-files';
