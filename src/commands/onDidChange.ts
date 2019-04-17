@@ -11,8 +11,6 @@ export async function onDidChange({ path }: { path: string }): Promise<IModule> 
         throw new Error('Error get module');
     }
 
-    console.log(module);
-
     const file = new File(path);
 
     let content;

@@ -25,15 +25,26 @@ function consumeTreeView(treeView) {
     if (!modules || !branch) {
         return;
     }
-    state_1.default.pipe(operators_1.map(({ modules }) => modules))
-        .pipe(operators_1.distinctUntilChanged())
-        .pipe(operators_1.switchMap(() => rxjs_1.from(Object.entries(modules))
-        .pipe(operators_1.filter(([, { modified }]) => !!modified))))
+    const modules$ = state_1.default.pipe(operators_1.map(({ modules }) => modules))
+        .pipe(operators_1.distinctUntilChanged());
+    modules$
+        .pipe(operators_1.switchMap((modules) => rxjs_1.from(Object.entries(modules))))
         .pipe(operators_1.tap(([name, data]) => {
         const modulePath = utils_1.getModulePath(branch, name);
         commands_1.changeTreeViewItemStatus(modulePath, data);
     }))
-        .toPromise();
+        .subscribe();
+    modules$
+        .pipe(operators_1.map((modules) => Object.entries(modules).some(([, { modified }]) => !!modified)))
+        .pipe(operators_1.tap((modified) => {
+        if (modified) {
+            entry.classList.add('status-modified--screeps');
+        }
+        else {
+            entry.classList.remove('status-modified--screeps');
+        }
+    }))
+        .subscribe();
 }
 exports.consumeTreeView = consumeTreeView;
 //# sourceMappingURL=consume-tree-view.js.map

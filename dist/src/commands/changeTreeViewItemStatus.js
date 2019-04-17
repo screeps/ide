@@ -7,10 +7,6 @@ function changeTreeViewItemStatus(path, { modified }) {
     const entry = treeView.entryForPath(path);
     if (modified) {
         entry.classList.add('status-modified--screeps');
-        // @ts-ignore
-        console.log(entry);
-        // @ts-ignore
-        entry.parentElement.parentElement.classList.add('status-modified--screeps');
         return;
     }
     entry.classList.remove('status-modified--screeps');

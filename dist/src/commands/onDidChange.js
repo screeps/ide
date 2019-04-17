@@ -8,7 +8,6 @@ async function onDidChange({ path }) {
     if (!module) {
         throw new Error('Error get module');
     }
-    console.log(module);
     const file = new atom_1.File(path);
     let content;
     try {

@@ -1,7 +1,7 @@
 const path = require('path');
 
 import { from } from 'rxjs';
-import { tap, map, switchMap, filter, distinctUntilChanged } from 'rxjs/operators';
+import { tap, map, switchMap, distinctUntilChanged } from 'rxjs/operators';
 
 import { default as __state } from '../state';
 import { configGetter } from '../config';
@@ -33,16 +33,26 @@ export function consumeTreeView(treeView: any) {
         return;
     }
 
-    __state.pipe(map(({ modules }) => modules))
-        .pipe(distinctUntilChanged())
-        .pipe(switchMap(() => 
-            from(Object.entries(modules))
-                .pipe(filter(([, { modified }]) => !!modified))
-        ))
+    const modules$ = __state.pipe(map(({ modules }) => modules))
+        .pipe(distinctUntilChanged());
+
+    modules$
+        .pipe(switchMap((modules) => from(Object.entries(modules))))
         .pipe(tap(([name, data]) => {
             const modulePath = getModulePath(branch, name);
             changeTreeViewItemStatus(modulePath, data);
         }))
-        .toPromise();
+        .subscribe();
+
+    modules$
+        .pipe(map((modules) => Object.entries(modules).some(([, { modified }]) => !!modified)))
+        .pipe(tap((modified) => {
+            if (modified) {
+                entry.classList.add('status-modified--screeps');
+            } else {
+                entry.classList.remove('status-modified--screeps');
+            }
+        }))
+        .subscribe();
 
 }
