@@ -16,6 +16,14 @@ var config_2 = require("./config");
 exports.config = config_2.default;
 tslib_1.__exportStar(require("./consumed-services"), exports);
 function initialize(state) {
+    if (!state) {
+        state = {
+            modules: {}
+        };
+    }
+    if (!state.modules) {
+        state.modules = {};
+    }
     state_1.default.next(state);
     atom.project.onDidChangeFiles(commands_1.onDidChangeFiles);
 }

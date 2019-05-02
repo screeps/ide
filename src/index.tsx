@@ -25,6 +25,16 @@ export { default as config } from './config';
 export * from './consumed-services';
 
 export function initialize(state: IState) {
+    if (!state) {
+        state = {
+            modules: {}
+        }
+    }
+
+    if (!state.modules) {
+        state.modules = {}
+    }
+
     __state.next(state);
 
     atom.project.onDidChangeFiles(onDidChangeFiles);
