@@ -45,34 +45,46 @@ class MemoryPanel {
             pane.onDidDestroy(() => this.destroy());
         });
         (async () => {
-            this._api = await utils_2.getApi();
-            this._user = await utils_2.getUser();
-            this._socket = utils_2.getSocket();
-            this._service = new service_1.Service();
-            this.initMemoryPipeSubscription();
-            this._service.shards$
-                .pipe(operators_1.tap((shards) => this.state = { shards }))
-                .subscribe();
-            const subscriptions = new atom_1.CompositeDisposable();
-            this.memory$
-                .pipe(operators_1.tap((memory) => this.state = { memory }))
-                .pipe(operators_1.tap(() => {
-                subscriptions.dispose();
-            }))
-                .pipe(operators_1.tap((memory) => {
-                memory.forEach(({ path }) => {
-                    const ref = document.getElementById(`${ui_1.PATH_BTN_REMOVE}${path || 'root'}`);
-                    if (!ref) {
+            try {
+                this._api = await utils_2.getApi();
+                this._user = await utils_2.getUser();
+                this._socket = utils_2.getSocket();
+                this._service = new service_1.Service();
+                this.initMemoryPipeSubscription();
+                this._service.shards$
+                    .pipe(operators_1.tap((shards) => this.state = { shards }))
+                    .subscribe();
+                const subscriptions = new atom_1.CompositeDisposable();
+                this.memory$
+                    .pipe(operators_1.tap((memory) => this.state = { memory }))
+                    .pipe(operators_1.tap(() => {
+                    subscriptions.dispose();
+                }))
+                    .pipe(operators_1.tap((memory) => {
+                    memory.forEach(({ path }) => {
+                        const ref = document.getElementById(`${ui_1.PATH_BTN_REMOVE}${path || 'root'}`);
+                        if (!ref) {
+                            return;
+                        }
+                        const disposable = atom.tooltips.add(ref, {
+                            title: 'Delete watch'
+                        });
+                        subscriptions.add(disposable);
+                    });
+                }))
+                    .subscribe();
+                this._applyTooltips();
+            }
+            catch (err) {
+                setTimeout(() => {
+                    const pane = atom.workspace.paneForItem(this);
+                    if (!pane) {
                         return;
                     }
-                    const disposable = atom.tooltips.add(ref, {
-                        title: 'Delete watch'
-                    });
-                    subscriptions.add(disposable);
+                    pane.destroyItem(this);
                 });
-            }))
-                .subscribe();
-            this._applyTooltips();
+                this.destroy();
+            }
         })();
     }
     get state() {

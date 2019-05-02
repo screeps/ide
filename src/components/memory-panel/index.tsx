@@ -89,41 +89,55 @@ export class MemoryPanel {
         });
 
         (async () => {
-            this._api = await getApi();
-            this._user = await getUser();
-            this._socket = getSocket();
-            this._service = new Service()
+            try {
+                this._api = await getApi();
+                this._user = await getUser();
+                this._socket = getSocket();
+                this._service = new Service()
 
-            this.initMemoryPipeSubscription();
+                this.initMemoryPipeSubscription();
 
-            this._service.shards$
-                .pipe(tap((shards: any) => this.state = { shards }))
-                .subscribe();
-    
-            const subscriptions = new CompositeDisposable();
-            this.memory$
-                .pipe(tap((memory: IMemoryPath[]) => this.state = { memory }))
-                .pipe(tap(() => {
-                    subscriptions.dispose();
-                }))
-                .pipe(tap((memory: IMemoryPath[]) => {
-                    memory.forEach(({ path }) => {
-                        const ref = document.getElementById(`${ PATH_BTN_REMOVE }${ path || 'root' }`);
-    
-                        if (!ref) {
-                            return;
-                        }
-    
-                        const disposable = atom.tooltips.add(ref, {
-                            title: 'Delete watch'
+                this._service.shards$
+                    .pipe(tap((shards: any) => this.state = { shards }))
+                    .subscribe();
+        
+                const subscriptions = new CompositeDisposable();
+                this.memory$
+                    .pipe(tap((memory: IMemoryPath[]) => this.state = { memory }))
+                    .pipe(tap(() => {
+                        subscriptions.dispose();
+                    }))
+                    .pipe(tap((memory: IMemoryPath[]) => {
+                        memory.forEach(({ path }) => {
+                            const ref = document.getElementById(`${ PATH_BTN_REMOVE }${ path || 'root' }`);
+        
+                            if (!ref) {
+                                return;
+                            }
+        
+                            const disposable = atom.tooltips.add(ref, {
+                                title: 'Delete watch'
+                            });
+        
+                            subscriptions.add(disposable);
                         });
-    
-                        subscriptions.add(disposable);
-                    });
-                }))
-                .subscribe();
-    
-            this._applyTooltips();
+                    }))
+                    .subscribe();
+        
+                this._applyTooltips();
+            } catch (err) {
+                setTimeout(() => {
+                    const pane = atom.workspace.paneForItem(this);
+
+                    if (!pane) {
+                        return;
+                    }
+
+                    pane.destroyItem(this);
+                });
+
+                this.destroy();
+            }
         })()
     }
 
