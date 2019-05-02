@@ -3,7 +3,8 @@ import { File, TextEditor, ViewModel } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { tap, distinctUntilChanged, map } from 'rxjs/operators';
+import { Subject, Observable } from 'rxjs';
+import { tap, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 import { default as __state } from '../../state';
 import { ModulesView } from '../../../ui';
@@ -33,6 +34,9 @@ export const MODULES_URI = 'atom://screeps-ide/modules';
 export class ModulesPane implements ViewModel {
     public element: HTMLElement;
     public viewRef = React.createRef<ModulesView>();
+
+    _destroySbj: Subject<null> = new Subject();
+    _destroy$: Observable<null> = this._destroySbj.asObservable();
 
     public get state(): any {
         if (!this.viewRef.current) {
@@ -73,6 +77,16 @@ export class ModulesPane implements ViewModel {
         //     events.forEach(({ path }) => this.onDidChange({ path }));
         // });
 
+        setTimeout(() => {
+            const pane = atom.workspace.paneForItem(this);
+
+            if (!pane) {
+                return;
+            }
+
+            pane.onDidDestroy(() => this.destroy());
+        });
+
         atom.workspace.onDidChangeActivePaneItem((pane) => {
             if (!(pane instanceof TextEditor)) {
                 return;
@@ -83,29 +97,46 @@ export class ModulesPane implements ViewModel {
         });
 
         (async () => {
-            const api = await getApi();
-            await getUser();
-            this._api = api;
+            try {
+                const api = await getApi();
+                await getUser();
+                this._api = api;
 
-            // TODO: need to destory subscribtion
-            __state
-                .pipe(map(({ branch }) => branch))
-                .pipe(distinctUntilChanged())
-                .pipe(tap((branch) => this.onSelectBranch(branch)))
-                .pipe(tap((branch) => this.state = { branch }))
-                .subscribe();
+                // TODO: need to destory subscribtion
+                __state
+                    .pipe(takeUntil(this._destroy$))
+                    .pipe(map(({ branch }) => branch))
+                    .pipe(distinctUntilChanged())
+                    .pipe(tap((branch) => this.onSelectBranch(branch)))
+                    .pipe(tap((branch) => this.state = { branch }))
+                    .subscribe();
 
-            __state
-                .pipe(map(({ modules }) => modules))
-                .pipe(distinctUntilChanged())
-                .pipe(tap((modules) => this.state = { modules }))
-                .subscribe();
+                __state
+                    .pipe(takeUntil(this._destroy$))
+                    .pipe(map(({ modules }) => modules))
+                    .pipe(distinctUntilChanged())
+                    .pipe(tap((modules) => this.state = { modules }))
+                    .subscribe();
 
-            __state
-                .pipe(map(({ branches }) => branches))
-                .pipe(distinctUntilChanged())
-                .pipe(tap((branches) => this.state = { branches }))
-                .subscribe();
+                __state
+                    .pipe(takeUntil(this._destroy$))
+                    .pipe(map(({ branches }) => branches))
+                    .pipe(distinctUntilChanged())
+                    .pipe(tap((branches) => this.state = { branches }))
+                    .subscribe();
+            } catch (err) {
+                setTimeout(() => {
+                    const pane = atom.workspace.paneForItem(this);
+        
+                    if (!pane) {
+                        return;
+                    }
+        
+                    pane.destroyItem(this);
+                });
+
+                this.destroy();
+            }
         })()
     }
 
@@ -290,6 +321,11 @@ export class ModulesPane implements ViewModel {
         }), {})
 
         this.state = { modules };
+    }
+
+    destroy() {
+        this._destroySbj.next();
+        this._destroySbj.complete();
     }
 
     // Implement serialization hook for view model

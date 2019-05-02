@@ -5,6 +5,7 @@ const fs = require('fs');
 const atom_1 = require("atom");
 const React = require("react");
 const ReactDOM = require("react-dom");
+const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const state_1 = require("../../state");
 const ui_1 = require("../../../ui");
@@ -17,11 +18,20 @@ exports.MODULES_URI = 'atom://screeps-ide/modules';
 class ModulesPane {
     constructor(state = {}) {
         this.viewRef = React.createRef();
+        this._destroySbj = new rxjs_1.Subject();
+        this._destroy$ = this._destroySbj.asObservable();
         this.element = document.createElement('div');
         this.render(state);
         // atom.project.onDidChangeFiles((events) => {
         //     events.forEach(({ path }) => this.onDidChange({ path }));
         // });
+        setTimeout(() => {
+            const pane = atom.workspace.paneForItem(this);
+            if (!pane) {
+                return;
+            }
+            pane.onDidDestroy(() => this.destroy());
+        });
         atom.workspace.onDidChangeActivePaneItem((pane) => {
             if (!(pane instanceof atom_1.TextEditor)) {
                 return;
@@ -30,26 +40,41 @@ class ModulesPane {
             this.onDidChangeActivePaneItem({ path });
         });
         (async () => {
-            const api = await utils_1.getApi();
-            await utils_1.getUser();
-            this._api = api;
-            // TODO: need to destory subscribtion
-            state_1.default
-                .pipe(operators_1.map(({ branch }) => branch))
-                .pipe(operators_1.distinctUntilChanged())
-                .pipe(operators_1.tap((branch) => this.onSelectBranch(branch)))
-                .pipe(operators_1.tap((branch) => this.state = { branch }))
-                .subscribe();
-            state_1.default
-                .pipe(operators_1.map(({ modules }) => modules))
-                .pipe(operators_1.distinctUntilChanged())
-                .pipe(operators_1.tap((modules) => this.state = { modules }))
-                .subscribe();
-            state_1.default
-                .pipe(operators_1.map(({ branches }) => branches))
-                .pipe(operators_1.distinctUntilChanged())
-                .pipe(operators_1.tap((branches) => this.state = { branches }))
-                .subscribe();
+            try {
+                const api = await utils_1.getApi();
+                await utils_1.getUser();
+                this._api = api;
+                // TODO: need to destory subscribtion
+                state_1.default
+                    .pipe(operators_1.takeUntil(this._destroy$))
+                    .pipe(operators_1.map(({ branch }) => branch))
+                    .pipe(operators_1.distinctUntilChanged())
+                    .pipe(operators_1.tap((branch) => this.onSelectBranch(branch)))
+                    .pipe(operators_1.tap((branch) => this.state = { branch }))
+                    .subscribe();
+                state_1.default
+                    .pipe(operators_1.takeUntil(this._destroy$))
+                    .pipe(operators_1.map(({ modules }) => modules))
+                    .pipe(operators_1.distinctUntilChanged())
+                    .pipe(operators_1.tap((modules) => this.state = { modules }))
+                    .subscribe();
+                state_1.default
+                    .pipe(operators_1.takeUntil(this._destroy$))
+                    .pipe(operators_1.map(({ branches }) => branches))
+                    .pipe(operators_1.distinctUntilChanged())
+                    .pipe(operators_1.tap((branches) => this.state = { branches }))
+                    .subscribe();
+            }
+            catch (err) {
+                setTimeout(() => {
+                    const pane = atom.workspace.paneForItem(this);
+                    if (!pane) {
+                        return;
+                    }
+                    pane.destroyItem(this);
+                });
+                this.destroy();
+            }
         })();
     }
     get state() {
@@ -168,6 +193,10 @@ class ModulesPane {
         let { modules } = this.state;
         modules = Object.entries(modules).reduce((modules, [_module, data]) => (Object.assign({}, modules, { [_module]: Object.assign({}, data, { active: module === _module }) })), {});
         this.state = { modules };
+    }
+    destroy() {
+        this._destroySbj.next();
+        this._destroySbj.complete();
     }
     // Implement serialization hook for view model
     serialize() {
