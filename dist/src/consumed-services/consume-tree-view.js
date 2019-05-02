@@ -21,22 +21,9 @@ function consumeTreeView() {
     const srcDir = config_1.configGetter('src');
     const fullPath = path.resolve(projectPath, srcDir);
     const projectEntry = treeView.entryForPath(projectPath);
-    projectEntry.addEventListener('click', async () => {
-        await new Promise((resolve) => setTimeout(resolve));
-        if (!projectEntry.classList.contains('expanded')) {
-            return;
-        }
-        // Set screeps icon for screeps source folder.
-        setDistIcon(treeView, fullPath);
-        const { branch, modules } = state_1.default.getValue();
-        if (!branch) {
-            return;
-        }
-        const entry = treeView.entryForPath(fullPath);
-        const modified = Object.values(modules).some(({ modified }) => !!modified);
-        toggleEntryStatusModified(entry, modified);
-        Object.entries(modules)
-            .forEach(setTreeViewEntryStatus(treeView, branch));
+    projectEntry.addEventListener('click', treeViewExpandItem);
+    atom.commands.add(treeView.element, {
+        'tree-view:expand-item': treeViewExpandItem
     });
     // Set screeps icon for screeps source folder.
     setDistIcon(treeView, fullPath);
@@ -45,22 +32,23 @@ function consumeTreeView() {
     if (!modules || !branch) {
         return;
     }
-    atom.commands.add(treeView.element, {
-        'tree-view:expand-item': async function () {
-            await new Promise((resolve) => setTimeout(resolve));
-            // Set screeps icon for screeps source folder.
-            setDistIcon(treeView, fullPath);
-            const { branch, modules } = state_1.default.getValue();
-            if (!branch) {
-                return;
-            }
-            const entry = treeView.entryForPath(fullPath);
-            const modified = Object.values(modules).some(({ modified }) => !!modified);
-            toggleEntryStatusModified(entry, modified);
-            Object.entries(modules)
-                .forEach(setTreeViewEntryStatus(treeView, branch));
+    async function treeViewExpandItem() {
+        await new Promise((resolve) => setTimeout(resolve));
+        if (!projectEntry.classList.contains('expanded')) {
+            return;
         }
-    });
+        // Set screeps icon for screeps source folder.
+        setDistIcon(treeView, fullPath);
+        const { branch, modules } = state_1.default.getValue();
+        if (!modules || !branch) {
+            return;
+        }
+        const entry = treeView.entryForPath(fullPath);
+        const modified = Object.values(modules).some(({ modified }) => !!modified);
+        toggleEntryStatusModified(entry, modified);
+        Object.entries(modules)
+            .forEach(setTreeViewEntryStatus(treeView, branch));
+    }
     const modules$ = state_1.default.pipe(operators_1.map(({ modules }) => modules))
         .pipe(operators_1.distinctUntilChanged());
     modules$
