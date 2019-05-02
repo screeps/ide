@@ -39,11 +39,10 @@ class TokenModal extends React.Component<ITokenModalProps> {
                             type='text'
                             name='email'
 
-
-                            disabled={ true }
                             required={ true }
+                            readOnly={ true }
 
-                            value={ this.props.token }
+                            value={ this.props.token.substr(0, 8) + '-****-****-****-************' }
                         />
                         <div className='underline' />
                     </fieldset>

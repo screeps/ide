@@ -22,7 +22,7 @@ class TokenModal extends React.Component {
             React.createElement("form", null,
                 React.createElement("fieldset", { className: 'screeps-field' },
                     React.createElement("legend", null, "It'll be save to global config"),
-                    React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'email', disabled: true, required: true, value: this.props.token }),
+                    React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'email', required: true, readOnly: true, value: this.props.token.substr(0, 8) + '-****-****-****-************' }),
                     React.createElement("div", { className: 'underline' }))),
             React.createElement("footer", null,
                 React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel }, "Cancel"),
