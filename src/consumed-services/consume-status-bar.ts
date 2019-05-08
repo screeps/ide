@@ -4,7 +4,7 @@ import { tap } from 'rxjs/operators';
 
 import { default as __state } from '../state';
 
-import { MODULES_URI } from '../components/modules-pane';
+import { SCREEPS_URI } from '../components/screeps-panel';
 
 import { ScreepsStatusBar } from '../components/screeps-status-bar';
 
@@ -18,7 +18,7 @@ export function consumeStatusBar(statusBar: any) {
     __state.pipe(tap((state: IState) => consoleStatusBar.render(state)))
         .subscribe();
     statusBar.addLeftTile({ item: consoleStatusBar.element, priority });
-    consoleStatusBar.element.addEventListener('click', () => atom.workspace.open(MODULES_URI, {
+    consoleStatusBar.element.addEventListener('click', () => atom.workspace.open(SCREEPS_URI, {
         activatePane: true,
         activateItem: true,
         // split: 'down',

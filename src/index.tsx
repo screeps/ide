@@ -16,6 +16,7 @@ import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ModulesPane, MODULES_URI } from './components/modules-pane';
 import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
 import { MemoryPanel, MEMORY_URI } from './components/memory-panel';
+import { ScreepsPanel, SCREEPS_URI } from './components/screeps-panel';
 
 // import { ModulesPane, MODULES_URI } from './components/modules-pane';
 
@@ -42,6 +43,12 @@ export function initialize(state: IState) {
 
 export function activate(state: IState) {
     console.log('Screeps-IDE:activate', state);
+
+    subscriptions.add(atom.workspace.addOpener((uri): any => {
+        if (uri === SCREEPS_URI) {
+            return new ScreepsPanel();
+        }
+    }));
 
     subscriptions.add(atom.workspace.addOpener((uri): any => {
         if (uri === MODULES_URI) {
