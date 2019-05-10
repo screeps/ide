@@ -1,0 +1,29 @@
+.screeps-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    & > button {
+        margin: 5px;
+    }
+
+    & > button:first-of-type {
+        margin-top: auto;
+    }
+
+    &:before {
+        content: "\e900";
+
+        position: absolute;
+        top: 40%;
+
+        width: 100%;
+        margin: auto;
+
+        opacity: .02;
+
+        font-family: 'screepsicons' !important;
+        font-size: 200px;
+        text-align: center;
+    }
+}

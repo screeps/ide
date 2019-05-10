@@ -13,12 +13,9 @@ import {
     onDidChangeFiles
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
-import { ModulesPane, MODULES_URI } from './components/modules-pane';
 import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
 import { MemoryPanel, MEMORY_URI } from './components/memory-panel';
 import { ScreepsPanel, SCREEPS_URI } from './components/screeps-panel';
-
-// import { ModulesPane, MODULES_URI } from './components/modules-pane';
 
 const subscriptions = new CompositeDisposable();
 
@@ -28,6 +25,7 @@ export * from './consumed-services';
 export function initialize(state: IState) {
     if (!state) {
         state = {
+            branch: 'default',
             modules: {}
         }
     }
@@ -47,12 +45,6 @@ export function activate(state: IState) {
     subscriptions.add(atom.workspace.addOpener((uri): any => {
         if (uri === SCREEPS_URI) {
             return new ScreepsPanel();
-        }
-    }));
-
-    subscriptions.add(atom.workspace.addOpener((uri): any => {
-        if (uri === MODULES_URI) {
-            return new ModulesPane();
         }
     }));
 
@@ -98,16 +90,16 @@ export function serialize() {
     return __state.getValue();
 }
 
-export function deserializeModulesPane({ state }: { state: IModulesViewState }) {
-    return ModulesPane.deserialize({ state });
-}
-
 export function deserializeConsolePanel({ state }: { state: any }) {
     return ConsolePanel.deserialize({ state });
 }
 
 export function deserializeMemoryPanel({ state }: { state: any }) {
     return MemoryPanel.deserialize({ state });
+}
+
+export function deserializeScreepsPanel({ state }: { state: any }) {
+    return ScreepsPanel.deserialize({ state });
 }
 
 export function handleURI(parsedUri: any) {

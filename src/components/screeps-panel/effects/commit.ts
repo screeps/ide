@@ -1,10 +1,21 @@
+import { default as store, Action } from '../../../store';
+import {
+    UPDATE_MODULE,
+    DELETE_MODULE
+} from '../../modules-block/actions';
+
 import {
     getApi, getUser
-} from '../utils';
+} from '../../../utils';
 
-import { default as __state } from '../state';
+export const updateEffect = store
+.effect(async ({ branch, modules: _modules }: IState, { type }: Action): Promise<void> => {
+    if (![UPDATE_MODULE, DELETE_MODULE].includes(type)) {
+        return;
+    }
 
-export async function commitAll() {
+    console.log('commit');
+
     let api;
     try {
         api = await getApi();
@@ -12,8 +23,6 @@ export async function commitAll() {
     } catch (err) {
         throw new Error(err);
     }
-
-    const { branch, modules: _modules } = __state.getValue();
 
     if (!branch) {
         throw new Error('Need check branch');
@@ -33,4 +42,4 @@ export async function commitAll() {
     } catch(err) {
         throw new Error('Error update user code');
     }
-}
+});

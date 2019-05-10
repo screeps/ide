@@ -111,14 +111,14 @@ export async function getUser(): Promise<User> {
 }
 
 export function getBranchPath(branch: string): string {
-    const projectPath = atom.project.getPaths()[0];
+    // const projectPath = atom.project.getPaths()[0];
 
-    if (projectPath) {
-        const srcDir = configGetter('src');
-        const fullPath = path.resolve(projectPath, srcDir);
+    // if (projectPath) {
+    //     const srcDir = configGetter('src');
+    //     const fullPath = path.resolve(projectPath, srcDir);
 
-        return fullPath;
-    }
+    //     return fullPath;
+    // }
 
     // @ts-ignore
     return path.resolve(`${ atom.packages.packageDirPaths }`, PACKAGE_NAME, `.branches/${ branch }`);
@@ -149,7 +149,7 @@ export function getModuleByPath(path: string): string | null {
     return null;
 }
 
-export async function readUserCode(fullPath: string): Promise<IModules> {
+export async function readUserCode(fullPath: string): Promise<IModulesData> {
     const dir = new Directory(fullPath);
     const entries = dir.getEntriesSync();
 
@@ -171,8 +171,8 @@ export async function readUserCode(fullPath: string): Promise<IModules> {
 }
 
 export function combineModules(
-    origin: IModules,
-    changes: IModules = {}
+    origin: IModulesData,
+    changes: IModulesData = {}
 ): { [key: string]: IModule; } {
     const modules: { [key: string]: IModule; } = {};
     const entries = Object.entries(origin);
@@ -181,7 +181,10 @@ export function combineModules(
         const [module, content] = entries[i];
         const _content = changes[module];
 
-        const modified = !!(_content !== content);
+        let modified = false;
+        if (typeof _content !== 'undefined') {
+            modified = !!(_content && _content !== content);
+        }
 
         modules[module] = {
             content,

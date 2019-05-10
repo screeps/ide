@@ -1,8 +1,8 @@
 /// <reference path='./index.d.ts' />
 
 import * as SockJS from 'sockjs-client';
-import { Subject } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { Subject, Observable, Observer } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
 
 function isAuth(msg: any): boolean {
     return msg.data && msg.data.match && msg.data.match(/^auth ok (.*)$/);
@@ -24,11 +24,12 @@ export class Socket {
 
     public connected: boolean = false;
 
-    // TODO: set private
-    public _messagesSbj = new Subject();
+    _unsubscribeSbj = new Subject();
+
+    _messagesSbj = new Subject();
     public messages$ = this._messagesSbj.asObservable();
 
-    private _afterConnectSbj = new Subject();
+    _afterConnectSbj = new Subject();
     public afterConnect$ = this._afterConnectSbj.asObservable();
 
     constructor({ url, token }: ISocketSettings) {
@@ -59,6 +60,7 @@ export class Socket {
             });
         }
 
+        // TODO: Можно удалять после того как подключились
         this.messages$
             .pipe(filter((msg: any) => isAuth(msg)))
             .subscribe(() => {
@@ -68,20 +70,32 @@ export class Socket {
     }
 
     on(channel: string) {
-        if (this.connected) {
-            this._socket.send(`subscribe ${ channel }`);
-        } else {
-            this.afterConnect$.subscribe(() => {
+        return Observable.create((observer: Observer<any>) => {
+            if (this.connected) {
                 this._socket.send(`subscribe ${ channel }`);
-            });
-        }
+            } else {
+                this.afterConnect$.subscribe(() => {
+                    this._socket.send(`subscribe ${ channel }`);
+                });
+            }
 
-        const pipe$ = this.messages$.pipe(filter((msg: any) => isSubscribe(channel, msg)));
+            const destroy$ = this._unsubscribeSbj.asObservable()
+                .pipe(filter((msg) => msg === `unsubscribe ${ channel }`));
 
-        return pipe$;
+            this.messages$
+                .pipe(takeUntil(destroy$))
+                .pipe(filter((msg: any) => isSubscribe(channel, msg)))
+                .subscribe((data) => {
+                    observer.next(data);
+                }, () => {}, () => {
+                    observer.complete();
+                });
+        });
     }
 
     off(channel: string) {
-        this._socket.send(`unsubscribe ${ channel }`);
+        const msg = `unsubscribe ${ channel }`;
+        this._unsubscribeSbj.next(msg);
+        this._socket.send(msg);
     }
 }

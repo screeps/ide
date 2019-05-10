@@ -13,13 +13,13 @@ interface ICredentials {
     password?: string;
 }
 
-interface IModules {
+interface IModulesData {
     [key: string]: string | null;
 }
 
 interface IUserCodeRequest {
     branch: string;
-    modules: IModules;
+    modules: IModulesData;
 }
 
 interface ICloneUserBranchBodyRequest {
@@ -29,7 +29,7 @@ interface ICloneUserBranchBodyRequest {
 
 interface IUserCodeResponse extends IResponse {
     branch: string;
-    modules: IModules;
+    modules: IModulesData;
 }
 
 interface IAuthResponse extends IResponse {
