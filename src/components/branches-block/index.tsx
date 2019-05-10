@@ -21,6 +21,9 @@ export function BranchesBlock({ branch, branches = [] }: any) {
             onCopyBranch={ onCopyBranch }
             onSelectBranch={ onSelectBranch }
             onDeleteBranch={ onDeleteBranch }
+
+            onSetActiveSim={ onSetActiveSim }
+            onSetActiveWorld={ onSetActiveWorld }
         />
     );
 
@@ -79,6 +82,72 @@ export function BranchesBlock({ branch, branches = [] }: any) {
                 ...__state.getValue(),
                 branches
             });
+        } catch(err) {
+            // Noop.
+        }
+    }
+
+    async function onSetActiveSim(_branch: string): Promise<void> {
+        try {
+            const _api = await getApi();
+
+            await _api.setActiveSim(_branch);
+
+            const state = __state.getValue();
+            let { branches } = state;
+
+            if (!branches) {
+                return;
+            }
+
+            branches = branches.map((data) => {
+                const { branch } = data;
+                data.activeSim = false;
+                if (branch === _branch) {
+                    data.activeSim = true;
+                }
+
+                return data;
+            })
+
+            __state.next({
+                ...state,
+                branches
+            })
+            // ttps://screeps.com/api/user/set-active-branch
+        } catch(err) {
+            // Noop.
+        }
+    }
+
+    async function onSetActiveWorld(_branch: string): Promise<void> {
+        try {
+            const _api = await getApi();
+
+            await _api.setActiveWorld(_branch);
+
+            const state = __state.getValue();
+            let { branches } = state;
+
+            if (!branches) {
+                return;
+            }
+
+            branches = branches.map((data) => {
+                const { branch } = data;
+                data.activeWorld = false;
+                if (branch === _branch) {
+                    data.activeWorld = true;
+                }
+
+                return data;
+            })
+
+            __state.next({
+                ...state,
+                branches
+            })
+            // ttps://screeps.com/api/user/set-active-branch
         } catch(err) {
             // Noop.
         }
