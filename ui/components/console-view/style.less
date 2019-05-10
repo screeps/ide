@@ -73,10 +73,12 @@
         color: #e79da7;
     }
 
+    .--input {
+        color: #82a1d6;
+    }
+
     .--input,
     .--output {
-        color: #82a1d6;
-
         &::before {
             content: '';
 
@@ -97,7 +99,10 @@
     }
 
     .--output {
+        color: rgba(234, 237, 255, 0.7);
+
         &::before {
+            background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z' opacity='0.7' fill='%23eaedff'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
             transform: rotate(180deg);
         }
     }
