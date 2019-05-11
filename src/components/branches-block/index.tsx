@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { default as __state } from '../../state';
 import {
@@ -8,7 +9,6 @@ import {
     getApi,
     combineModules
 } from '../../utils';
-import { copyBranch } from '../../commands';
 
 import BranchesView from '../../../ui/components/branches-view';
 
@@ -31,7 +31,30 @@ export function BranchesBlock({ branch, branches = [] }: any) {
         console.log('BranchesBlock::onCopyBranch');
 
         try {
-            await copyBranch(branch);
+            let api;
+            try {
+                api = await getApi();
+            } catch (err) {
+                throw err;
+            }
+        
+            let newName;
+            try {
+                newName = await prompt({
+                    legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
+                });
+        
+                await api.cloneUserBranch({ branch, newName });
+        
+                const { list: branches } = await api.getUserBranches();
+        
+                __state.next({
+                    ...__state.getValue(),
+                    branches
+                });
+            } catch(err) {
+                throw err;
+            }
         } catch(err) {
             // Noop.
         }
