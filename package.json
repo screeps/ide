@@ -80,9 +80,9 @@
     }
   },
   "deserializers": {
-    "ModulesPane": "deserializeModulesPane",
     "ConsolePanel": "deserializeConsolePanel",
-    "MemoryPanel": "deserializeMemoryPanel"
+    "MemoryPanel": "deserializeMemoryPanel",
+    "ScreepsPanel": "deserializeScreepsPanel"
   },
   "dependencies": {
     "jsoneditor": "^5.28.2",
