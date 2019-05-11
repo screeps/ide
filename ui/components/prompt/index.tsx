@@ -50,6 +50,7 @@ class PromptModal extends React.Component<IPromptModalProps> {
                             onChange={this.onInput}
 
                             required={ true }
+                            autoFocus={ true }
                         />
                         <div className='underline' />
                     </fieldset>

@@ -8,93 +8,41 @@ class ModulesView extends React.Component<IModulesViewProps> {
     //@ts-ignore
     props: IModulesViewProps;
 
-    state: IModulesViewState;
-
     constructor(props: IModulesViewProps) {
         super(props);
 
-        this.state = {
-            isProgressing: false,
-
-            modules: props.modules,
-
-            branch: props.branch,
-            branches: props.branches || [],
-
-            isShowingBranches: false
-        }
+        console.log('ModulesView::constructor', props.modules);
     }
 
     public render() {
-        let view;
-        let header;
+        // console.log('ModulesView::render', '');
 
-        if (this.state.isShowingBranches) {
-            header = (
-                <div className='screeps-modules-view__header'>
-                    <span>Choose active branch:</span>
-                </div>
-            );
-
-            view = (
-                <ul className='tab-bar screeps-modules-view__items'>
-                {this.state.branches && this.state.branches.map(({ _id, branch, activeSim, activeWorld }) => {
-                    let deleteButton;
-                    let sim;
-                    let world;
-
-                    if (!activeSim && !activeWorld) {
-                        deleteButton = <div className='close-icon' onClick={() => this.onDeleteBranch(branch)}></div>;
-                    }
-
-                    if (activeWorld) {
-                        world = <span className='screeps-modules-view__active'>world</span>;
-                    }
-
-                    if (activeSim) {
-                        sim = <span className='screeps-modules-view__active'>sim</span>;
-                    }
-
-
-                    return (
-                        <li className='tab screeps-modules-view__item' key={_id}>
-                            <button className='btn btn--clear' onClick={() => this.onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
-                            <button className='btn btn--clear' onClick={() => this.onSelectBranch(branch)}>{ branch }</button>
-                            { world } { sim }
-                            { deleteButton }
-                        </li>
-                    )
-                })}
-                </ul>
-            );
-        } else {
-            header = (
+        return (
+            <div className='screeps-ide screeps-modules-view'>
                 <div className='screeps-modules-view__header'>
                     <span>Branch</span>
-                    <button className='btn btn--clear' onClick={() => this.onChooseBranches()}>
-                        { this.state.branch }
+                    <button className='btn btn--clear'>
+                        { this.props.branch }
                     </button>
 
-                    <button className='btn btn--clear' onClick={() => this.onApplyChanges()} disabled={ !this.hasChanges() }>
+                    {/* <button className='btn btn--clear' onClick={() => this.onApplyChanges()} disabled={ !this.hasChanges() }>
                         <i className='sc-icon-done' />
-                    </button>
-                    <button className='btn btn--clear' onClick={() => this.onRevertChanges()} disabled={ !this.hasChanges() }>
+                    </button> */}
+                    {/* <button className='btn btn--clear' onClick={() => this.onRevertChanges()} disabled={ !this.hasChanges() }>
                         <i className='sc-icon-revert' />
-                    </button>
+                    </button> */}
                 </div>
-            )
-
-            view = (
+                <hr className={ 'screeps-hr' } />
                 <div>
                     <ul className='tab-bar screeps-modules-view__items'>
                         <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
-                            this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
-                            this.state.modules[MAIN_MODULE] && this.state.modules[MAIN_MODULE].active ? ' active' : ''
+                            this.props.modules[MAIN_MODULE] && this.props.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
+                            this.props.modules[MAIN_MODULE] && this.props.modules[MAIN_MODULE].active ? ' active' : ''
                         )}>
                             <button className='btn btn--clear' onClick={() => this.onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
                             <div className='modified-icon'></div>
                         </li>
-                        {this._getAdditionalModules(this.state.modules).map(([ moduleName, { modified, active }]) => {
+                        {this._getAdditionalModules(this.props.modules).map(([ moduleName, { modified, active }]) => {
                             return (
                         <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                             modified ? ' modified' : '' ) +  (
@@ -119,48 +67,13 @@ class ModulesView extends React.Component<IModulesViewProps> {
                         </form>
                     </div>
                 </div>
-            );
-        }
-
-        return (
-            <div className='screeps-ide screeps-modules-view'>
-                { header }
-                <hr className={ 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') } />
-                { view }
             </div>
         );
     }
 
     hasChanges() {
-        return Object.values(this.state.modules)
+        return Object.values(this.props.modules)
             .some(({ modified, deleted }) => !!modified || !!deleted);
-    }
-
-    onChooseModules() {
-        this.state.isShowingBranches = false;
-        this.setState({ ...this.state });
-        this.props.onChooseModules && this.props.onChooseModules();
-    }
-
-    onChooseBranches() {
-        this.state.isShowingBranches = true;
-        this.setState({ ...this.state });
-        this.props.onChooseBranches && this.props.onChooseBranches();
-    }
-
-    onCopyBranch(branch: string) {
-        this.props.onCopyBranch && this.props.onCopyBranch(branch);
-    }
-
-    onSelectBranch(branch: string) {
-        this.state.isShowingBranches = false;
-        this.state.modules = {};
-        this.setState({ ...this.state, branch });
-        this.props.onSelectBranch && this.props.onSelectBranch(branch);
-    }
-
-    onDeleteBranch(branch: string) {
-        this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
     }
 
     onCreateModule(module: string) {

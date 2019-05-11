@@ -2,50 +2,88 @@
 
 import * as React from 'react';
 
-const DEFAULT_BRANCH = 'default';
-
 export default class BranchesView extends React.Component<IBranchesViewProps> {
     //@ts-ignore
     props: IBranchesViewProps;
-    state: IBranchesViewState;
-
-    _inputRef = React.createRef();
 
     constructor(props: IBranchesViewProps) {
-        super(props);
+        console.log('BranchesView::constructor', '');
 
-        this.state = {
-            branch: props.branch || DEFAULT_BRANCH
-        }
+        super(props);
     }
 
     public render() {
+        console.log('BranchesView::render', '');
+
         return (
             <div className='screeps-ide screeps-branches-view'>
-                <i className='sc-icon-screeps' />
-                <select className='input-select'
-                    value={ this.state.branch }
+                <div className='screeps-branches-view__header'>
+                    <span>Branches</span>
+                </div>
+                <hr className='screeps-hr' />
+                <ul className='tab-bar screeps-branches-view__items'>
+                {this.props.branches && this.props.branches.map(({ _id, branch, activeSim, activeWorld }) => {
+                    let deleteButton;
+                    let sim;
+                    let world;
 
-                    onChange={(event) => this.onBranch(event)}
-                >
-                    { this.props.branches.map(({ _id, branch }) => {
-                        return (<option key={ _id } value={ branch }>{ branch }</option>);
-                    })}
-                </select>
-                <button className='btn'
-                    onClick={() => this.onCopyBranch(this.state.branch)}
-                >
-                    Copy Branch
-                </button>
+                    if (!activeSim && !activeWorld) {
+                        deleteButton = <div className='close-icon' onClick={() => this.onDeleteBranch(branch)}></div>;
+                    }
+
+                    if (activeWorld) {
+                        world = (<button className='screeps-branches-view__world --active'>
+                            world
+                        </button>);
+                    } else {
+                        world = (<button className='screeps-branches-view__world'
+                            onClick={() => this.onSetActiveWorld(branch)}>
+                            world
+                        </button>);
+                    }
+
+                    if (activeSim) {
+                        sim = (<button className='screeps-branches-view__sim --active'>
+                            sim
+                        </button>);
+                    } else {
+                        sim = (<button className='screeps-branches-view__sim'
+                            onClick={() => this.onSetActiveSim(branch)}>
+                            sim
+                        </button>);
+                    }
+
+                    return (
+                        <li className='tab screeps-branches-view__item' key={_id}>
+                            <button className='btn btn--clear' onClick={() => this.onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
+                            <button className='btn btn--clear' onClick={() => this.onSelectBranch(branch)}>{ branch }</button>
+                            { world } { sim }
+                            { deleteButton }
+                        </li>
+                    )
+                })}
+                </ul>
             </div>
-        )
+        );
     }
 
-    public onBranch(event: React.ChangeEvent<HTMLSelectElement>) {
-        this.props.onBranch && this.props.onBranch(event.target.value);
-    }
-
-    public onCopyBranch(branch: string) {
+    onCopyBranch(branch: string) {
         this.props.onCopyBranch && this.props.onCopyBranch(branch);
+    }
+
+    onSelectBranch(branch: string) {
+        this.props.onSelectBranch && this.props.onSelectBranch(branch);
+    }
+
+    onDeleteBranch(branch: string) {
+        this.props.onDeleteBranch && this.props.onDeleteBranch(branch);
+    }
+
+    onSetActiveSim(branch: string) {
+        this.props.onSetActiveSim && this.props.onSetActiveSim(branch);
+    }
+
+    onSetActiveWorld(branch: string) {
+        this.props.onSetActiveWorld && this.props.onSetActiveWorld(branch);
     }
 }

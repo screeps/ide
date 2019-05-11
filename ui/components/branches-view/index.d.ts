@@ -1,11 +1,18 @@
-interface IBranchesViewProps {
-    branch: string | undefined;
-    branches: IBranch[];
-
-    onBranch?(branch: string): void;
-    onCopyBranch?(branch: string): void;
+interface IBranch {
+    _id: string;
+    branch: string;
+    activeWorld?: boolean;
+    activeSim: boolean;
 }
 
-interface IBranchesViewState {
-    branch: string
+interface IBranchesViewProps {
+    branch: string;
+    branches: IBranch[];
+
+    onCopyBranch?(branch: string): Promise<void>;
+    onSelectBranch?(branch: string): Promise<void>;
+    onDeleteBranch?(branch: string): Promise<void>;
+
+    onSetActiveSim?(branch: string): Promise<void>;
+    onSetActiveWorld?(branch: string): Promise<void>;
 }

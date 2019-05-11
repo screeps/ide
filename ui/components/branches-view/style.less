@@ -1,29 +1,121 @@
+@import '../icons/style.less';
+
 .screeps-branches-view {
-    display: flex;
-    align-items: center;
-    width: 400px;
+    color: rgba(234, 237, 255, 0.7);
+    font-family: 'Segoe UI';
+    font-size: 12px;
 
-    & > * {
-        margin: 5px;
+    button:focus {
+        outline: none;
+        box-shadow: inherit !important;
     }
 
-    i {
-        margin-left: 3px;
-
-        font-size: 24px;
+    &__items {
+        flex-direction: column;
+        height: auto !important;
+        margin: 0;
+        padding: 0;
+    
+        list-style: none;
     }
 
-    select {
-        flex-grow: 1;
-        flex-shrink: 1;
-        width: 100%;
+    &__item {
+        position: relative;
+        
+        display: flex;
+        flex-direction: row;
+        flex: 1 0 auto !important;
+        min-height: 30px;
+    
+        &.tab {
+            border-left: none;
+        }
+    
+        .btn {
+            text-align: left;
+        }
+
+        .btn--clear {
+            color: inherit;
+            background: none;
+        }
     }
 
-    atom-text-editor {
-        flex-grow: 1;
-        flex-shrink: 1;
-        width: 100%;
+    &__header {
+        display: flex;
+        align-items: center;
+    
+        padding-left: 5px;
+        padding-right: 5px;
+    
+        line-height: 32px;
+    
+        span {
+            text-transform: uppercase;
+        }
+    
+        button {
+            position: relative;
+            z-index: 1;
+        }
+    
+        button:nth-child(2) {
+            overflow: hidden;
+    
+            cursor: pointer;
+            color: #4A5FD2 !important;
+            font-weight: bold;
+            text-overflow: ellipsis;
+        }
+    
+        button:nth-child(3),
+        button:nth-child(4) {
+            font-size: 16px;
+        }
+    
+        button:last-child {
+            margin-right: 40px;
+        }
+    
+        button:focus {
+            outline: none;
+        }
+    }
 
-        text-align: left;
+    &__world,
+    &__sim {
+        display: inline-block;
+        margin-left: 10px;
+        padding: 0;
+
+        border: none;
+        background: none;
+
+        font-size: 11px;
+        text-transform: uppercase;
+
+        &:hover {
+            color: #6C82FF;
+        }
+
+        &.--active {
+            display: inline-block;
+            margin-left: 10px;
+    
+            color: #6C82FF;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+    }
+
+    &__item.active {
+        width: auto !important;
+
+        box-shadow: inherit !important;
+
+        & .btn {
+            color: rgba(234, 237, 255, 1);
+            font-style: italic;
+        }
     }
 }
