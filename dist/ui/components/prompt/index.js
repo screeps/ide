@@ -32,7 +32,7 @@ class PromptModal extends React.Component {
             React.createElement("form", null,
                 React.createElement("fieldset", { className: 'screeps-field' },
                     React.createElement("legend", null, this.state.legend),
-                    React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'message', onChange: this.onInput, required: true }),
+                    React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'message', onChange: this.onInput, required: true, autoFocus: true }),
                     React.createElement("div", { className: 'underline' }))),
             React.createElement("footer", null,
                 React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel }, "Cancel"),

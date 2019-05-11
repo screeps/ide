@@ -98,12 +98,12 @@ async function getUser() {
 }
 exports.getUser = getUser;
 function getBranchPath(branch) {
-    const projectPath = atom.project.getPaths()[0];
-    if (projectPath) {
-        const srcDir = config_1.configGetter('src');
-        const fullPath = path.resolve(projectPath, srcDir);
-        return fullPath;
-    }
+    // const projectPath = atom.project.getPaths()[0];
+    // if (projectPath) {
+    //     const srcDir = configGetter('src');
+    //     const fullPath = path.resolve(projectPath, srcDir);
+    //     return fullPath;
+    // }
     // @ts-ignore
     return path.resolve(`${atom.packages.packageDirPaths}`, config_1.PACKAGE_NAME, `.branches/${branch}`);
 }
@@ -150,7 +150,10 @@ function combineModules(origin, changes = {}) {
     for (let i = 0, l = entries.length; i < l; i++) {
         const [module, content] = entries[i];
         const _content = changes[module];
-        const modified = !!(_content !== content);
+        let modified = false;
+        if (typeof _content !== 'undefined') {
+            modified = !!(_content && _content !== content);
+        }
         modules[module] = {
             content,
             modified

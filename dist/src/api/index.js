@@ -241,6 +241,42 @@ class Api {
         }
         return data;
     }
+    async setActiveWorld(branch) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/set-active-branch`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({
+                    branch,
+                    activeName: 'activeWorld',
+                })
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
+    async setActiveSim(branch) {
+        let data;
+        try {
+            const response = await fetch(`${this.url}/user/set-active-branch`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({
+                    branch,
+                    activeName: 'activeSim',
+                })
+            });
+            data = await response.json();
+        }
+        catch (err) {
+            throw err;
+        }
+        return data;
+    }
 }
 exports.Api = Api;
 //# sourceMappingURL=index.js.map

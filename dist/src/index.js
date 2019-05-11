@@ -1,25 +1,24 @@
 "use strict";
-/// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+/// <reference path='./index.d.ts' />
 const atom_1 = require("atom");
+const store_1 = require("./store");
 const state_1 = require("./state");
 const config_1 = require("./config");
 const commands_1 = require("./commands");
 const welcome_pane_1 = require("./components/welcome-pane");
-const modules_pane_1 = require("./components/modules-pane");
 const console_panel_1 = require("./components/console-panel");
 const memory_panel_1 = require("./components/memory-panel");
-// import { ModulesPane, MODULES_URI } from './components/modules-pane';
+const screeps_panel_1 = require("./components/screeps-panel");
+const actions_1 = require("./components/modules-block/actions");
 const subscriptions = new atom_1.CompositeDisposable();
 var config_2 = require("./config");
 exports.config = config_2.default;
 tslib_1.__exportStar(require("./consumed-services"), exports);
 function initialize(state) {
     if (!state) {
-        state = {
-            modules: {}
-        };
+        state = state_1.INITIAL_STATE;
     }
     if (!state.modules) {
         state.modules = {};
@@ -30,9 +29,19 @@ function initialize(state) {
 exports.initialize = initialize;
 function activate(state) {
     console.log('Screeps-IDE:activate', state);
+    atom.workspace.getTextEditors()
+        .forEach((textEditor) => {
+        const path = textEditor.getPath();
+        const matches = /[\\\/]\.branches[\\\/]([^\\]+)[\\\/]([^\\]+)\.js/.exec(path);
+        if (!matches) {
+            return;
+        }
+        const [, branch, module] = matches;
+        store_1.default.dispatch(actions_1.OpenTextEditorAction(branch, module));
+    });
     subscriptions.add(atom.workspace.addOpener((uri) => {
-        if (uri === modules_pane_1.MODULES_URI) {
-            return new modules_pane_1.ModulesPane();
+        if (uri === screeps_panel_1.SCREEPS_URI) {
+            return new screeps_panel_1.ScreepsPanel();
         }
     }));
     subscriptions.add(atom.workspace.addOpener((uri) => {
@@ -73,10 +82,6 @@ function serialize() {
     return state_1.default.getValue();
 }
 exports.serialize = serialize;
-function deserializeModulesPane({ state }) {
-    return modules_pane_1.ModulesPane.deserialize({ state });
-}
-exports.deserializeModulesPane = deserializeModulesPane;
 function deserializeConsolePanel({ state }) {
     return console_panel_1.ConsolePanel.deserialize({ state });
 }
@@ -85,6 +90,10 @@ function deserializeMemoryPanel({ state }) {
     return memory_panel_1.MemoryPanel.deserialize({ state });
 }
 exports.deserializeMemoryPanel = deserializeMemoryPanel;
+function deserializeScreepsPanel({ state }) {
+    return screeps_panel_1.ScreepsPanel.deserialize({ state });
+}
+exports.deserializeScreepsPanel = deserializeScreepsPanel;
 function handleURI(parsedUri) {
     console.log(parsedUri);
 }

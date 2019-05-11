@@ -17,7 +17,7 @@ class Socket {
     constructor({ url, token }) {
         this.token = null;
         this.connected = false;
-        // TODO: set private
+        this._unsubscribeSbj = new rxjs_1.Subject();
         this._messagesSbj = new rxjs_1.Subject();
         this.messages$ = this._messagesSbj.asObservable();
         this._afterConnectSbj = new rxjs_1.Subject();
@@ -40,6 +40,7 @@ class Socket {
             }
             this._messagesSbj.next(Object.assign({}, msg, { data }));
         };
+        // TODO: Можно удалять после того как подключились
         this.messages$
             .pipe(operators_1.filter((msg) => isAuth(msg)))
             .subscribe(() => {
@@ -48,19 +49,31 @@ class Socket {
         });
     }
     on(channel) {
-        if (this.connected) {
-            this._socket.send(`subscribe ${channel}`);
-        }
-        else {
-            this.afterConnect$.subscribe(() => {
+        return rxjs_1.Observable.create((observer) => {
+            if (this.connected) {
                 this._socket.send(`subscribe ${channel}`);
+            }
+            else {
+                this.afterConnect$.subscribe(() => {
+                    this._socket.send(`subscribe ${channel}`);
+                });
+            }
+            const destroy$ = this._unsubscribeSbj.asObservable()
+                .pipe(operators_1.filter((msg) => msg === `unsubscribe ${channel}`));
+            this.messages$
+                .pipe(operators_1.takeUntil(destroy$))
+                .pipe(operators_1.filter((msg) => isSubscribe(channel, msg)))
+                .subscribe((data) => {
+                observer.next(data);
+            }, () => { }, () => {
+                observer.complete();
             });
-        }
-        const pipe$ = this.messages$.pipe(operators_1.filter((msg) => isSubscribe(channel, msg)));
-        return pipe$;
+        });
     }
     off(channel) {
-        this._socket.send(`unsubscribe ${channel}`);
+        const msg = `unsubscribe ${channel}`;
+        this._unsubscribeSbj.next(msg);
+        this._socket.send(msg);
     }
 }
 exports.Socket = Socket;

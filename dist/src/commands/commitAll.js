@@ -1,41 +1,32 @@
 "use strict";
+// import {
+//     getApi, getUser
+// } from '../utils';
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("../utils");
-const state_1 = require("../state");
 async function commitAll() {
-    let api;
-    try {
-        api = await utils_1.getApi();
-        await utils_1.getUser();
-    }
-    catch (err) {
-        throw new Error(err);
-    }
-    const { branch } = state_1.default.getValue();
-    if (!branch) {
-        throw new Error('Need check branch');
-    }
-    let { modules } = await api.getUserCode(branch);
-    const changes = await utils_1.readUserCode(utils_1.getBranchPath(branch));
-    modules = Object.assign({}, modules, changes);
-    try {
-        Object.entries(state_1.default.getValue().modules)
-            .forEach(([module, { deleted }]) => {
-            if (deleted) {
-                delete modules[module];
-            }
-        });
-    }
-    catch (err) {
-        throw new Error(err);
-    }
-    try {
-        await api.updateUserCode({ branch, modules });
-    }
-    catch (err) {
-        throw new Error('Error update user code');
-    }
-    state_1.default.next(Object.assign({}, state_1.default.getValue(), { modules: utils_1.combineModules(modules) }));
+    // let api;
+    // try {
+    //     api = await getApi();
+    //     await getUser();
+    // } catch (err) {
+    //     throw new Error(err);
+    // }
+    // const { branch, modules: _modules } = __state.getValue();
+    // if (!branch) {
+    //     throw new Error('Need check branch');
+    // }
+    // const modules: IModulesData = Object.entries(_modules)
+    //     .reduce((modules, [module, { content, deleted }]) => {
+    //         if (!deleted) {
+    //             modules[module] = content;
+    //         }
+    //         return modules;
+    //     }, {} as IModulesData);
+    // try {
+    //     await api.updateUserCode({ branch, modules });
+    // } catch(err) {
+    //     throw new Error('Error update user code');
+    // }
 }
 exports.commitAll = commitAll;
 //# sourceMappingURL=commitAll.js.map
