@@ -1,8 +1,8 @@
 /// <reference path='./index.d.ts' />
-
 import { CompositeDisposable } from 'atom';
 
-import { default as __state } from './state';
+import { default as store } from './store';
+import { default as __state, INITIAL_STATE } from './state';
 import { PACKAGE_NAME, configGetter } from './config';
 
 import {
@@ -17,6 +17,8 @@ import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
 import { MemoryPanel, MEMORY_URI } from './components/memory-panel';
 import { ScreepsPanel, SCREEPS_URI } from './components/screeps-panel';
 
+import { OpenTextEditorAction } from './components/modules-block/actions';
+
 const subscriptions = new CompositeDisposable();
 
 export { default as config } from './config';
@@ -24,10 +26,7 @@ export * from './consumed-services';
 
 export function initialize(state: IState) {
     if (!state) {
-        state = {
-            branch: 'default',
-            modules: {}
-        }
+        state = INITIAL_STATE;
     }
 
     if (!state.modules) {
@@ -41,6 +40,20 @@ export function initialize(state: IState) {
 
 export function activate(state: IState) {
     console.log('Screeps-IDE:activate', state);
+
+    atom.workspace.getTextEditors()
+        .forEach((textEditor) => {
+            const path = textEditor.getPath() as string;
+            const matches = /[\\\/]\.branches[\\\/]([^\\]+)[\\\/]([^\\]+)\.js/.exec(path);
+
+            if (!matches) {
+                return;
+            }
+
+            const [, branch, module] = matches;
+            store.dispatch(OpenTextEditorAction(branch, module));
+        });
+
 
     subscriptions.add(atom.workspace.addOpener((uri): any => {
         if (uri === SCREEPS_URI) {

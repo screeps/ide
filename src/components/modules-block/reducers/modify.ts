@@ -1,12 +1,12 @@
 import { default as store, Action } from '../../../store';
 import { MODIFY_MODULE } from '../actions';
 
-store.reducer((state: IState, { type, payload: { module, modified} }: Action): IState => {
+store.reducer((state: IState, { type, payload: { branch, module, modified} }: Action): IState => {
     if (type !== MODIFY_MODULE) {
         return state;
     }
 
-    if (state.modules[module].modified === modified) {
+    if (state.modules[branch][module].modified === modified) {
         return state;
     }
 
@@ -14,9 +14,12 @@ store.reducer((state: IState, { type, payload: { module, modified} }: Action): I
         ...state,
         modules: {
             ...state.modules,
-            [module]: {
-                ...state.modules[module],
-                modified
+            [branch]: {
+                ...state.modules[branch],
+                [module]: {
+                    ...state.modules[branch][module],
+                    modified
+                }
             }
         }
     };

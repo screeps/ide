@@ -17,6 +17,8 @@ import ModulesView from '../../../ui/components/modules-view';
 
 export function ModulesBlock({ branch, modules }: { branch: any, modules: IModules }) {
 
+    console.log(1, 'ModulesBlock', branch, modules);
+
     return (
         <ModulesView
             branch={ branch }
@@ -29,15 +31,15 @@ export function ModulesBlock({ branch, modules }: { branch: any, modules: IModul
     )
 
     async function onCreateModule(module: string): Promise<void> {
-        store.dispatch(CreateModuleAction(module));
-        store.dispatch(OpenTextEditorAction(module));
+        store.dispatch(CreateModuleAction(branch, module));
+        store.dispatch(OpenTextEditorAction(branch, module));
     }
 
     async function onSelectModule(module: string): Promise<void> {
-        store.dispatch(OpenTextEditorAction(module));
+        store.dispatch(OpenTextEditorAction(branch, module));
     }
 
     async function onDeleteModule(module: string): Promise<void> {
-        store.dispatch(DeleteModuleAction(module));
+        store.dispatch(DeleteModuleAction(branch, module));
     }
 }

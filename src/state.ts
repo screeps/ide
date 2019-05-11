@@ -1,9 +1,15 @@
 import { BehaviorSubject } from 'rxjs';
 
-const __state = new BehaviorSubject<IState>({
+export const INITIAL_STATE = {
     branch: '',
-    modules: {}
-});
+    branches: [],
+    modules: {
+        default: {
+        }
+    }
+};
+
+const __state = new BehaviorSubject<IState>(INITIAL_STATE);
 
 const next = __state.next;
 __state.next = function(...args) {

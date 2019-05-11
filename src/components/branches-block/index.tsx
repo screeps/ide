@@ -55,10 +55,15 @@ export function BranchesBlock({ branch, branches = [] }: any) {
                 ..._modules
             }, changes);
 
+            const state = __state.getValue();
+
             __state.next({
-                ...__state.getValue(),
+                ...state,
                 branch,
-                modules
+                modules: {
+                    ...state.modules,
+                    [branch]: modules
+                }
             });
         } catch(err) {
             // Noop.

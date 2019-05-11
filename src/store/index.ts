@@ -11,6 +11,7 @@ export type Action = {
 const store = new Subject<Action>();
 
 function dispatch(action: Action) {
+    console.log(action.type);
     store.next(action);
 }
 

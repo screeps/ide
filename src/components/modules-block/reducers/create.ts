@@ -1,12 +1,10 @@
 import { default as store, Action } from '../../../store';
 import { CREATE_MODULE } from '../actions';
 
-store.reducer((state: IState, { type, payload }: Action): IState => {
+store.reducer((state: IState, { type, payload: { branch, module } }: Action): IState => {
     if (type !== CREATE_MODULE) {
         return state;
     }
-
-    const { module } = payload;
 
     const content = `/*
 * Module code goes here. Use 'module.exports' to export things:
@@ -26,9 +24,12 @@ module.exports = {
         ...state,
         modules: {
             ...state.modules,
-            [module]: {
-                content,
-                modified: true
+            [branch]: {
+                ...state.modules[branch],
+                [module]: {
+                    content,
+                    modified: true
+                }
             }
         }
     };

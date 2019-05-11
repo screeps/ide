@@ -9,12 +9,10 @@ import {
 } from '../../../utils';
 
 export const updateEffect = store
-.effect(async ({ branch, modules: _modules }: IState, { type }: Action): Promise<void> => {
+.effect(async ({ modules: _modules }: IState, { type, payload: { branch } }: Action): Promise<void> => {
     if (![UPDATE_MODULE, DELETE_MODULE].includes(type)) {
         return;
     }
-
-    console.log('commit');
 
     let api;
     try {
@@ -28,7 +26,7 @@ export const updateEffect = store
         throw new Error('Need check branch');
     }
 
-    const modules: IModulesData = Object.entries(_modules)
+    const modules: IModulesData = Object.entries(_modules[branch])
         .reduce((modules, [module, { content, deleted }]) => {
             if (!deleted) {
                 modules[module] = content;

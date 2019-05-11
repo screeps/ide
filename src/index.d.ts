@@ -1,8 +1,9 @@
 
 interface IState {
     branch: string;
+    branches: IBranch[];
+
     modules: {
-        [key: string]: IModule;
-    },
-    branches?: IBranch[]
+        [key: string]: IModules;
+    }
 }

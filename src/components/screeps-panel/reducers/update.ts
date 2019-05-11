@@ -1,21 +1,22 @@
 import { default as store, Action } from '../../../store';
 import { UPDATE_MODULES } from '../actions';
 
-store.reducer((state: IState, { type, payload }: Action): IState => {
+store.reducer((state: IState, { type, payload: { branch, modules } }: Action): IState => {
     if (type !== UPDATE_MODULES) {
         return state;
     }
 
-    const { modules } = payload;
-
     return {
         ...state,
-        modules: Object.entries(modules).reduce((modules, [module, content]) => {
-            modules[module] = {
-                content,
-                modified: false
-            }
-            return modules;
-        }, {} as any)
+        modules: {
+            ...state.modules,
+            [branch]: Object.entries(modules).reduce((modules, [module, content]) => {
+                modules[module] = {
+                    content,
+                    modified: false
+                }
+                return modules;
+            }, {} as any)
+        }
     };
 });

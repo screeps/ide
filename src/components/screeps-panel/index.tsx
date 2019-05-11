@@ -39,9 +39,6 @@ export class ScreepsPanel implements ViewModel {
 
         __state
             .pipe(distinctUntilChanged())
-            // .pipe(tap(() => {
-            //     console.log(1);
-            // }))
             .pipe(tap((state) => this.render(state)))
             .subscribe();
 
@@ -52,9 +49,8 @@ export class ScreepsPanel implements ViewModel {
                 this._socket = getSocket();
 
                 this._socket.on(`user:${ this._user.id }/code`)
-                    .pipe(tap(({ data }) => {
-                        const [, { modules }] = data;
-                        store.dispatch(UpdateModulesAction(modules));
+                    .pipe(tap(({ data: [, { branch, modules }] }) => {
+                        store.dispatch(UpdateModulesAction(branch, modules));
                     }))
                     .subscribe();
 
@@ -72,13 +68,14 @@ export class ScreepsPanel implements ViewModel {
             }
         })()
 
+        // TODO: тут надо сделать выставление статуса активный модуль
         atom.workspace.onDidChangeActivePaneItem((pane) => {
             if (!(pane instanceof TextEditor)) {
                 return;
             }
 
             // @ts-ignore
-            console.log(pane.getPath());
+            // console.log(pane.getPath());
 
             // const path = pane.getPath() as string;
             // store.dispatch(ActiveModule())
@@ -86,10 +83,19 @@ export class ScreepsPanel implements ViewModel {
     }
 
     render({ branch, branches, modules }: IState) {
+        console.log(branch, branches, modules);
+
+        const _modules = modules[branch];
+
+        let modulesView;
+        if (_modules) {
+            modulesView = (<ModulesBlock branch={ branch } modules={ _modules } />);
+        }
+
         ReactDOM.render(
             <div className='screeps-ide screeps-panel'>
                 <BranchesBlock branch={ branch } branches={ branches } />
-                <ModulesBlock branch={ branch } modules={ modules } />
+                { modulesView }
                 <button className='btn btn-primary'>
                     Create Project
                 </button>
