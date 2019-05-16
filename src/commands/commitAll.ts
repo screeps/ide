@@ -1,36 +1,38 @@
-// import {
-//     getApi, getUser
-// } from '../utils';
+const path = require('path');
+
+import {
+    readUserCode,
+    getApi, getUser
+} from '../utils';
+
+import { configGetter } from '../config';
 
 import { default as __state } from '../state';
 
 export async function commitAll() {
-    // let api;
-    // try {
-    //     api = await getApi();
-    //     await getUser();
-    // } catch (err) {
-    //     throw new Error(err);
-    // }
+    let api;
+    try {
+        api = await getApi();
+        await getUser();
+    } catch (err) {
+        throw new Error(err);
+    }
 
-    // const { branch, modules: _modules } = __state.getValue();
+    const { branch } = __state.getValue();
 
-    // if (!branch) {
-    //     throw new Error('Need check branch');
-    // }
+    if (!branch) {
+        throw new Error('Need check branch');
+    }
 
-    // const modules: IModulesData = Object.entries(_modules)
-    //     .reduce((modules, [module, { content, deleted }]) => {
-    //         if (!deleted) {
-    //             modules[module] = content;
-    //         }
+    const projectPath = atom.project.getPaths()[0];
+    const srcDir = configGetter('src');
+    const fullPath = path.resolve(projectPath, srcDir);
 
-    //         return modules;
-    //     }, {} as IModulesData);
+    const modules = await readUserCode(fullPath);
 
-    // try {
-    //     await api.updateUserCode({ branch, modules });
-    // } catch(err) {
-    //     throw new Error('Error update user code');
-    // }
+    try {
+        await api.updateUserCode({ branch, modules });
+    } catch(err) {
+        throw new Error('Error update user code');
+    }
 }
