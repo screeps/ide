@@ -1,5 +1,6 @@
 import { File, TextEditor } from 'atom';
-import { map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { merge } from 'rxjs';
+import { map, tap, distinctUntilChanged, filter } from 'rxjs/operators';
 
 import { default as store, Action } from '../../../store';
 import { default as __state } from '../../../state';
@@ -60,17 +61,31 @@ export const openTExtEditorEffect = store
     if (textEditor.getTitle() !== `@${ branch }/${ module }.js`) {
         textEditor.getTitle = () => `@${ branch }/${ module }.js`;
 
-        __state.pipe(map(({ modules }) => modules[branch][module]))
-            .pipe(distinctUntilChanged())
-            .pipe(tap(async ({ content }) => {
-                await file.write(content || '');
+        const subscriber = merge(
+            __state.pipe(map(({ modules }) => modules[branch][module]))
+                .pipe(distinctUntilChanged())
+                .pipe(filter((_) => !!_))
+                .pipe(tap(async ({ content }) => {
+                    await file.write(content || '');
 
-                if (content) {
+                    if (!content) {
+                        return;
+                    }
+
                     // @ts-ignore
                     textEditor.buffer.loadSync();
-                }
-            }))
-            .subscribe();
+                })),
+
+            __state.pipe(map(({ modules }) => modules[branch][module]))
+                .pipe(distinctUntilChanged())
+                .pipe(filter((_) => !_))
+                .pipe(tap(() => {
+                    isNew = true;
+
+                    // @ts-ignore
+                    textEditor.buffer.loadSync();
+                }))
+        ).subscribe();
 
         textEditor.onDidSave(() => {
             isNew = false;
@@ -85,6 +100,8 @@ export const openTExtEditorEffect = store
         });
 
         textEditor.onDidDestroy(() => {
+            subscriber.unsubscribe();
+
             if (!isNew) {
                 store.dispatch(ModifyModuleAction(branch, module, false));
                 return;
