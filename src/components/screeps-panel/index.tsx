@@ -15,7 +15,10 @@ import { ModulesBlock } from '../modules-block';
 import { CONSOLE_URI } from '../console-panel';
 import { MEMORY_URI } from '../memory-panel';
 
-import { UpdateModulesAction } from './actions';
+import {
+    CreateProjectAction,
+    UpdateModulesAction
+} from './actions';
 
 import './reducers';
 import * as effects from './effects';
@@ -96,7 +99,7 @@ export class ScreepsPanel implements ViewModel {
             <div className='screeps-ide screeps-panel'>
                 <BranchesBlock branch={ branch } branches={ branches } />
                 { modulesView }
-                <button className='btn btn-primary'>
+                <button className='btn btn-primary' onClick={ this.openProjectPanel }>
                     Create Project
                 </button>
                 <button className='btn btn-primary' onClick={ this.openMemoryPanel } >
@@ -108,6 +111,14 @@ export class ScreepsPanel implements ViewModel {
             </div>,
             this.element as HTMLElement
         )
+    }
+
+    openProjectPanel() {
+        const projectPaths = atom.project.getPaths();
+
+        if (!projectPaths.length) {
+            store.dispatch(CreateProjectAction());
+        }
     }
 
     openMemoryPanel() {
