@@ -1,2 +1,2 @@
 import './update';
-import './reload';
+import './add-project';

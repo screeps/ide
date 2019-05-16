@@ -6,7 +6,7 @@ import { default as prompt } from '../../prompt-modal';
 import { CREATE_PROJECT } from '../actions';
 
 import {
-    ReloadStateAction
+    AddProjectAction
 } from '../actions';
 
 export const createProjectEffect = store
@@ -28,7 +28,7 @@ export const createProjectEffect = store
         }
 
         atom.project.addPath(projectPath);
-        store.dispatch(ReloadStateAction());
+        store.dispatch(AddProjectAction());
     } catch(err) {
         throw err;
     }

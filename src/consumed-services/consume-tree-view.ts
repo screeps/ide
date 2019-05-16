@@ -1,14 +1,38 @@
-// const path = require('path');
+const path = require('path');
 
 // import { from, of } from 'rxjs';
 // import { tap, map, switchMap, distinctUntilChanged, combineLatest } from 'rxjs/operators';
 
 // import { default as __state } from '../state';
-// import { configGetter } from '../config';
+import { configGetter } from '../config';
 // import { getModulePath } from '../utils';
 
-// export function consumeTreeView(treeView: any) {
-export function consumeTreeView() {
+import { default as store, Action } from '../store';
+import {
+    ADD_PROJECT
+} from '../components/screeps-panel/actions';
+
+export function consumeTreeView(treeView: any) {
+    store.effect((state: IState, { type }: Action) => {
+        if (![ADD_PROJECT, 'UPDATE_ICON'].includes(type)) {
+            return state;
+        }
+
+        const projectPath = atom.project.getPaths()[0];
+
+        if (!projectPath) {
+            // Return if project doesn't exist.
+            return;
+        }
+
+        const srcDir = configGetter('src');
+        const fullPath = path.resolve(projectPath, srcDir);
+
+        setDistIcon(treeView, fullPath);
+    })
+    .subscribe();
+
+    store.dispatch({ type: 'UPDATE_ICON', payload: {}});
     // const treeViewPackage = atom.packages.getActivePackage('tree-view');
     // // @ts-ignore
     // const treeView = treeViewPackage.mainModule.treeView;
@@ -83,10 +107,10 @@ export function consumeTreeView() {
 
 }
 
-// function setDistIcon(treeView: any, fullPath: string) {
-//     const entry = treeView.entryForPath(fullPath) as HTMLElement;
-//     entry.setAttribute('screeps-dist', 'screeps-dist');
-// }
+function setDistIcon(treeView: any, fullPath: string) {
+    const entry = treeView.entryForPath(fullPath) as HTMLElement;
+    entry.setAttribute('screeps-dist', 'screeps-dist');
+}
 
 // function setTreeViewEntryStatus(treeView: any, branch: string) {
 //     return ([name, { modified }]: [string, IModule]) => {

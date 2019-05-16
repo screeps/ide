@@ -111,15 +111,6 @@ export async function getUser(): Promise<User> {
 }
 
 export function getBranchPath(branch: string): string {
-    // const projectPath = atom.project.getPaths()[0];
-
-    // if (projectPath) {
-    //     const srcDir = configGetter('src');
-    //     const fullPath = path.resolve(projectPath, srcDir);
-
-    //     return fullPath;
-    // }
-
     // @ts-ignore
     return path.resolve(`${ atom.packages.packageDirPaths }`, PACKAGE_NAME, `.branches/${ branch }`);
 }
@@ -132,14 +123,21 @@ export function getModulePath(branch: string, module: string): string {
     return path.resolve(`${ branchPath }/${ module }${ extension }`);
 }
 
-export function getModuleByPath(path: string): string | null {
-    const srcDir = getBranchPath('');
+export function getModuleByPath(modulePath: string): string | null {
+    const projectPath = atom.project.getPaths()[0];
 
-    if (!path.includes(srcDir) || path === srcDir) {
+    if (!projectPath) {
         return null;
     }
 
-    const matches = path.match(/([^\\]+)$/gm);
+    const srcDir = configGetter('src');
+    const fullPath = path.resolve(projectPath, srcDir);
+
+    if (!modulePath.includes(fullPath) || modulePath === fullPath) {
+        return null;
+    }
+
+    const matches = modulePath.match(/([^\\]+)$/gm);
 
     if (matches && matches[0]) {
         const match = matches[0];
