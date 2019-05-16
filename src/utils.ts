@@ -152,7 +152,7 @@ export async function readUserCode(fullPath: string): Promise<IModulesData> {
     const entries = dir.getEntriesSync();
 
     const files = entries.filter((entry) => {
-        return entry.isFile();
+        return /\.js$/.test(entry.getBaseName()) && entry.isFile();
     }) as File[];
 
     const modules: { [key: string]: string } = {};
