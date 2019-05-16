@@ -33,6 +33,15 @@ export function consumeTreeView(treeView: any) {
     .subscribe();
 
     store.dispatch({ type: 'UPDATE_ICON', payload: {}});
+
+    atom.project.onDidChangePaths((paths) => {
+        if (paths.length) {
+            return;
+        }
+
+        store.dispatch({ type: 'REMOVE_PROJECT', payload: {}});
+    });
+
     // const treeViewPackage = atom.packages.getActivePackage('tree-view');
     // // @ts-ignore
     // const treeView = treeViewPackage.mainModule.treeView;

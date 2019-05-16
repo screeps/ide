@@ -86,8 +86,6 @@ export class ScreepsPanel implements ViewModel {
     }
 
     render({ branch, branches, modules }: IState) {
-        console.log(branch, branches, modules);
-
         const _modules = modules[branch];
 
         let modulesView;

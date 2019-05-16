@@ -17,8 +17,6 @@ import ModulesView from '../../../ui/components/modules-view';
 
 export function ModulesBlock({ branch, modules }: { branch: any, modules: IModules }) {
 
-    console.log(1, 'ModulesBlock', branch, modules);
-
     return (
         <ModulesView
             branch={ branch }
