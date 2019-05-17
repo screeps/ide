@@ -7,13 +7,13 @@ export default class BranchesView extends React.Component<IBranchesViewProps> {
     props: IBranchesViewProps;
 
     constructor(props: IBranchesViewProps) {
-        console.log('BranchesView::constructor', '');
+        // console.log('BranchesView::constructor', '');
 
         super(props);
     }
 
     public render() {
-        console.log('BranchesView::render', '');
+        // console.log('BranchesView::render', '');
 
         return (
             <div className='screeps-ide screeps-branches-view'>

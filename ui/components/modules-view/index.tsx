@@ -11,7 +11,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
     constructor(props: IModulesViewProps) {
         super(props);
 
-        console.log('ModulesView::constructor', props.modules);
+        // console.log('ModulesView::constructor', props.modules);
     }
 
     public render() {
