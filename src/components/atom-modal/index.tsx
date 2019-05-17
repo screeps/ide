@@ -26,6 +26,11 @@ export class AtomModal {
         this._element = document.createElement('div');
         this.events$ = this._eventsSbj.asObservable();
 
+        this._atomModalPanelRef = atom.workspace.addModalPanel({
+            item: this._element,
+            visible: true
+        });
+
         ReactDOM.render(
             <Component ref={ this.ref }
                 { ...props }
@@ -35,11 +40,6 @@ export class AtomModal {
             />,
             this._element as HTMLElement
         );
-
-        this._atomModalPanelRef = atom.workspace.addModalPanel({
-            item: this._element,
-            visible: true
-        });
     }
 
     hide() {
