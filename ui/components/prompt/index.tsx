@@ -51,6 +51,8 @@ class PromptModal extends React.Component<IPromptModalProps> {
 
                             required={ true }
                             autoFocus={ true }
+
+                            tabIndex={ 1 }
                         />
                         <div className='underline' />
                     </fieldset>
@@ -59,12 +61,16 @@ class PromptModal extends React.Component<IPromptModalProps> {
                     <button
                         className='btn btn--big btn--transparent'
                         onClick={this.onCancel}
+
+                        tabIndex={ 2 }
                     >Cancel</button>
                     <button
                         className='btn btn--big btn--primary' type='submit'
                         disabled={ !this.message }
 
                         onClick={this.onSubmit}
+
+                        tabIndex={ 3 }
                     >{ this.state.submitBtn }</button>
                 </footer>
             </div>
