@@ -62,6 +62,8 @@ class PromptModal extends React.Component<IPromptModalProps> {
                     >Cancel</button>
                     <button
                         className='btn btn--big btn--primary' type='submit'
+                        disabled={ !this.message }
+
                         onClick={this.onSubmit}
                     >{ this.state.submitBtn }</button>
                 </footer>
@@ -74,6 +76,8 @@ class PromptModal extends React.Component<IPromptModalProps> {
         const target = event.target as HTMLInputElement;
 
         this.message = target.value; 
+
+        this.setState({ ...this.state });
     }
 
     // Public component output actions.
