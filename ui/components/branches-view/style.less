@@ -7,7 +7,7 @@
 
     button:focus {
         outline: none;
-        box-shadow: inherit !important;
+        box-shadow: none;
     }
 
     &__items {
@@ -21,14 +21,14 @@
 
     &__item {
         position: relative;
-        
+
         display: flex;
         flex-direction: row;
         flex: 1 0 auto !important;
         min-height: 30px;
-    
+
         &.tab {
-            border-left: none;
+            border-left: none !important;
         }
     
         .btn {
