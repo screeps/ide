@@ -1,19 +1,17 @@
 {
     "context-menu": {
-        ".tree-view [screeps-dist].status-modified--screeps > div": [
+        ".tree-view [screeps-dist] > div": [
             { "type": "separator" },
 
-            { "label": "Screeps Commit All", "command": "screeps-ide:commitAll" },
-            { "label": "Screeps Revert All", "command": "screeps-ide:revertAll" },
+            { "label": "Screeps Commit All to Choosed Branch", "command": "screeps-ide:commitAll" },
 
             { "type": "separator" }
         ],
 
-        ".tree-view [screeps-dist] .file.status-modified--screeps": [
+        ".tree-view [screeps-dist] .file": [
             { "type": "separator" },
 
-            { "label": "Screeps Commit", "command": "screeps-ide:commit" },
-            { "label": "Screeps Revert", "command": "screeps-ide:revert" },
+            { "label": "Screeps Commit to Choosed Branch", "command": "screeps-ide:commit" },
 
             { "type": "separator" }
         ]
