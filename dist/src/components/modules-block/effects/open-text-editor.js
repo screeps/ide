@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const atom_1 = require("atom");
+const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const store_1 = require("../../../store");
 const state_1 = require("../../../state");
@@ -40,16 +41,24 @@ exports.openTExtEditorEffect = store_1.default
     }
     if (textEditor.getTitle() !== `@${branch}/${module}.js`) {
         textEditor.getTitle = () => `@${branch}/${module}.js`;
-        state_1.default.pipe(operators_1.map(({ modules }) => modules[branch][module]))
+        const subscriber = rxjs_1.merge(state_1.default.pipe(operators_1.map(({ modules }) => modules[branch][module]))
             .pipe(operators_1.distinctUntilChanged())
+            .pipe(operators_1.filter((_) => !!_))
             .pipe(operators_1.tap(async ({ content }) => {
             await file.write(content || '');
-            if (content) {
-                // @ts-ignore
-                textEditor.buffer.loadSync();
+            if (!content) {
+                return;
             }
-        }))
-            .subscribe();
+            // @ts-ignore
+            textEditor.buffer.loadSync();
+        })), state_1.default.pipe(operators_1.map(({ modules }) => modules[branch][module]))
+            .pipe(operators_1.distinctUntilChanged())
+            .pipe(operators_1.filter((_) => !_))
+            .pipe(operators_1.tap(() => {
+            isNew = true;
+            // @ts-ignore
+            textEditor.buffer.loadSync();
+        }))).subscribe();
         textEditor.onDidSave(() => {
             isNew = false;
             if (!textEditor) {
@@ -59,6 +68,7 @@ exports.openTExtEditorEffect = store_1.default
             store_1.default.dispatch(actions_1.UpdateModuleAction(branch, module, content));
         });
         textEditor.onDidDestroy(() => {
+            subscriber.unsubscribe();
             if (!isNew) {
                 store_1.default.dispatch(actions_1.ModifyModuleAction(branch, module, false));
                 return;

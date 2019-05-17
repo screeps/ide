@@ -16,11 +16,11 @@ class AtomModal {
         };
         this._element = document.createElement('div');
         this.events$ = this._eventsSbj.asObservable();
-        ReactDOM.render(React.createElement(Component, Object.assign({ ref: this.ref }, props, { onCancel: this.onCancel, onSubmit: this.onSubmit })), this._element);
         this._atomModalPanelRef = atom.workspace.addModalPanel({
             item: this._element,
             visible: true
         });
+        ReactDOM.render(React.createElement(Component, Object.assign({ ref: this.ref }, props, { onCancel: this.onCancel, onSubmit: this.onSubmit })), this._element);
     }
     hide() {
         this._atomModalPanelRef.hide();

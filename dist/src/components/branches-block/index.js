@@ -1,17 +1,35 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const state_1 = require("../../state");
 const utils_1 = require("../../utils");
-const commands_1 = require("../../commands");
 const branches_view_1 = require("../../../ui/components/branches-view");
 function BranchesBlock({ branch, branches = [] }) {
     return (React.createElement(branches_view_1.default, { branch: branch, branches: branches, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
     async function onCopyBranch(branch) {
         console.log('BranchesBlock::onCopyBranch');
         try {
-            await commands_1.copyBranch(branch);
+            let api;
+            try {
+                api = await utils_1.getApi();
+            }
+            catch (err) {
+                throw err;
+            }
+            let newName;
+            try {
+                newName = await prompt_modal_1.default({
+                    legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
+                });
+                await api.cloneUserBranch({ branch, newName });
+                const { list: branches } = await api.getUserBranches();
+                state_1.default.next(Object.assign({}, state_1.default.getValue(), { branches }));
+            }
+            catch (err) {
+                throw err;
+            }
         }
         catch (err) {
             // Noop.

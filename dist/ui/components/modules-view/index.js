@@ -21,7 +21,7 @@ class ModulesView extends React.Component {
                 return name !== MAIN_MODULE && !deleted;
             });
         };
-        console.log('ModulesView::constructor', props.modules);
+        // console.log('ModulesView::constructor', props.modules);
     }
     render() {
         // console.log('ModulesView::render', '');

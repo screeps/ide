@@ -10,6 +10,7 @@ class PromptModal extends React.Component {
         this.onInput = (event) => {
             const target = event.target;
             this.message = target.value;
+            this.setState(Object.assign({}, this.state));
         };
         // Public component output actions.
         this.onCancel = () => {
@@ -32,11 +33,11 @@ class PromptModal extends React.Component {
             React.createElement("form", null,
                 React.createElement("fieldset", { className: 'screeps-field' },
                     React.createElement("legend", null, this.state.legend),
-                    React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'message', onChange: this.onInput, required: true, autoFocus: true }),
+                    React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'message', onChange: this.onInput, required: true, autoFocus: true, tabIndex: 1 }),
                     React.createElement("div", { className: 'underline' }))),
             React.createElement("footer", null,
-                React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel }, "Cancel"),
-                React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', onClick: this.onSubmit }, this.state.submitBtn))));
+                React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel, tabIndex: 2 }, "Cancel"),
+                React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', disabled: !this.message, onClick: this.onSubmit, tabIndex: 3 }, this.state.submitBtn))));
     }
 }
 exports.default = PromptModal;

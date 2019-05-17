@@ -1,64 +1,49 @@
 "use strict";
-// import { File } from 'atom';
 Object.defineProperty(exports, "__esModule", { value: true });
-// import {
-//     getModuleByPath,
-//     getApi, getUser
-// } from '../utils';
-// import { default as __state } from '../state';
+const atom_1 = require("atom");
+const utils_1 = require("../utils");
+const state_1 = require("../state");
 async function commit(event) {
-    console.log(event);
-    // let api;
-    // try {
-    //     api = await getApi();
-    //     await getUser();
-    // } catch (err) {
-    //     throw new Error(err);
-    // }
-    // let target: HTMLElement = event.target as HTMLElement;
-    // if (target.nodeName === 'LI') {
-    //     target = target.firstChild as HTMLElement;
-    // }
-    // const path = target.getAttribute('data-path');
-    // if (!path) {
-    //     throw new Error('No data-path');
-    // }
-    // const file = new File(path);
-    // let content;
-    // try {
-    //     content = await file.read();
-    // } catch (err) {
-    //     throw new Error('Error read file');
-    // }
-    // const { branch } = __state.getValue();
-    // if (!branch) {
-    //     throw new Error('Need check branch');
-    // }
-    // const module = getModuleByPath(path);
-    // if (!module) {
-    //     throw new Error('Error get module');
-    // }
-    // let { modules } = await api.getUserCode(branch);
-    // modules = {
-    //     ...modules,
-    //     [module]: content
-    // };
-    // try {
-    //     await api.updateUserCode({ branch, modules });
-    // } catch(err) {
-    //     throw new Error('Error update user code');
-    // }
-    // const state = __state.getValue();
-    // __state.next({
-    //     ...state,
-    //     modules: {
-    //         ...state.modules,
-    //         [module]: {
-    //             content,
-    //             modified: false
-    //         }
-    //     }
-    // });
+    let api;
+    try {
+        api = await utils_1.getApi();
+        await utils_1.getUser();
+    }
+    catch (err) {
+        throw new Error(err);
+    }
+    let target = event.target;
+    if (target.nodeName === 'LI') {
+        target = target.firstChild;
+    }
+    const path = target.getAttribute('data-path');
+    if (!path) {
+        throw new Error('No data-path');
+    }
+    const file = new atom_1.File(path);
+    let content;
+    try {
+        content = await file.read();
+    }
+    catch (err) {
+        throw new Error('Error read file');
+    }
+    const { branch } = state_1.default.getValue();
+    if (!branch) {
+        throw new Error('Need check branch');
+    }
+    const module = utils_1.getModuleByPath(path);
+    if (!module) {
+        throw new Error('Error get module');
+    }
+    let { modules } = await api.getUserCode(branch);
+    modules = Object.assign({}, modules, { [module]: content });
+    try {
+        await api.updateUserCode({ branch, modules });
+    }
+    catch (err) {
+        throw new Error('Error update user code');
+    }
 }
 exports.commit = commit;
 //# sourceMappingURL=commit.js.map

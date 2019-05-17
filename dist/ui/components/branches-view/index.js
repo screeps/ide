@@ -4,11 +4,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 class BranchesView extends React.Component {
     constructor(props) {
-        console.log('BranchesView::constructor', '');
+        // console.log('BranchesView::constructor', '');
         super(props);
     }
     render() {
-        console.log('BranchesView::render', '');
+        // console.log('BranchesView::render', '');
         return (React.createElement("div", { className: 'screeps-ide screeps-branches-view' },
             React.createElement("div", { className: 'screeps-branches-view__header' },
                 React.createElement("span", null, "Branches")),

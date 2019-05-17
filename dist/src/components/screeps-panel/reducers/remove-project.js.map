@@ -1,0 +1,1 @@
+{"version":3,"file":"remove-project.js","sourceRoot":"","sources":["../../../../../src/components/screeps-panel/reducers/remove-project.ts"],"names":[],"mappings":";;AAAA,0CAA0D;AAC1D,+CAA+C;AAE/C,eAAK,CAAC,OAAO,CAAC,CAAC,KAAa,EAAE,EAAE,IAAI,EAAU,EAAU,EAAE;IACtD,IAAI,IAAI,KAAK,gBAAgB,EAAE;QAC3B,OAAO,KAAK,CAAC;KAChB;IAED,yBACO,KAAK,EACV;AACN,CAAC,CAAC,CAAC"}

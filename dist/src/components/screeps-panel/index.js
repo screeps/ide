@@ -60,18 +60,34 @@ class ScreepsPanel {
         });
     }
     render({ branch, branches, modules }) {
-        console.log(branch, branches, modules);
         const _modules = modules[branch];
         let modulesView;
         if (_modules) {
             modulesView = (React.createElement(modules_block_1.ModulesBlock, { branch: branch, modules: _modules }));
         }
+        const projectPaths = atom.project.getPaths();
+        let projectBtn;
+        if (!projectPaths.length) {
+            projectBtn = (React.createElement("button", { className: 'btn btn-primary', onClick: this.createProjectPanel }, "Create Project"));
+        }
+        else {
+            projectBtn = (React.createElement("button", { className: 'btn btn-primary', onClick: this.openProjectPanel }, "View Project"));
+        }
         ReactDOM.render(React.createElement("div", { className: 'screeps-ide screeps-panel' },
             React.createElement(branches_block_1.BranchesBlock, { branch: branch, branches: branches }),
             modulesView,
-            React.createElement("button", { className: 'btn btn-primary' }, "Create Project"),
+            projectBtn,
             React.createElement("button", { className: 'btn btn-primary', onClick: this.openMemoryPanel }, "Open Memory Panel"),
             React.createElement("button", { className: 'btn btn-primary', onClick: this.openConsolePanel }, "Open Console Panel")), this.element);
+    }
+    createProjectPanel() {
+        store_1.default.dispatch(actions_1.CreateProjectAction());
+    }
+    openProjectPanel() {
+        atom.workspace.open('atom://tree-view', {
+            activatePane: true,
+            activateItem: true
+        });
     }
     openMemoryPanel() {
         atom.workspace.open(memory_panel_1.MEMORY_URI, {

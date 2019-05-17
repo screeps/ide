@@ -1,13 +1,37 @@
 "use strict";
-// const path = require('path');
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = require('path');
 // import { from, of } from 'rxjs';
 // import { tap, map, switchMap, distinctUntilChanged, combineLatest } from 'rxjs/operators';
 // import { default as __state } from '../state';
-// import { configGetter } from '../config';
+const config_1 = require("../config");
 // import { getModulePath } from '../utils';
-// export function consumeTreeView(treeView: any) {
-function consumeTreeView() {
+const store_1 = require("../store");
+const actions_1 = require("../components/screeps-panel/actions");
+function consumeTreeView(treeView) {
+    store_1.default.effect(async (state, { type }) => {
+        if (![actions_1.ADD_PROJECT, 'UPDATE_ICON'].includes(type)) {
+            return state;
+        }
+        const projectPath = atom.project.getPaths()[0];
+        if (!projectPath) {
+            // Return if project doesn't exist.
+            return;
+        }
+        const srcDir = config_1.configGetter('src');
+        const fullPath = path.resolve(projectPath, srcDir);
+        await new Promise((resolve) => setTimeout(resolve));
+        setDistIcon(treeView, fullPath);
+    })
+        .subscribe();
+    store_1.default.dispatch({ type: 'UPDATE_ICON', payload: {} });
+    atom.project.onDidChangePaths((paths) => {
+        if (paths.length) {
+            store_1.default.dispatch({ type: 'ADD_PROJECT', payload: {} });
+            return;
+        }
+        store_1.default.dispatch({ type: 'REMOVE_PROJECT', payload: {} });
+    });
     // const treeViewPackage = atom.packages.getActivePackage('tree-view');
     // // @ts-ignore
     // const treeView = treeViewPackage.mainModule.treeView;
@@ -62,10 +86,10 @@ function consumeTreeView() {
     //     .subscribe();
 }
 exports.consumeTreeView = consumeTreeView;
-// function setDistIcon(treeView: any, fullPath: string) {
-//     const entry = treeView.entryForPath(fullPath) as HTMLElement;
-//     entry.setAttribute('screeps-dist', 'screeps-dist');
-// }
+function setDistIcon(treeView, fullPath) {
+    const entry = treeView.entryForPath(fullPath);
+    entry.setAttribute('screeps-dist', 'screeps-dist');
+}
 // function setTreeViewEntryStatus(treeView: any, branch: string) {
 //     return ([name, { modified }]: [string, IModule]) => {
 //         const path = getModulePath(branch, name);
