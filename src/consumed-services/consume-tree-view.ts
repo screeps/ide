@@ -13,7 +13,7 @@ import {
 } from '../components/screeps-panel/actions';
 
 export function consumeTreeView(treeView: any) {
-    store.effect((state: IState, { type }: Action) => {
+    store.effect(async (state: IState, { type }: Action) => {
         if (![ADD_PROJECT, 'UPDATE_ICON'].includes(type)) {
             return state;
         }
@@ -28,6 +28,8 @@ export function consumeTreeView(treeView: any) {
         const srcDir = configGetter('src');
         const fullPath = path.resolve(projectPath, srcDir);
 
+        await new Promise((resolve) => setTimeout(resolve));
+
         setDistIcon(treeView, fullPath);
     })
     .subscribe();
@@ -36,6 +38,7 @@ export function consumeTreeView(treeView: any) {
 
     atom.project.onDidChangePaths((paths) => {
         if (paths.length) {
+            store.dispatch({ type: 'ADD_PROJECT', payload: {}});
             return;
         }
 

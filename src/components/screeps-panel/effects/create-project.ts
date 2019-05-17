@@ -5,10 +5,6 @@ import { default as store, Action } from '../../../store';
 import { default as prompt } from '../../prompt-modal';
 import { CREATE_PROJECT } from '../actions';
 
-import {
-    AddProjectAction
-} from '../actions';
-
 export const createProjectEffect = store
 .effect(async (state: IState, { type }: Action): Promise<void> => {
     state;
@@ -28,7 +24,6 @@ export const createProjectEffect = store
         }
 
         atom.project.addPath(projectPath);
-        store.dispatch(AddProjectAction());
     } catch(err) {
         throw err;
     }
