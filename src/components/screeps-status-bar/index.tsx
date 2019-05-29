@@ -1,13 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { BehaviorSubject } from 'rxjs';
-
 export class ScreepsStatusBar {
     public element: HTMLElement = document.createElement('div');
 
     constructor(
-        private _state: BehaviorSubject<IState>
     ) {
         this.element.classList.add(
             'screeps-ide__status-bar',
@@ -15,14 +12,14 @@ export class ScreepsStatusBar {
             'inline-block'
         );
 
-        this.render(this._state.getValue());
+        this.render();
     }
 
-    render({ branch }: IState) {
+    render() {
         ReactDOM.render(
             <div>
                 <b className='sc-icon-screeps'></b>
-                <i>{ branch }</i>
+                <i>Screeps</i>
             </div>,
             this.element
         )
