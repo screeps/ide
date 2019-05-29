@@ -93,43 +93,28 @@ export class ScreepsPanel implements ViewModel {
             modulesView = (<ModulesBlock branch={ branch } modules={ _modules } />);
         }
 
-        const projectPaths = atom.project.getPaths();
-        let projectBtn;
-        if (!projectPaths.length) {
-            projectBtn = (<button className='btn btn-primary' onClick={ this.createProjectPanel }>
-                Create Project
-            </button>)
-        } else {
-            projectBtn = (<button className='btn btn-primary' onClick={ this.openProjectPanel }>
-                View Project
-            </button>)
-        }
-
         ReactDOM.render(
             <div className='screeps-ide screeps-panel'>
                 <BranchesBlock branch={ branch } branches={ branches } />
                 { modulesView }
-                { projectBtn }
-                <button className='btn btn-primary' onClick={ this.openMemoryPanel } >
-                    Open Memory Panel
+                <button className='btn btn-primary' onClick={ this.createProject }>
+                    Create New Project
                 </button>
-                <button className='btn btn-primary' onClick={ this.openConsolePanel } >
-                    Open Console Panel
-                </button>
+                <div>
+                    <button className='btn' onClick={ this.openMemoryPanel } >
+                        Open Memory Panel
+                    </button>
+                    <button className='btn' onClick={ this.openConsolePanel } >
+                        Open Console Panel
+                    </button>
+                </div>
             </div>,
             this.element as HTMLElement
         )
     }
 
-    createProjectPanel() {
+    createProject() {
         store.dispatch(CreateProjectAction());
-    }
-
-    openProjectPanel() {
-        atom.workspace.open('atom://tree-view', {
-            activatePane: true,
-            activateItem: true
-        });
     }
 
     openMemoryPanel() {
