@@ -1,9 +1,20 @@
 const fs = require('fs');
 const path = require('path');
 
+import { File, Directory } from 'atom';
+import { filter, tap } from 'rxjs/operators';
+
+import __state from '../../../state';
 import { default as store, Action } from '../../../store';
-import { default as prompt } from '../../prompt-modal';
+import { AtomModal } from '../../atom-modal';
+import { default as confirm } from '../../confirm-modal';
+import { default as CreateProjectView } from '../../../../ui/components/create-project-view';
 import { CREATE_PROJECT } from '../actions';
+
+import {
+    getApi,
+    createScreepsProjectConfig
+} from '../../../utils';
 
 export const createProjectEffect = store
 .effect(async (state: IState, { type }: Action): Promise<void> => {
@@ -13,14 +24,59 @@ export const createProjectEffect = store
     }
 
     try {
-        const projectPath = await prompt({
-            legend: 'Please enter a new project fodler path:'
+        const {
+            projectPath,
+            download,
+            branch
+        } = await new Promise((resolve, reject) => {
+            const createProjectModal = new AtomModal(CreateProjectView, {
+                branch: state.branch,
+                branches: state.branches
+            });
+
+            createProjectModal.events$
+                .pipe(filter(({ type }) => type === 'MODAL_SUBMIT'))
+                .pipe(tap(() => createProjectModal.hide()))
+                .pipe(tap(({ payload }) => resolve(payload)))
+                .subscribe();
+
+            createProjectModal.events$
+                .pipe(filter(({ type }) => type === 'MODAL_CANCEL'))
+                .pipe(tap(() => reject(null)))
+                .subscribe();
         });
 
-        try {
-            mkdir(projectPath);
-        } catch(err) {
-            return;
+        const projectDir = mkdir(projectPath);
+
+        const configFile = await createScreepsProjectConfig(projectPath, {
+            branch
+        });
+
+        if (download) {
+            try {
+                const projectEntries = await projectDir.getEntriesSync();
+
+                if ((projectEntries.length > 1) ||
+                    (projectEntries.length === 1 && projectEntries[0].getPath() !== configFile.getPath())
+                ) {
+                    await confirm({
+                        legend: 'Folder is not empty! Would you like to continue?'
+                    });
+                }
+
+                const api = await getApi();
+                const { modules } = await api.getUserCode(branch);
+
+                for (const moduleName in modules) {
+                    const content = modules[moduleName];
+                    const modulePath = path.resolve(projectPath, moduleName);
+
+                    const moduleFile = new File(modulePath);
+                    await moduleFile.write(content || '');
+                }
+            } catch(err) {
+                // Noop.
+            }
         }
 
         atom.project.addPath(projectPath);
@@ -29,10 +85,10 @@ export const createProjectEffect = store
     }
 });
 
-function mkdir(targetDir: string) {
+function mkdir(targetDir: string): Directory {
     const sep = path.sep;
 
-    return targetDir.split(sep).reduce((parentDir, childDir) => {
+    const dir = targetDir.split(sep).reduce((parentDir, childDir) => {
         const curDir = path.resolve('/', parentDir, childDir);
 
         try {
@@ -54,4 +110,6 @@ function mkdir(targetDir: string) {
 
         return curDir;
     });
+
+    return new Directory(dir);
 }

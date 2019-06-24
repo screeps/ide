@@ -36,7 +36,7 @@
 
         font-size: 12px;
     }
-    .screeps-field input {
+    .screeps-field input:not([type='checkbox']) {
         width: 100%;
         margin: 3px 0;
 
@@ -50,6 +50,10 @@
     .screeps-field input:focus {
         outline: none;
     }
+    .screeps-field input[type='checkbox'] {
+        margin-right: 5px;
+    }
+
     .screeps-field legend {
         position: absolute;
         top: -1.42em;
@@ -65,14 +69,21 @@
     }
 
     .screeps-field label {
-        position: absolute;
-        top: 0;
+        display: flex;
+        align-items: center;
 
         color: #d9dfff;
         font-size: 1.14em;
-        pointer-events: none;
         transition: top 0.3s ease, font-size 0.3s ease;
     }
+
+    .screeps-field input + label {
+        position: absolute;
+        top: 0;
+
+        pointer-events: none;
+    }
+
     .screeps-field input:focus ~ label,
     .screeps-field input:valid ~ label,
     .screeps-field input:disabled ~ label,

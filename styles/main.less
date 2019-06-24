@@ -16,6 +16,7 @@
 @import '../ui/components/resizable-panel/style.less';
 @import '../ui/components/welcome-view/style.less';
 @import '../ui/components/branches-view/style.less';
+@import '../ui/components/create-project-view/style.less';
 
 @import '../src/components/screeps-status-bar/style.less';
 @import '../src/components/screeps-panel/style.less';
@@ -102,5 +103,16 @@
         background-color: #21252b;
         border-bottom-right-radius: 2px;
         transform: rotate(-45deg);
+    }
+}
+
+.project-branch {
+    color: #568af2;
+
+    &:before {
+        content: '•';
+
+        display: inline-block;
+        margin: 0 5px;
     }
 }
