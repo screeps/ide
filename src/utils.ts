@@ -11,6 +11,12 @@ import { authCommand } from './commands/auth';
 let api: Api;
 let socket: Socket;
 
+const LOCAL_PROJECT_CONFIG = '.screepsiderc';
+
+export function $(s: string, el: HTMLElement | Document = document) {
+    return el.querySelector(s);
+}
+
 export async function getApi(): Promise<Api> {
     if (api) {
         return api;
@@ -191,4 +197,53 @@ export function combineModules(
     }
 
     return modules;
+}
+
+export async function isScreepsProject(project: string) {
+    const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+
+    const configFile = new File(configPath);
+
+    if (configFile.exists) {
+        return true;
+    }
+
+    return false;
+}
+
+export async function createScreepsProjectConfig(project: string, settings: any): Promise<File> {
+    try {
+        const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+        const configFile: File = new File(configPath);
+        const settingsStr = JSON.stringify(settings, null, '\t');
+
+        await configFile.write(settingsStr);
+
+        return configFile;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export async function getScreepsProjectConfig(project: string): Promise<any> {
+    try {
+        const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+
+        const configFile = new File(configPath);
+        const configStr = await configFile.read(true) as string;
+
+        let config = {};
+        try {
+            config = JSON.parse(configStr);
+        } catch (err) {
+        }
+
+        return config;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export function getScreepsProjectSrc(project: string, src: string = ''): string {
+    return path.resolve(project, src);
 }

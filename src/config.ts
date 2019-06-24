@@ -50,7 +50,7 @@ const properties: IAtomConfigProperties = {
 };
 
 export const PACKAGE_NAME = 'screeps-ide';
-const LOCAL_PROJECT_CONFIG = '.screepsrc'
+const LOCAL_PROJECT_CONFIG = '.screepsiderc'
 
 try {
     atom.config.unset(`${ PACKAGE_NAME }.local`);

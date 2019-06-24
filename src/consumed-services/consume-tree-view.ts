@@ -1,16 +1,23 @@
-const path = require('path');
+// const path = require('path');
 
 // import { from, of } from 'rxjs';
 // import { tap, map, switchMap, distinctUntilChanged, combineLatest } from 'rxjs/operators';
 
 // import { default as __state } from '../state';
-import { configGetter } from '../config';
-// import { getModulePath } from '../utils';
+// import { configGetter } from '../config';
+import {
+    $,
+    isScreepsProject,
+    getScreepsProjectSrc,
+    getScreepsProjectConfig
+} from '../utils';
 
 import { default as store, Action } from '../store';
 import {
     ADD_PROJECT
 } from '../components/screeps-panel/actions';
+
+const PROJECT_ROOT_NODE = '.project-root-header';
 
 export function consumeTreeView(treeView: any) {
     store.effect(async (state: IState, { type }: Action) => {
@@ -18,19 +25,48 @@ export function consumeTreeView(treeView: any) {
             return state;
         }
 
-        const projectPath = atom.project.getPaths()[0];
+        const projects = atom.project.getPaths();
 
-        if (!projectPath) {
-            // Return if project doesn't exist.
-            return;
-        }
+        projects.forEach(async (project) => {
+            if (!isScreepsProject(project)) {
+                return;
+            }
 
-        const srcDir = configGetter('src');
-        const fullPath = path.resolve(projectPath, srcDir);
+            const config = await getScreepsProjectConfig(project);
 
-        await new Promise((resolve) => setTimeout(resolve));
+            const node = treeView.entryForPath(project) as HTMLElement;
 
-        setDistIcon(treeView, fullPath);
+            const projectRootNode = $(PROJECT_ROOT_NODE, node);
+            if (projectRootNode) {
+                const branch = document.createElement('span');
+                branch.classList.add('project-branch');
+                branch.innerText = `${ config.branch }`;
+    
+                projectRootNode.appendChild(branch);
+            }
+
+            const srcPath = getScreepsProjectSrc(project, config.src);
+
+            setDistIcon(treeView, srcPath);
+        });
+
+        // if () {
+
+        // }
+
+        // const projectPath = atom.project.getPaths()[0];
+
+        // if (!projectPath) {
+        //     // Return if project doesn't exist.
+        //     return;
+        // }
+
+        // const srcDir = configGetter('src');
+        // const fullPath = path.resolve(projectPath, srcDir);
+
+        // await new Promise((resolve) => setTimeout(resolve));
+
+        // setDistIcon(treeView, fullPath);
     })
     .subscribe();
 
