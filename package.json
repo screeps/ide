@@ -39,7 +39,6 @@
       "default": true,
       "description": "Show welcome panes with useful information when opening a new Atom window."
     },
-
     "global": {
       "title": "Common",
       "type": "object",
@@ -52,7 +51,6 @@
           "default": "",
           "order": 1
         },
-
         "apiUrl": {
           "title": "Screep API Url",
           "description": "",
@@ -60,7 +58,6 @@
           "default": "https://screeps.com/api",
           "order": 1
         },
-
         "websocketUrl": {
           "title": "Screep socket Url",
           "description": "",
@@ -68,7 +65,6 @@
           "default": "https://screeps.com/socket",
           "order": 1
         },
-
         "src": {
           "title": "Project folder",
           "description": "",
@@ -87,8 +83,8 @@
   "dependencies": {
     "jsoneditor": "^5.28.2",
     "pako": "^1.0.8",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "rxjs": "^6.3.3",
     "sockjs-client": "^1.3.0"
   },
@@ -96,8 +92,8 @@
     "@types/atom": "^1.31.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
-    "@types/react": "^16.7.18",
-    "@types/react-dom": "^16.0.11",
+    "@types/react": "^16.8.17",
+    "@types/react-dom": "^16.8.4",
     "@types/sockjs-client": "^1.1.0",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
