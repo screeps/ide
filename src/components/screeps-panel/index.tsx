@@ -102,10 +102,10 @@ export class ScreepsPanel implements ViewModel {
                 </button>
                 <div>
                     <button className='btn' onClick={ this.openMemoryPanel } >
-                        Open Memory Panel
+                        Memory
                     </button>
                     <button className='btn' onClick={ this.openConsolePanel } >
-                        Open Console Panel
+                        Console
                     </button>
                 </div>
             </div>,
