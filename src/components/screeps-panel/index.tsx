@@ -15,14 +15,12 @@ import { ModulesBlock } from '../modules-block';
 import { CONSOLE_URI } from '../console-panel';
 import { MEMORY_URI } from '../memory-panel';
 
-import {
-    CreateProjectAction,
-    UpdateModulesAction
-} from './actions';
+import { UpdateModulesAction } from './actions';
 
 import './reducers';
 import * as effects from './effects';
-import store from '../../store';
+import { default as store } from '../../store';
+import { CreateProjectAction } from '../../store/actions';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const SCREEPS_URI = 'atom://screeps-ide/screeps';

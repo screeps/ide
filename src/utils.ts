@@ -204,7 +204,7 @@ export async function isScreepsProject(project: string) {
 
     const configFile = new File(configPath);
 
-    if (configFile.exists) {
+    if (await configFile.exists()) {
         return true;
     }
 

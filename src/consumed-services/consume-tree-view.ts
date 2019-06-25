@@ -1,11 +1,3 @@
-// const path = require('path');
-
-// import { from, of } from 'rxjs';
-// import { tap, map, switchMap, distinctUntilChanged, combineLatest } from 'rxjs/operators';
-
-// import { default as __state } from '../state';
-// import { configGetter } from '../config';
-
 import { Directory } from 'atom';
 
 import {
@@ -20,11 +12,17 @@ import {
     ADD_PROJECT
 } from '../components/screeps-panel/actions';
 
-const PROJECT_ROOT_NODE = '.project-root-header';
+const PROJECT_ROOT_HEADER = '.project-root-header';
+const PROJECT_SCREEPS_BRANCH = '.project-branch';
+const PROJECT_EMPTY_BTN = 'screeps-download-btn';
 
 export function consumeTreeView(treeView: any) {
+    const updateIcon = () => {
+        store.dispatch({ type: 'UPDATE_ICON', payload: {}});
+    };
+
     store.effect(async (state: IState, { type }: Action) => {
-        if (![ADD_PROJECT, 'UPDATE_ICON'].includes(type)) {
+        if (![ADD_PROJECT, 'UPDATE_ICON', 'CHANGE_PROJECT'].includes(type)) {
             return state;
         }
 
@@ -32,86 +30,32 @@ export function consumeTreeView(treeView: any) {
 
         projects.forEach(async (projectPath) => {
             const projectDir = new Directory(projectPath);
-            const projectEntries = projectDir.getEntriesSync();
+            const treeProjectNodeRef = treeView.entryForPath(projectPath) as HTMLElement;
 
-            const node = treeView.entryForPath(projectPath) as HTMLElement;
+            toggleFolderEmptyBtn(treeProjectNodeRef, projectDir);
 
-            if (!projectEntries.length) {
-                const btn = document.createElement('button');
-                btn.innerText = 'Folder is empty you can download modules from screeps';
-                btn.classList.add('btn');
-                btn.style.whiteSpace = 'initial';
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-
-                    store.dispatch({
-                        type: 'CREATE_PROJECT',
-                        payload: {
-                            projectPath,
-                            projectPathLabel: 'Project folder path',
-                            projectPathReadonly: true,
-                            downloadReadonly: true,
-                            submitBtn: 'Download'
-                        }
-                    });
-
-                    return false;
-                });
-
-                const div = document.createElement('div');
-                div.classList.add('screeps-download-btn');
-                div.appendChild(btn);
-
-                node.appendChild(div);
-                return;
-            } else {
-                const div = $('.screeps-download-btn', node);
-                if (div) {
-                    node.removeChild(div);
-                }
-            }
-
-            if (!isScreepsProject(projectPath)) {
+            if (!(await isScreepsProject(projectPath))) {
                 return;
             }
 
-            const config = await getScreepsProjectConfig(projectPath);
+            const projectConfig = await getScreepsProjectConfig(projectPath);
 
-            const projectRootNode = $(PROJECT_ROOT_NODE, node);
-            if (projectRootNode) {
-                const branch = document.createElement('span');
-                branch.classList.add('project-branch');
-                branch.innerText = `${ config.branch }`;
-    
-                projectRootNode.appendChild(branch);
-            }
+            assignScreepsBranch(treeProjectNodeRef, projectConfig);
 
-            const srcPath = getScreepsProjectSrc(projectPath, config.src);
+            assignScreepsSrcIcon(treeView, projectPath, projectConfig);
 
-            setDistIcon(treeView, srcPath);
+            treeProjectNodeRef.removeEventListener('click', updateIcon);
+            treeProjectNodeRef.addEventListener('click', updateIcon);
         });
 
-        // if () {
-
-        // }
-
-        // const projectPath = atom.project.getPaths()[0];
-
-        // if (!projectPath) {
-        //     // Return if project doesn't exist.
-        //     return;
-        // }
-
-        // const srcDir = configGetter('src');
-        // const fullPath = path.resolve(projectPath, srcDir);
-
-        // await new Promise((resolve) => setTimeout(resolve));
-
-        // setDistIcon(treeView, fullPath);
     })
     .subscribe();
 
-    store.dispatch({ type: 'UPDATE_ICON', payload: {}});
+    const treeViewPackage = atom.packages.getActivePackage('tree-view');
+    // @ts-ignore
+    atom.commands.add(treeViewPackage.mainModule.treeView.element, {
+        'tree-view:expand-item': updateIcon
+    });
 
     atom.project.onDidChangePaths((paths) => {
         if (paths.length) {
@@ -122,98 +66,83 @@ export function consumeTreeView(treeView: any) {
         store.dispatch({ type: 'REMOVE_PROJECT', payload: {}});
     });
 
-    // const treeViewPackage = atom.packages.getActivePackage('tree-view');
-    // // @ts-ignore
-    // const treeView = treeViewPackage.mainModule.treeView;
-
-    // // Choose first project as screeps folder.
-    // const projectPath = atom.project.getPaths()[0];
-
-    // if (!projectPath) {
-    //     // Return if project doesn't exist.
-    //     return;
-    // }
-
-    // // Get local setting for screeps source folder.
-    // const srcDir = configGetter('src');
-    // const fullPath = path.resolve(projectPath, srcDir);
-
-    // const projectEntry = treeView.entryForPath(projectPath) as HTMLElement;
-    // projectEntry.addEventListener('click', treeViewExpandItem);
-
-    // atom.commands.add(treeView.element, {
-    //     'tree-view:expand-item': treeViewExpandItem
-    // });
-
-    // // Set screeps icon for screeps source folder.
-    // setDistIcon(treeView, fullPath);
-
-    // // If user has modules values in global state
-    // const { branch, modules } = __state.getValue();
-
-    // if (!modules || !branch) {
-    //     return;
-    // }
-
-    // async function treeViewExpandItem() {
-    //     await new Promise((resolve) => setTimeout(resolve));
-
-    //     if (!projectEntry.classList.contains('expanded')) {
-    //         return;
-    //     }
-
-    //     // Set screeps icon for screeps source folder.
-    //     setDistIcon(treeView, fullPath);
-
-    //     const { branch, modules } = __state.getValue();
-
-    //     if (!modules || !branch) {
-    //         return;
-    //     }
-
-    //     const entry = treeView.entryForPath(fullPath) as HTMLElement;
-
-    //     const modified = Object.values(modules).some(({ modified }) => !!modified);
-    //     toggleEntryStatusModified(entry, modified as boolean)
-
-    //     Object.entries(modules)
-    //         .forEach(setTreeViewEntryStatus(treeView, branch));
-    // }
-
-    // const modules$ = __state.pipe(map(({ modules }) => modules))
-    //     .pipe(distinctUntilChanged());
-
-    // modules$
-    //     .pipe(switchMap((modules) => from(Object.entries(modules))))
-    //     .pipe(tap(setTreeViewEntryStatus(treeView, branch)))
-    //     .subscribe();
-
-    // modules$
-    //     .pipe(map((modules) => Object.entries(modules).some(([, { modified }]) => !!modified)))
-    //     .pipe(combineLatest(of(treeView.entryForPath(fullPath) as HTMLElement)))
-    //     .pipe(tap(([modified, entry]) => toggleEntryStatusModified(entry, modified as boolean)))
-    //     .subscribe();
-
+    updateIcon();
 }
 
-function setDistIcon(treeView: any, fullPath: string) {
-    const entry = treeView.entryForPath(fullPath) as HTMLElement;
+function assignScreepsSrcIcon(treeView: any, projectPath: string, cfg: any) {
+    const dataPath = getScreepsProjectSrc(projectPath, cfg.src);
+
+    const entry = treeView.entryForPath(dataPath) as HTMLElement;
+    const iconRef = $('.header > .icon-file-directory', entry) as HTMLElement;
+
+    if (iconRef.getAttribute('data-path') !== dataPath) {
+        return;
+    }
+
     entry.setAttribute('screeps-dist', 'screeps-dist');
 }
 
-// function setTreeViewEntryStatus(treeView: any, branch: string) {
-//     return ([name, { modified }]: [string, IModule]) => {
-//         const path = getModulePath(branch, name);
-//         const entry = treeView.entryForPath(path) as HTMLElement;
+function assignScreepsBranch(projectRef: HTMLElement, cfg: any)  {
+    const headerRef = $(PROJECT_ROOT_HEADER, projectRef) as HTMLElement;
 
-//         toggleEntryStatusModified(entry, modified as boolean);
-//     };
-// }
+    if (!headerRef) {
+        return;
+    }
 
-// function toggleEntryStatusModified(entry: HTMLElement, modified: boolean) {
-//     if (modified) {
-//         entry.classList.add('status-modified--screeps');
-//     } else {
-//         entry.classList.remove('status-modified--screeps');
-//     }
-// }
+    let branchRef = $(PROJECT_SCREEPS_BRANCH, headerRef) as HTMLElement;
+
+    if (!branchRef) {
+        branchRef = document.createElement('span');
+        branchRef.classList.add('project-branch');
+
+        headerRef.appendChild(branchRef);
+    }
+
+    branchRef.innerText = `${ cfg.branch }`;
+}
+
+function toggleFolderEmptyBtn(projectRef: HTMLElement, projectDir: Directory) {
+    const entries = projectDir.getEntriesSync();
+
+    let div = $(`.${ PROJECT_EMPTY_BTN }`, projectRef);
+
+    if (entries.length && !div) {
+        return;
+    }
+
+    if (entries.length && div) {
+        projectRef.removeChild(div);
+        return;
+    }
+
+    if (div) {
+        return;
+    }
+
+    div = document.createElement('div');
+    div.classList.add(PROJECT_EMPTY_BTN);
+
+    const btn = document.createElement('button');
+    btn.innerText = 'Folder is empty you can download modules from screeps';
+    btn.classList.add('btn');
+    btn.style.whiteSpace = 'initial';
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        store.dispatch({
+            type: 'CREATE_PROJECT',
+            payload: {
+                projectPath: projectDir.getPath(),
+                projectPathLabel: 'Project folder path',
+                projectPathReadonly: true,
+                downloadReadonly: true,
+                submitBtn: 'Download'
+            }
+        });
+
+        return false;
+    });
+
+    div.appendChild(btn);
+    projectRef.appendChild(div);
+}

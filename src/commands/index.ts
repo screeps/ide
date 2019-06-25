@@ -7,3 +7,4 @@ export * from './revertAll';
 export * from './on-did-change';
 export * from './copyBranch';
 export * from './on-did-change-files';
+export * from './change-project-branch';

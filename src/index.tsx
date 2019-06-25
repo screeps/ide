@@ -2,6 +2,8 @@
 import { CompositeDisposable } from 'atom';
 
 import { default as store } from './store';
+import * as effects from './store/effects';
+
 import { default as __state, INITIAL_STATE } from './state';
 import { PACKAGE_NAME, configGetter } from './config';
 
@@ -10,7 +12,8 @@ import {
     commitAll,
     revert,
     revertAll,
-    onDidChangeFiles
+    onDidChangeFiles,
+    changeProjectBranch
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
@@ -34,6 +37,8 @@ export function initialize(state: IState) {
     }
 
     __state.next(state);
+
+    Object.values(effects).forEach((effect) => effect.subscribe());
 
     atom.project.onDidChangeFiles(onDidChangeFiles);
 }
@@ -83,7 +88,8 @@ export function activate(state: IState) {
         [`${ PACKAGE_NAME }:${ commit.name }`]: commit,
         [`${ PACKAGE_NAME }:${ commitAll.name }`]: commitAll,
         [`${ PACKAGE_NAME }:${ revert.name }`]: revert,
-        [`${ PACKAGE_NAME }:${ revertAll.name }`]: revertAll
+        [`${ PACKAGE_NAME }:${ revertAll.name }`]: revertAll,
+        [`${ PACKAGE_NAME }:${ changeProjectBranch.name }`]: changeProjectBranch
     }));
 
     if (configGetter('showOnStartup')) {

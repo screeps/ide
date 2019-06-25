@@ -1,4 +1,4 @@
-import { Action } from '../../../store';
+import { Action } from '../';
 
 export const CREATE_PROJECT = 'CREATE_PROJECT';
 export function CreateProjectAction(): Action {

@@ -4,6 +4,7 @@
             { "type": "separator" },
 
             { "label": "Screeps Commit All to Choosed Branch", "command": "screeps-ide:commitAll" },
+            { "label": "Screeps Project Change Branch", "command": "screeps-ide:changeProjectBranch" },
 
             { "type": "separator" }
         ],
@@ -11,7 +12,7 @@
         ".tree-view [screeps-dist] .file": [
             { "type": "separator" },
 
-            { "label": "Screeps Commit to Choosed Branch", "command": "screeps-ide:commit" },
+            { "label": "Screeps Commit File to Choosed Branch", "command": "screeps-ide:commit" },
 
             { "type": "separator" }
         ]

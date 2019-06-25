@@ -4,17 +4,17 @@ const path = require('path');
 import { File, Directory } from 'atom';
 import { filter, tap } from 'rxjs/operators';
 
-import __state from '../../../state';
-import { default as store, Action } from '../../../store';
-import { AtomModal } from '../../atom-modal';
-import { default as confirm } from '../../confirm-modal';
-import { default as CreateProjectView } from '../../../../ui/components/create-project-view';
+import __state from '../../state';
+import { default as store, Action } from '..';
+import { AtomModal } from '../../components/atom-modal';
+import { default as confirm } from '../../components/confirm-modal';
+import { default as CreateProjectView } from '../../../ui/components/create-project-view';
 import { CREATE_PROJECT } from '../actions';
 
 import {
     getApi,
     createScreepsProjectConfig
-} from '../../../utils';
+} from '../../utils';
 
 export const createProjectEffect = store
 .effect(async (state: IState, { type, payload }: Action): Promise<void> => {
@@ -57,12 +57,14 @@ export const createProjectEffect = store
             try {
                 const projectEntries = await projectDir.getEntriesSync();
 
-                if ((projectEntries.length > 1) ||
-                    (projectEntries.length === 1 && projectEntries[0].getPath() !== configFile.getPath())
-                ) {
-                    await confirm({
-                        legend: 'Folder is not empty! Would you like to continue?'
-                    });
+                if (!payload.downloadForce) {
+                    if ((projectEntries.length > 1) ||
+                        (projectEntries.length === 1 && projectEntries[0].getPath() !== configFile.getPath())
+                    ) {
+                        await confirm({
+                            legend: 'Folder is not empty! Would you like to continue?'
+                        });
+                    }
                 }
 
                 const api = await getApi();
@@ -76,15 +78,13 @@ export const createProjectEffect = store
                     await moduleFile.write(content || '');
                 }
 
-                // Сделано чтобы убиралась кнопка, когда синхронизируем пустую папку
-                // Нужно более правильное решение
-                store.dispatch({ type: 'UPDATE_ICON', payload: {} });
             } catch(err) {
                 // Noop.
             }
         }
 
         atom.project.addPath(projectPath);
+        store.dispatch({ type: 'CHANGE_PROJECT', payload: {} })
     } catch(err) {
         throw err;
     }

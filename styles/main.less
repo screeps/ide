@@ -109,6 +109,7 @@
 
 .project-branch {
     color: #568af2;
+    pointer-events: none;
 
     &:before {
         content: '•';
@@ -116,4 +117,8 @@
         display: inline-block;
         margin: 0 5px;
     }
+}
+
+[screeps-dist='screeps-dist'] .project-root-header > span:first-child {
+    pointer-events: none;
 }
