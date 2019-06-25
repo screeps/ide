@@ -100,6 +100,10 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                     <div className='error'>Account credentials are invalid</div>
                 </form>
                 <footer>
+                    <div>
+                        <a href='https://screeps.com/a/#!/register' target='_blank'>Create a new account</a>
+                        <a href='https://screeps.com/a/#!/register/ask-recover' target='_blank'>I forgot my password</a>
+                    </div>
                     <button
                         className='btn btn--big btn--transparent'
                         onClick={this.onCancel}
