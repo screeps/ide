@@ -5,6 +5,6 @@ export * from './commit-all';
 export * from './revert';
 export * from './revertAll';
 export * from './on-did-change';
-export * from './copyBranch';
+export * from './copy-branch';
 export * from './on-did-change-files';
 export * from './change-project-branch';
