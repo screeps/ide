@@ -106,7 +106,7 @@
         border-bottom: 1px solid rgba(74, 95, 210, 0.65);
         transition: width .3s ease;
     }
-    .screeps-field input:focus ~ .underline:before {
+    .screeps-field input:not([readonly]):focus ~ .underline:before {
         width: 100%;
     }
 

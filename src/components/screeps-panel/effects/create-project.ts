@@ -17,7 +17,7 @@ import {
 } from '../../../utils';
 
 export const createProjectEffect = store
-.effect(async (state: IState, { type }: Action): Promise<void> => {
+.effect(async (state: IState, { type, payload }: Action): Promise<void> => {
     state;
     if (CREATE_PROJECT !== type) {
         return;
@@ -31,7 +31,8 @@ export const createProjectEffect = store
         } = await new Promise((resolve, reject) => {
             const createProjectModal = new AtomModal(CreateProjectView, {
                 branch: state.branch,
-                branches: state.branches
+                branches: state.branches,
+                ...payload
             });
 
             createProjectModal.events$
@@ -74,6 +75,10 @@ export const createProjectEffect = store
                     const moduleFile = new File(modulePath);
                     await moduleFile.write(content || '');
                 }
+
+                // Сделано чтобы убиралась кнопка, когда синхронизируем пустую папку
+                // Нужно более правильное решение
+                store.dispatch({ type: 'UPDATE_ICON', payload: {} });
             } catch(err) {
                 // Noop.
             }

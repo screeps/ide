@@ -5,6 +5,11 @@ import { useState } from 'react';
 type CreateProjectProps = {
     branch: string;
     branches: IBranch[];
+    projectPath: string;
+    projectPathLabel: string;
+    projectPathReadonly: boolean;
+    downloadReadonly: boolean;
+    submitBtn: string;
 
     onCancel(): void;
     onSubmit(data: {
@@ -16,9 +21,15 @@ type CreateProjectProps = {
 
 export default function(props: CreateProjectProps) {
     const [branch, setBranchValue] = useState(props.branch);
-    // const [projectPath, setProjectPathValue] = useState('');
-    const [projectPath, setProjectPathValue] = useState('C:\\Users\\dmitriyff\\Projects\\screeps\\_attemps\\');
+
+    const [projectPath, setProjectPathValue] = useState(props.projectPath || '');
+    const [projectPathLabel] = useState(props.projectPathLabel || 'Please enter a new project folder path');
+    const [projectPathReadonly] = useState(props.projectPathReadonly || false);
+
     const [download, setDownloadValue] = useState(true);
+    const [downloadReadonly] = useState(props.downloadReadonly || false);
+
+    const [submitBtn] = useState(props.submitBtn || 'Create');
 
     return (
         <div className='screeps-ide screeps-modal screeps-create-project'>
@@ -28,7 +39,7 @@ export default function(props: CreateProjectProps) {
             </header>
             <form>
                 <fieldset className='screeps-field'>
-                    <legend>Please enter a new project folder path:</legend>
+                    <legend>{ projectPathLabel }:</legend>
                     <input
                         className='native-key-bindings'
 
@@ -39,6 +50,7 @@ export default function(props: CreateProjectProps) {
                         onChange={onInput}
 
                         required={ true }
+                        readOnly={ projectPathReadonly }
                         autoFocus={ true }
 
                         tabIndex={ 1 }
@@ -65,7 +77,9 @@ export default function(props: CreateProjectProps) {
                         <input className='native-key-bindings input-checkbox' type='checkbox'
                             name='download'
                             checked={ download }
-                            onChange={() => setDownloadValue(!download)}
+                            onChange={() => !downloadReadonly && setDownloadValue(!download)}
+
+                            readOnly={ downloadReadonly }
 
                             tabIndex={ 3 }
                         />
@@ -87,7 +101,7 @@ export default function(props: CreateProjectProps) {
                     onClick={onSubmit}
 
                     tabIndex={ 5 }
-                >Create</button>
+                >{ submitBtn }</button>
             </footer>
         </div>
     );

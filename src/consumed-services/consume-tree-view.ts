@@ -5,6 +5,9 @@
 
 // import { default as __state } from '../state';
 // import { configGetter } from '../config';
+
+import { Directory } from 'atom';
+
 import {
     $,
     isScreepsProject,
@@ -27,14 +30,52 @@ export function consumeTreeView(treeView: any) {
 
         const projects = atom.project.getPaths();
 
-        projects.forEach(async (project) => {
-            if (!isScreepsProject(project)) {
+        projects.forEach(async (projectPath) => {
+            const projectDir = new Directory(projectPath);
+            const projectEntries = projectDir.getEntriesSync();
+
+            const node = treeView.entryForPath(projectPath) as HTMLElement;
+
+            if (!projectEntries.length) {
+                const btn = document.createElement('button');
+                btn.innerText = 'Folder is empty you can download modules from screeps';
+                btn.classList.add('btn');
+                btn.style.whiteSpace = 'initial';
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
+                    store.dispatch({
+                        type: 'CREATE_PROJECT',
+                        payload: {
+                            projectPath,
+                            projectPathLabel: 'Project folder path',
+                            projectPathReadonly: true,
+                            downloadReadonly: true,
+                            submitBtn: 'Download'
+                        }
+                    });
+
+                    return false;
+                });
+
+                const div = document.createElement('div');
+                div.classList.add('screeps-download-btn');
+                div.appendChild(btn);
+
+                node.appendChild(div);
+                return;
+            } else {
+                const div = $('.screeps-download-btn', node);
+                if (div) {
+                    node.removeChild(div);
+                }
+            }
+
+            if (!isScreepsProject(projectPath)) {
                 return;
             }
 
-            const config = await getScreepsProjectConfig(project);
-
-            const node = treeView.entryForPath(project) as HTMLElement;
+            const config = await getScreepsProjectConfig(projectPath);
 
             const projectRootNode = $(PROJECT_ROOT_NODE, node);
             if (projectRootNode) {
@@ -45,7 +86,7 @@ export function consumeTreeView(treeView: any) {
                 projectRootNode.appendChild(branch);
             }
 
-            const srcPath = getScreepsProjectSrc(project, config.src);
+            const srcPath = getScreepsProjectSrc(projectPath, config.src);
 
             setDistIcon(treeView, srcPath);
         });
