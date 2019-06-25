@@ -74,7 +74,7 @@ export const createProjectEffect = store
                     const content = modules[moduleName];
                     const modulePath = path.resolve(projectPath, moduleName);
 
-                    const moduleFile = new File(modulePath);
+                    const moduleFile = new File(`${ modulePath }.js`);
                     await moduleFile.write(content || '');
                 }
 
