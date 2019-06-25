@@ -2,8 +2,6 @@ export * from './start';
 export * from './auth';
 export * from './commit';
 export * from './commit-all';
-export * from './revert';
-export * from './revertAll';
 export * from './on-did-change';
 export * from './copy-branch';
 export * from './on-did-change-files';
