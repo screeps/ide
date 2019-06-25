@@ -49,7 +49,7 @@ exports.createProjectEffect = __1.default
                 for (const moduleName in modules) {
                     const content = modules[moduleName];
                     const modulePath = path.resolve(projectPath, moduleName);
-                    const moduleFile = new atom_1.File(modulePath);
+                    const moduleFile = new atom_1.File(`${modulePath}.js`);
                     await moduleFile.write(content || '');
                 }
             }
