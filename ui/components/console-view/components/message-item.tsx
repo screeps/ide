@@ -4,6 +4,10 @@ interface IConsoleMessageItemViewProps {
     message: any
 }
 
+function unescapeHTML(escapedHTML: string) {
+    return escapedHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+}
+
 class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProps> {
     constructor(props: IConsoleMessageItemViewProps) {
         super(props);
@@ -36,25 +40,25 @@ class ConsoleMessageItemView extends React.Component<IConsoleMessageItemViewProp
 
         if (this.props.message.log) {
             message = (
-                <span className='--log'>{ this.props.message.log }</span>
+                <span className='--log'>{ unescapeHTML(this.props.message.log) }</span>
             );
         }
 
         if (this.props.message.expression) {
             message = (
-                <span className='--input'>{ this.props.message.expression }</span>
+                <span className='--input'>{ unescapeHTML(this.props.message.expression) }</span>
             );
         }
 
         if (this.props.message.result) {
             message = (
-                <span className='--output'>{ this.props.message.result }</span>
+                <span className='--output'>{ unescapeHTML(this.props.message.result) }</span>
             );
         }
 
         if (this.props.message.error) {
             error =(
-                <span className='--error'>{ this.props.message.error }</span>
+                <span className='--error'>{ unescapeHTML(this.props.message.error) }</span>
             );
         }
 
