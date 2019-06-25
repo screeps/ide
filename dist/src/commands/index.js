@@ -10,4 +10,5 @@ tslib_1.__exportStar(require("./revertAll"), exports);
 tslib_1.__exportStar(require("./on-did-change"), exports);
 tslib_1.__exportStar(require("./copyBranch"), exports);
 tslib_1.__exportStar(require("./on-did-change-files"), exports);
+tslib_1.__exportStar(require("./change-project-branch"), exports);
 //# sourceMappingURL=index.js.map

@@ -34,7 +34,7 @@ const properties = {
     }
 };
 exports.PACKAGE_NAME = 'screeps-ide';
-const LOCAL_PROJECT_CONFIG = '.screepsrc';
+const LOCAL_PROJECT_CONFIG = '.screepsiderc';
 try {
     atom.config.unset(`${exports.PACKAGE_NAME}.local`);
     const paths = atom.project.getPaths();

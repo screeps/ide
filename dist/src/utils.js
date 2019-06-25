@@ -9,6 +9,11 @@ const user_1 = require("./services/user");
 const auth_1 = require("./commands/auth");
 let api;
 let socket;
+const LOCAL_PROJECT_CONFIG = '.screepsiderc';
+function $(s, el = document) {
+    return el.querySelector(s);
+}
+exports.$ = $;
 async function getApi() {
     if (api) {
         return api;
@@ -161,4 +166,48 @@ function combineModules(origin, changes = {}) {
     return modules;
 }
 exports.combineModules = combineModules;
+async function isScreepsProject(project) {
+    const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+    const configFile = new atom_1.File(configPath);
+    if (await configFile.exists()) {
+        return true;
+    }
+    return false;
+}
+exports.isScreepsProject = isScreepsProject;
+async function createScreepsProjectConfig(project, settings) {
+    try {
+        const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+        const configFile = new atom_1.File(configPath);
+        const settingsStr = JSON.stringify(settings, null, '\t');
+        await configFile.write(settingsStr);
+        return configFile;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+exports.createScreepsProjectConfig = createScreepsProjectConfig;
+async function getScreepsProjectConfig(project) {
+    try {
+        const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+        const configFile = new atom_1.File(configPath);
+        const configStr = await configFile.read(true);
+        let config = {};
+        try {
+            config = JSON.parse(configStr);
+        }
+        catch (err) {
+        }
+        return config;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+exports.getScreepsProjectConfig = getScreepsProjectConfig;
+function getScreepsProjectSrc(project, src = '') {
+    return path.resolve(project, src);
+}
+exports.getScreepsProjectSrc = getScreepsProjectSrc;
 //# sourceMappingURL=utils.js.map

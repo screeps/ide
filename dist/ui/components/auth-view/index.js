@@ -62,6 +62,9 @@ class AuthView extends React.Component {
                     React.createElement("div", { className: 'underline' })),
                 React.createElement("div", { className: 'error' }, "Account credentials are invalid")),
             React.createElement("footer", null,
+                React.createElement("div", null,
+                    React.createElement("a", { href: 'https://screeps.com/a/#!/register', target: '_blank' }, "Create a new account"),
+                    React.createElement("a", { href: 'https://screeps.com/a/#!/register/ask-recover', target: '_blank' }, "I forgot my password")),
                 React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: this.onCancel, tabIndex: 3 }, "Cancel"),
                 React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', onClick: this.onSubmit, disabled: this.state.isBlocking, tabIndex: 4 }, "Sign In"))));
     }

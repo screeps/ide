@@ -4,6 +4,7 @@ const tslib_1 = require("tslib");
 /// <reference path='./index.d.ts' />
 const atom_1 = require("atom");
 const store_1 = require("./store");
+const effects = require("./store/effects");
 const state_1 = require("./state");
 const config_1 = require("./config");
 const commands_1 = require("./commands");
@@ -24,6 +25,7 @@ function initialize(state) {
         state.modules = {};
     }
     state_1.default.next(state);
+    Object.values(effects).forEach((effect) => effect.subscribe());
     atom.project.onDidChangeFiles(commands_1.onDidChangeFiles);
 }
 exports.initialize = initialize;
@@ -63,7 +65,8 @@ function activate(state) {
         [`${config_1.PACKAGE_NAME}:${commands_1.commit.name}`]: commands_1.commit,
         [`${config_1.PACKAGE_NAME}:${commands_1.commitAll.name}`]: commands_1.commitAll,
         [`${config_1.PACKAGE_NAME}:${commands_1.revert.name}`]: commands_1.revert,
-        [`${config_1.PACKAGE_NAME}:${commands_1.revertAll.name}`]: commands_1.revertAll
+        [`${config_1.PACKAGE_NAME}:${commands_1.revertAll.name}`]: commands_1.revertAll,
+        [`${config_1.PACKAGE_NAME}:${commands_1.changeProjectBranch.name}`]: commands_1.changeProjectBranch
     }));
     if (config_1.configGetter('showOnStartup')) {
         setTimeout(() => atom.workspace.open(welcome_pane_1.WELCOME_URI, {

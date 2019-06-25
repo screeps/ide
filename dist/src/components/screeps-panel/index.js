@@ -15,6 +15,7 @@ const actions_1 = require("./actions");
 require("./reducers");
 const effects = require("./effects");
 const store_1 = require("../../store");
+const actions_2 = require("../../store/actions");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.SCREEPS_URI = 'atom://screeps-ide/screeps';
 class ScreepsPanel {
@@ -65,29 +66,16 @@ class ScreepsPanel {
         if (_modules) {
             modulesView = (React.createElement(modules_block_1.ModulesBlock, { branch: branch, modules: _modules }));
         }
-        const projectPaths = atom.project.getPaths();
-        let projectBtn;
-        if (!projectPaths.length) {
-            projectBtn = (React.createElement("button", { className: 'btn btn-primary', onClick: this.createProjectPanel }, "Create Project"));
-        }
-        else {
-            projectBtn = (React.createElement("button", { className: 'btn btn-primary', onClick: this.openProjectPanel }, "View Project"));
-        }
         ReactDOM.render(React.createElement("div", { className: 'screeps-ide screeps-panel' },
             React.createElement(branches_block_1.BranchesBlock, { branch: branch, branches: branches }),
             modulesView,
-            projectBtn,
-            React.createElement("button", { className: 'btn btn-primary', onClick: this.openMemoryPanel }, "Open Memory Panel"),
-            React.createElement("button", { className: 'btn btn-primary', onClick: this.openConsolePanel }, "Open Console Panel")), this.element);
+            React.createElement("button", { className: 'btn btn-primary', onClick: this.createProject }, "Create New Project"),
+            React.createElement("div", null,
+                React.createElement("button", { className: 'btn', onClick: this.openMemoryPanel }, "Memory"),
+                React.createElement("button", { className: 'btn', onClick: this.openConsolePanel }, "Console"))), this.element);
     }
-    createProjectPanel() {
-        store_1.default.dispatch(actions_1.CreateProjectAction());
-    }
-    openProjectPanel() {
-        atom.workspace.open('atom://tree-view', {
-            activatePane: true,
-            activateItem: true
-        });
+    createProject() {
+        store_1.default.dispatch(actions_2.CreateProjectAction());
     }
     openMemoryPanel() {
         atom.workspace.open(memory_panel_1.MEMORY_URI, {
