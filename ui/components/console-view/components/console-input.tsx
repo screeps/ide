@@ -1,107 +1,93 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 interface IConsoleInputViewProps {
     onInput?(expression: string): void;
 }
 
-class ConsoleInputView extends React.Component<IConsoleInputViewProps> {
-    private _inputRef = React.createRef<HTMLInputElement>();
-    private _history: string[] = [];
-    private _historyIndex: number = 0;
+export default function({
+    onInput
+}: IConsoleInputViewProps) {
+    const [value, setValue] = useState('');
 
-    constructor(props: IConsoleInputViewProps) {
-        super(props);
+    const [history, setHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+
+    useEffect(() => {
+        if (historyIndex >= 0 && historyIndex < history.length) {
+            setValue(history[historyIndex]);
+            return;
+        }
+
+        if (historyIndex === -1) {
+            setValue('');
+            return;
+        }
+    }, [historyIndex]);
+
+    return (
+        <div className='screeps-console__input'>
+            <form onSubmit={ onSubmit }>
+                <fieldset className='screeps-field'>
+                    <input className='native-key-bindings' type='text' placeholder='Command...'
+                        autoComplete=''
+
+                        onChange={ onChange }
+                        onKeyUp={ onKeyPress }
+
+                        tabIndex={ 0 }
+
+                        value={ value }/>
+                    <div className='underline' />
+                </fieldset>
+            </form>
+        </div>
+    );
+
+    function onKeyPress({ key }: React.KeyboardEvent) {
+        switch(key) {
+            case 'ArrowUp': {
+                historyUp();
+                break;
+            }
+            case 'ArrowDown': {
+                historyDown();
+                break;
+            }
+        }
     }
 
-    componentDidMount() {
-        if (!this._inputRef.current) {
+    function historyUp() {
+        if (historyIndex >= (history.length - 1)) {
             return;
         }
 
-        this._inputRef.current.addEventListener('keyup', this.onKeyUpHandler);
-        this._inputRef.current.addEventListener('keydown', this.onKeyDownHandler);
+        setHistoryIndex(historyIndex + 1);
     }
 
-    public render() {
-        return (
-            <div className='screeps-console__input'>
-                <form onSubmit={ this.onSubmit }>
-                    <fieldset className='screeps-field'>
-                        <input className='native-key-bindings' type='text' placeholder='Command...'
-                            ref={ this._inputRef }
+    function historyDown() {
+        if (historyIndex < 0) {
+            return;
+        }
 
-                            autoComplete=''
-
-                            onKeyPress={ this.onKeyPressHandler }
-
-                            tabIndex={ 0 }/>
-                        <div className='underline' />
-                    </fieldset>
-                </form>
-            </div>
-        );
+        setHistoryIndex(historyIndex - 1);
     }
 
-    onKeyUpHandler = (event: any) => {
-        if (event.key !== 'ArrowUp') {
-            return;
-        }
+    function onChange(event: React.ChangeEvent) {
+        const target = event.target as HTMLInputElement;
+        const value = target.value;
 
-        if (!this._inputRef.current) {
-            return;
-        }
-
-        if (this._historyIndex < this._history.length - 1) {
-            this._historyIndex++;
-            this._inputRef.current.value = this._history[this._historyIndex];
-
-            return;
-        }
-
-        this._inputRef.current.value = '';
-        this._historyIndex = this._history.length;
+        setValue(value);
     }
 
-    onKeyDownHandler = (event: any) => {
-        if (event.key !== 'ArrowDown') {
-            return;
-        }
+    function onSubmit(event: React.FormEvent) {
+        onInput && onInput(value);
+        setValue('');
 
-        if (!this._inputRef.current) {
-            return;
-        }
+        // @ts-ignore
+        setHistory([value, ...history]);
+        setHistoryIndex(-1);
 
-        if (this._historyIndex > 0) {
-            this._historyIndex--;
-            this._inputRef.current.value = this._history[this._historyIndex];
-
-            return;
-        }
-
-        this._inputRef.current.value = '';
-        this._historyIndex = -1;
-    }
-
-    onKeyPressHandler = (event: any) => {
-        if (event.key !== 'Enter') {
-            return;
-        }
-
-        if (!event.target.value) {
-            return;
-        }
-
-        this.props.onInput && this.props.onInput(event.target.value);
-        this._history.unshift(event.target.value);
-
-        event.target.value = '';
-        this._historyIndex = -1;
-    }
-
-    onSubmit = (event: any) => {
         event.preventDefault();
     }
-
 }
-
-export default ConsoleInputView;
