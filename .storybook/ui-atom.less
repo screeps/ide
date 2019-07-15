@@ -17,6 +17,11 @@ p {
     margin-bottom: 1rem;
 }
 
+button {
+    cursor: pointer;
+    color: inherit;
+}
+
 .input-checkbox {
     vertical-align: middle;
     -webkit-appearance: none;
@@ -118,4 +123,80 @@ p {
         border: none;
         background: none;
     }
+}
+
+.btn {
+    height: initial;
+    padding: 0 0.8em;
+    font-size: 1em;
+    line-height: 2em;
+}
+
+.btn:hover,
+.btn.btn-default:hover {
+    color: #d7dae0;
+    background-image: linear-gradient(#3e4451, #3a3f4b);
+}
+
+.tab-bar {
+    display: flex;
+    -webkit-user-select: none;
+    margin: 0;
+}
+
+.tab-bar {
+    position: relative;
+    // height: 2.5em;
+    box-shadow: inset 0 -1px 0 #181a1f;
+    background: #21252b;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 0;
+
+    .tab {
+        font-size: 11px;
+        position: relative;
+        padding-left: 10px;
+        padding-right: 24px;
+        -webkit-user-drag: element;
+        flex: 1;
+        max-width: 175px;
+        min-width: 40px;
+        transition: max-width 0.25s ease-in-out;
+    }
+
+    .tab {
+        position: relative;
+        top: 0;
+        padding: 0;
+        margin: 0;
+        height: inherit;
+        font-size: inherit;
+        line-height: 2.5em;
+        color: rgba(157, 165, 180, 0.6);
+        background-color: #21252b;
+        box-shadow: inherit;
+        border-left: 1px solid #181a1f;
+    }
+
+    .tab,
+    .tab.active {
+        padding-right: 0;
+    }
+
+    .tab,
+    .tab.active {
+        flex: 1 1 0;
+        max-width: 22em;
+        min-width: 7em;
+    }
+
+    .tab:first-of-type {
+        border-left-color: transparent;
+    }
+}
+
+atom-dock .tab-bar .tab,
+atom-dock .tab-bar .tab.active {
+    max-width: none;
 }
