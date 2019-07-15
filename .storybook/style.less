@@ -7,9 +7,9 @@
 @import '../ui/components/welcome-view/style.less';
 
 // Elements
+@import '../ui/elements/buttons.less';
 @import '../ui/components/form/style.less';
 @import '../ui/components/modal/style.less';
-@import '../ui/components/buttons.less';
 
 html, body {
     height: 100%;
@@ -21,4 +21,23 @@ html, body {
 
 #root {
     height: 100%;
+}
+
+.storybook-ui-elements-buttons {
+    margin: 0 20px;
+
+    & > div {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+
+        &:first-child {
+            color: @text-color-highlight;
+            font-size: 12px;
+        }
+
+        div {
+            width: 20%;
+        }
+    }
 }
