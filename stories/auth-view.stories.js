@@ -4,9 +4,9 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
-import { default as Authiew } from '../ui/components/auth-view';
+import { default as AuthView } from '../ui/components/auth-view';
 
 storiesOf('UI Components|Auth View', module)
     .add('View', () => (
-        <Authiew />
+        <AuthView />
     ));
