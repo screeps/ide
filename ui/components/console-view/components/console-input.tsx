@@ -9,8 +9,7 @@ export default function({
     onInput
 }: IConsoleInputViewProps) {
     const [value, setValue] = useState('');
-
-    const [history, setHistory] = useState([]);
+    const [history, setHistory] = useState<string[]>([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
 
     useEffect(() => {
@@ -84,7 +83,6 @@ export default function({
         onInput && onInput(value);
         setValue('');
 
-        // @ts-ignore
         setHistory([value, ...history]);
         setHistoryIndex(-1);
 
