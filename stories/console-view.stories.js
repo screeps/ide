@@ -16,26 +16,50 @@ const shards = [{
     name: 'shard3'
 }];
 
-const messages = [{
-    log: 'default message',
+const log = {
+    log: '234',
     shard: 'shard3',
     timeStamp: 1563204231657
-}, {
+};
+
+const input = {
     expression: 'console.log(234)'
-}, {
+};
+
+const output = {
     result: 'undefined'
-}, {
+};
+
+const error = {
     error: 'ReferenceError: asd is not defined\n    at eval (eval at &lt;anonymous> (_console1563204406339_0:1:46), &lt;anonymous>:1:1)\n    at _console1563204406339_0:1:46\n    at _console1563204406339_0:1:60\n    at Object.exports.evalCode (&lt;runtime>:15958:71)\n    at Object.exports.run (&lt;runtime>:30494:41)\n',
     shard: 'shard3',
     timeStamp: 1563204407549
-}];
+}
+
+const messages = [input, log, output, error];
 
 storiesOf('UI Components|Console View', module)
-    .add('View', () => (
+    .add('All', () => (
         <ConsoleView
             shard={ shards[2].name }
             shards={ shards }
 
             messages={ messages }
+        />
+    ))
+    .add('Input/Output', () => (
+        <ConsoleView
+            shard={ shards[2].name }
+            shards={ shards }
+
+            messages={ [input, log, output] }
+        />
+    ))
+    .add('Error', () => (
+        <ConsoleView
+            shard={ shards[2].name }
+            shards={ shards }
+
+            messages={ [error] }
         />
     ));
