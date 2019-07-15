@@ -10,6 +10,7 @@ storiesOf('UI Elements|Buttons', module)
     .add('View', () => (
         <div className='screeps-ide storybook-ui-elements-buttons'>
             <div>
+                <div></div>
                 <div>Enabled</div>
                 <div>Hover</div>
                 <div>Focused</div>
@@ -17,59 +18,61 @@ storiesOf('UI Elements|Buttons', module)
                 <div>Disabled</div>
             </div>
             <div>
+                <div>Primary</div>
                 <div>
                     <button
                         className='btn btn--big btn--primary' type='button'
-                    >Primary</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--primary btn--hover' type='button'
-                    >Primary</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--primary btn--focus' type='button'
-                    >Primary</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--primary btn--active' type='button'
-                    >Primary</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--primary' type='button'
                         disabled={ true }
-                    >Primary</button>
+                    >Button</button>
                 </div>
             </div>
             <div>
+                <div>Transparent</div>
                 <div>
                     <button
                         className='btn btn--big btn--transparent'
-                    >Transparent</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--transparent'
-                    >Transparent</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--transparent'
-                    >Transparent</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--transparent'
-                    >Transparent</button>
+                    >Button</button>
                 </div>
                 <div>
                     <button
                         className='btn btn--big btn--transparent'
                         disabled={ true }
-                    >Transparent</button>
+                    >Button</button>
                 </div>
             </div>
         </div>
