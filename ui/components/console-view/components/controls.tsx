@@ -1,94 +1,75 @@
 import * as React from 'react';
+import { useState } from 'react';
 
 interface IConsoleControlsViewProps {
     shard: string;
     shards: any;
     paused: boolean;
 
-    onShard?: Function;
-    onResume?: Function;
-    onPause?: Function;
-    onClose?: Function;
-    onDelete?: Function;
+    onShard?(shard: string): void;
+    onResume?(): void;
+    onPause?(): void;
+    onDelete?(): void;
 }
 
-interface IConsoleControlsViewState {
-    paused: boolean;
-}
+export default function({
+    shard,
+    shards,
+    paused: _paused,
 
-class ConsoleControlsView extends React.Component<IConsoleControlsViewProps> {
-    //@ts-ignore
-    props: IConsoleControlsViewProps;
-    state: IConsoleControlsViewState;
+    onShard: applyShard,
+    onResume: resume,
+    onPause: pause,
+    onDelete: clear,
+}: IConsoleControlsViewProps) {
+    const [paused, setPausedValue] = useState(_paused)
+    let toggle;
 
-    constructor(props: IConsoleControlsViewProps) {
-        super(props);
-
-        this.state = {
-            paused: props.paused
-        };
+    if (!paused) {
+        toggle = (<button id='screeps-console__play'
+            className='btn icon' onClick={ onResume }><i className='sc-icon-play' />
+        </button>);
+    } else {
+        toggle = (<button id='screeps-console__pause'
+            className='btn icon' onClick={ onPause }><i className='sc-icon-pause' />
+        </button>);
     }
 
-    public render() {
-        let toggle;
-
-        if (!this.state.paused) {
-            toggle = (<button id='screeps-console__play'
-                className='btn icon' onClick={ this.onResume }><i className='sc-icon-play' />
-            </button>);
-        } else {
-            toggle = (<button id='screeps-console__pause'
-                className='btn icon' onClick={ this.onPause }><i className='sc-icon-pause' />
-            </button>);
-        }
-
-        return (
-            <div className='screeps-console__controls'>
-                <div className=''>
-                    <select className='input-select' onChange={ this.onShard } value={ this.props.shard }>
-                        { this.props.shards.map(({ name }: { name: string }) => {
-                            return (<option key={ name } value={ name }>{ name }</option>);
-                        })}
-                    </select>
-                </div>
-                <div className='btn-group'>
-                    <button id='screeps-console__delete'
-                        className='btn icon' onClick={ this.onDelete }><i className='sc-icon-delete' />
-                    </button>
-                    { toggle }
-                    {/* <button id='screeps-console__close'
-                        className='btn icon' onClick={ this.onClose }><i className='sc-icon-clear' />
-                    </button> */}
-                </div>
+    return (
+        <div className='screeps-console__controls'>
+            <div className=''>
+                <select className='input-select' onChange={ onShard } value={ shard }>
+                    { shards.map(({ name }: { name: string }) => {
+                        return (<option key={ name } value={ name }>{ name }</option>);
+                    })}
+                </select>
             </div>
-        );
+            <div className='btn-group'>
+                <button id='screeps-console__delete'
+                    className='btn icon' onClick={ onDelete }><i className='sc-icon-delete' />
+                </button>
+                { toggle }
+            </div>
+        </div>
+    );
+
+    function onShard(event: any) {
+        applyShard && applyShard(event.target.value);
     }
 
-    onShard = (event: any) => {
-        this.props.onShard && this.props.onShard(event.target.value);
+    function onPause() {
+        setPausedValue(false);
+
+        pause && pause();
     }
 
-    onPause = () => {
-        this.state.paused = false;
-        this.setState({ ...this.state });
+    function onResume() {
+        setPausedValue(true);
 
-        this.props.onPause && this.props.onPause();
+        resume && resume();
     }
 
-    onResume = () => {
-        this.state.paused = true;
-        this.setState({ ...this.state });
-
-        this.props.onResume && this.props.onResume();
-    }
-
-    onClose = () => {
-        this.props.onClose && this.props.onClose();
-    }
-
-    onDelete = () => {
-        this.props.onDelete && this.props.onDelete();
+    function onDelete() {
+        clear && clear();
     }
 }
-
-export default ConsoleControlsView;
