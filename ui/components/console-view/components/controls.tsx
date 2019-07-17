@@ -9,7 +9,7 @@ interface IConsoleControlsViewProps {
     onShard?(shard: string): void;
     onResume?(): void;
     onPause?(): void;
-    onDelete?(): void;
+    onClean?(): void;
 }
 
 export default function({
@@ -20,12 +20,12 @@ export default function({
     onShard: applyShard,
     onResume: resume,
     onPause: pause,
-    onDelete: clear,
+    onClean: clean,
 }: IConsoleControlsViewProps) {
-    const [paused, setPausedValue] = useState(_paused)
+    const [paused, setPaused] = useState(_paused);
     let toggle;
 
-    if (!paused) {
+    if (paused) {
         toggle = (<button id='screeps-console__play'
             className='btn icon' onClick={ onResume }><i className='sc-icon-play' />
         </button>);
@@ -46,7 +46,7 @@ export default function({
             </div>
             <div className='btn-group'>
                 <button id='screeps-console__delete'
-                    className='btn icon' onClick={ onDelete }><i className='sc-icon-delete' />
+                    className='btn icon' onClick={ onClean }><i className='sc-icon-delete' />
                 </button>
                 { toggle }
             </div>
@@ -58,18 +58,18 @@ export default function({
     }
 
     function onPause() {
-        setPausedValue(false);
+        setPaused(true);
 
         pause && pause();
     }
 
     function onResume() {
-        setPausedValue(true);
+        setPaused(false);
 
         resume && resume();
     }
 
-    function onDelete() {
-        clear && clear();
+    function onClean() {
+        clean && clean();
     }
 }

@@ -18,34 +18,26 @@ export const CONSOLE_URI = 'atom://screeps-ide/console';
 
 export class ConsolePanel implements ViewModel {
     public element: HTMLElement;
-    public viewRef = React.createRef<ConsoleView>();
 
     // @ts-ignore
     private _console$: Subject<void> | null;
     private _tooltipsDisposables: CompositeDisposable | null = null;
 
-    public get state(): any {
-        if (!this.viewRef.current) {
-            return {
-            };
-        }
+    private _state = {
+        messages: []
+    }
 
-        return this.viewRef.current.state;
+    public get state(): any {
+        return this._state;
     }
 
     public set state(state: any) {
-        if (!this.viewRef.current) {
-            return;
+        this._state = {
+            ...this._state,
+            ...state
         }
 
-        this.viewRef.current.state = {
-            ...this.viewRef.current.state,
-            ...state
-        };
-
-        this.viewRef.current.setState(
-            this.viewRef.current.state
-        );
+        this.render(this.state);
     }
 
     // @ts-ignore
@@ -80,7 +72,7 @@ export class ConsolePanel implements ViewModel {
                 this._socket = getSocket();
                 this._service = new Service()
 
-                // this.state = { shard: this._user.shard };
+                this.state = { shard: this._user.shard };
 
                 this._service.shards$
                     .pipe(tap((shards: any) => this.state = { shards }))
@@ -103,16 +95,20 @@ export class ConsolePanel implements ViewModel {
         })()
     }
 
-    render({ shard }: IConsoleViewState) {
+    render({ shard, shards, messages = [] }: IConsoleViewState) {
         ReactDOM.render(
+            // @ts-ignore
             <ConsoleView ref={ this.viewRef }
                 shard={ shard }
+                shards={ shards }
+                messages={ messages }
 
-                onShard={() => this.onShard()}
+                onShard={(shard) => this.onShard(shard)}
                 onInput={(expression: string) => this.onInput(expression)}
                 onClose={() => this.onClose()}
                 onPause={() => this.onPause()}
                 onResume={() => this.onResume()}
+                onClean={() => this.onClean()}
             />,
             this.element as HTMLElement
         )
@@ -133,7 +129,8 @@ export class ConsolePanel implements ViewModel {
         }
     }
 
-    private async onShard(): Promise<void> {
+    private async onShard(shard: any): Promise<void> {
+        this.state = { shard };
     }
 
     private async onClose(): Promise<void> {
@@ -171,8 +168,8 @@ export class ConsolePanel implements ViewModel {
             .pipe(tap((msg: any) => {
                 const timeStamp = msg.timeStamp;
                 const shard = msg.data[1].shard;
-
                 const messages: any = [];
+
                 try {
                     msg.data[1].messages.log.reduce((messages: any[], log: string) => {
                         messages.push({
@@ -217,37 +214,35 @@ export class ConsolePanel implements ViewModel {
         this._applyTooltips();
     }
 
+    private async onClean(): Promise<void> {
+        this.state = {
+            messages: []
+        };
+    }
+
     private _applyTooltips() {
         setTimeout(() => {
             if (this._tooltipsDisposables) {
                 this._tooltipsDisposables.dispose();
             }
 
-            this._tooltipsDisposables = new CompositeDisposable();
+            const _tooltipsDisposables = this._tooltipsDisposables = new CompositeDisposable();
 
-            const clearConsoleBtnRef = document.getElementById('screeps-console__delete');
-            if (clearConsoleBtnRef) {
-                const disposable = atom.tooltips.add(clearConsoleBtnRef, { title: 'Clear' });
-                this._tooltipsDisposables.add(disposable);
+            function _applyTooltip(btnClass: string, title: string) {
+                const btnRef = document.getElementById(btnClass);
+
+                if (!btnRef) {
+                    return;
+                }
+
+                const disposable = atom.tooltips.add(btnRef, { title });
+                _tooltipsDisposables.add(disposable);
             }
 
-            const closeConsoleBtnRef = document.getElementById('screeps-console__close');
-            if (closeConsoleBtnRef) {
-                const disposable = atom.tooltips.add(closeConsoleBtnRef, { title: 'Close panel' });
-                this._tooltipsDisposables.add(disposable);
-            }
-
-            const pauseConsoleBtnRef = document.getElementById('screeps-console__pause');
-            if (pauseConsoleBtnRef) {
-                const disposable = atom.tooltips.add(pauseConsoleBtnRef, { title: 'Pause tracking' });
-                this._tooltipsDisposables.add(disposable);
-            }
-
-            const playConsoleBtnRef = document.getElementById('screeps-console__play');
-            if (playConsoleBtnRef) {
-                const disposable = atom.tooltips.add(playConsoleBtnRef, { title: 'Resume tracking' });
-                this._tooltipsDisposables.add(disposable);
-            }
+            _applyTooltip('screeps-console__delete', 'Clear');
+            _applyTooltip('screeps-console__close', 'Close panel');
+            _applyTooltip('screeps-console__pause', 'Pause tracking');
+            _applyTooltip('screeps-console__play', 'Resume tracking');
         });
     }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState, useRef } from 'react';
 
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
@@ -38,7 +39,43 @@ const error = {
 
 const messages = [input, log, output, error];
 
+let i = 0;
+let timeoutId;
+
+function ConsoleMessagesIteration() {
+    const [messages, setMessages] = useState([{
+        log: `iterate message ${ i }`,
+        shard: 'shard3',
+        timeStamp: new Date() .getTime()
+    }]);
+
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+        setMessages([...messages, {
+            log: `iterate message ${ ++i }`,
+            shard: 'shard3',
+            timeStamp: new Date() .getTime()
+        }]);
+
+    }, 2000);
+
+    return (
+        <ConsoleView
+            shard={ shards[2].name }
+            shards={ shards }
+            messages={ messages }
+
+            onClean={() => {
+                setMessages([]);
+            }}
+        />
+    );
+}
+
 storiesOf('UI Components|Console View', module)
+    .add('Iterate', () => (
+        <ConsoleMessagesIteration />
+    ))
     .add('All', () => (
         <ConsoleView
             shard={ shards[2].name }
