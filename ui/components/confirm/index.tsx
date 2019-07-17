@@ -3,68 +3,53 @@ import * as React from 'react';
 export const MODAL_CLOSE = 'MODAL_CLOSE';
 
 interface IConfirmModalProps {
-    submitBtn?: string;
     legend?: string;
-
-    onCancel?: Function;
-    onSubmit?: Function;
-}
-
-interface IConfirmModalState {
     submitBtn?: string;
-    legend: string;
+
+    onCancel?(): void;
+    onSubmit?(): void;
 }
 
-class ConfirmModal extends React.Component<IConfirmModalProps> {
-    //@ts-ignore
-    props: IConfirmModalProps;
-    state: IConfirmModalState;
+export default function({
+    legend,
+    submitBtn,
 
-    constructor(props: IConfirmModalProps) {
-        super(props);
+    onCancel: cancel,
+    onSubmit: submit
+}: IConfirmModalProps) {
+    legend = legend || 'Are you sure? Do you want execute it?';
+    submitBtn = submitBtn || 'Ok';
 
-        this.state = {
-            legend: props.legend || 'Are you sure? Do you want execute it?',
-            submitBtn: props.submitBtn || 'Ok'
-        }
-    }
-
-    public render() {
-        return (
-            <div className='screeps-ide screeps-modal screeps-auth-modal'>
-                <header>
-                    <div className='logotype' />
-                    <button className='btn _cross' onClick={this.onCancel}/>
-                </header>
-                <form>
-                    <fieldset className='screeps-field'>
-                        <legend>{ this.state.legend }</legend>
-                    </fieldset>
-                </form>
-                <footer>
-                    <button
-                        className='btn btn--big btn--transparent'
-                        onClick={this.onCancel}
-                    >Cancel</button>
-                    <button
-                        className='btn btn--big btn--primary' type='submit'
-                        onClick={this.onSubmit}
-                    >{ this.state.submitBtn }</button>
-                </footer>
-            </div>
-        );
-    }
+    return (
+        <div className='screeps-ide screeps-modal screeps-auth-modal'>
+            <header>
+                <div className='logotype' />
+                <button className='btn _cross' onClick={ onCancel }/>
+            </header>
+            <form>
+                <fieldset className='screeps-field'>
+                    <legend>{ legend }</legend>
+                </fieldset>
+            </form>
+            <footer>
+                <button
+                    className='btn btn--big btn--transparent'
+                    onClick={ onCancel }
+                >Cancel</button>
+                <button
+                    className='btn btn--big btn--primary' type='submit'
+                    onClick={ onSubmit }
+                >{ submitBtn }</button>
+            </footer>
+        </div>
+    );
 
     // Public component output actions.
-    onCancel = () => {
-        this.props.onCancel && this.props.onCancel();
-    };
+    function onCancel() {
+        cancel && cancel();
+    }
 
-    onSubmit = () => {
-        this.setState({ });
-
-        this.props.onSubmit && this.props.onSubmit();
+    function onSubmit() {
+        submit && submit();
     }
 }
-
-export default ConfirmModal;
