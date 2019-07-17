@@ -1,17 +1,11 @@
 @text-color-fail: #D2554A;
 
 .screeps-ide {
-    form.--invalid {
-        input  ~ .underline {
-            border-color: @text-color-fail;
-        }
-
-        .error {
-            opacity: 1;
-        }
-    }
-
     form {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+
         .error {
             position: absolute;
             bottom: 10px;
@@ -24,12 +18,31 @@
 
             transition: opacity .3s ease;
         }
+
+        &.--invalid {
+            input  ~ .underline {
+                border-color: @text-color-fail;
+            }
+
+            .error {
+                opacity: 1;
+            }
+        }
+
+        &.--indented {
+            padding: 10px 0;
+
+            .screeps-field {
+                margin: 20px 0;
+            }
+        }
     }
 
     .screeps-field {
         position: relative;
         display: flex;
         flex-direction: column;
+        // margin: 20px 0;
         margin: 0;
         padding: 0;
         border: none;

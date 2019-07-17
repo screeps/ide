@@ -29,7 +29,7 @@ export default function({
                 <div className='logotype' />
                 <button className='btn _cross' onClick={ onCancel }/>
             </header>
-            <form>
+            <form className='--indented'>
                 <fieldset className='screeps-field'>
                     <legend>{ legend }</legend>
                     <input

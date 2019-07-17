@@ -37,7 +37,7 @@ export default function(props: CreateProjectProps) {
                 <div className='logotype' />
                 <button className='btn _cross' onClick={onCancel}/>
             </header>
-            <form>
+            <form className='--indented'>
                 <fieldset className='screeps-field'>
                     <legend>{ projectPathLabel }:</legend>
                     <input

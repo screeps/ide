@@ -62,7 +62,7 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                     <div className='logotype' />
                     <button className='btn _cross' onClick={this.onCancel}/>
                 </header>
-                <form className={ this.state.isInvalid ? '--invalid' : '' }>
+                <form className={ ['--indented', this.state.isInvalid ? '--invalid' : ''].join(' ') }>
                     <fieldset className='screeps-field'>
                         <input ref={ this._emailRef }
                             className='native-key-bindings'
