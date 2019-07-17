@@ -1,101 +1,85 @@
 import * as React from 'react';
+import { useState } from 'react';
 
 export const MODAL_CLOSE = 'MODAL_CLOSE';
 
 interface IPromptModalProps {
-    submitBtn?: string;
     legend?: string;
+    submitBtn?: string;
 
     onCancel?: Function;
     onSubmit?: Function;
 }
 
-interface IPromptModalState {
-    submitBtn?: string;
-    legend: string;
-}
+export default function({
+    legend,
+    submitBtn,
 
-class PromptModal extends React.Component<IPromptModalProps> {
-    //@ts-ignore
-    props: IPromptModalProps;
-    state: IPromptModalState;
+    onCancel: cancel,
+    onSubmit: submit
+}: IPromptModalProps) {
+    const [message, setMessage] = useState('');
 
-    message: string = '';
+    legend = legend || 'Are you sure? Do you want execute it?';
+    submitBtn = submitBtn || 'Ok';
 
-    constructor(props: IPromptModalProps) {
-        super(props);
+    return (
+        <div className='screeps-ide screeps-modal screeps-auth-modal'>
+            <header>
+                <div className='logotype' />
+                <button className='btn _cross' onClick={ onCancel }/>
+            </header>
+            <form>
+                <fieldset className='screeps-field'>
+                    <legend>{ legend }</legend>
+                    <input
+                        className='native-key-bindings'
 
-        this.state = {
-            legend: props.legend || 'Are you sure? Do you want execute it?',
-            submitBtn: props.submitBtn || 'Ok'
-        }
-    }
+                        type='text'
+                        name='message'
 
-    public render() {
-        return (
-            <div className='screeps-ide screeps-modal screeps-auth-modal'>
-                <header>
-                    <div className='logotype' />
-                    <button className='btn _cross' onClick={this.onCancel}/>
-                </header>
-                <form>
-                    <fieldset className='screeps-field'>
-                        <legend>{ this.state.legend }</legend>
-                        <input
-                            className='native-key-bindings'
+                        onChange={ onInput }
 
-                            type='text'
-                            name='message'
+                        required={ true }
+                        autoFocus={ true }
 
-                            onChange={this.onInput}
+                        tabIndex={ 1 }
+                    />
+                    <div className='underline' />
+                </fieldset>
+            </form>
+            <footer>
+                <button
+                    className='btn btn--big btn--transparent'
+                    onClick={ onCancel }
 
-                            required={ true }
-                            autoFocus={ true }
+                    tabIndex={ 2 }
+                >Cancel</button>
+                <button
+                    className='btn btn--big btn--primary' type='submit'
+                    disabled={ !message }
 
-                            tabIndex={ 1 }
-                        />
-                        <div className='underline' />
-                    </fieldset>
-                </form>
-                <footer>
-                    <button
-                        className='btn btn--big btn--transparent'
-                        onClick={this.onCancel}
+                    onClick={ onSubmit }
 
-                        tabIndex={ 2 }
-                    >Cancel</button>
-                    <button
-                        className='btn btn--big btn--primary' type='submit'
-                        disabled={ !this.message }
-
-                        onClick={this.onSubmit}
-
-                        tabIndex={ 3 }
-                    >{ this.state.submitBtn }</button>
-                </footer>
-            </div>
-        );
-    }
+                    tabIndex={ 3 }
+                >{ submitBtn }</button>
+            </footer>
+        </div>
+    );
 
     // Private component actions.
-    private onInput = (event: React.ChangeEvent) => {
+    function onInput(event: React.ChangeEvent) {
         const target = event.target as HTMLInputElement;
 
-        this.message = target.value; 
-
-        this.setState({ ...this.state });
+        setMessage(target.value);
     }
 
     // Public component output actions.
-    onCancel = () => {
-        this.props.onCancel && this.props.onCancel();
-    };
+    function onCancel() {
+        cancel && cancel();
+    }
 
-    onSubmit = () => {
-        this.setState({ });
-
-        this.props.onSubmit && this.props.onSubmit(this.message);
+    function onSubmit() {
+        submit && submit(message);
     }
 }
-
-export default PromptModal;
