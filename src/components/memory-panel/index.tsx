@@ -189,7 +189,6 @@ export class MemoryPanel {
         memory = getWatches(),
         segment = '0'
     }) {
-        console.log(JSON.stringify(memory));
         ReactDOM.render(
             <MemoryView ref={ this.viewRef }
                 onInput={ this.onInput }
