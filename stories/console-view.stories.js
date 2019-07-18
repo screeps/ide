@@ -7,15 +7,7 @@ import { linkTo } from '@storybook/addon-links';
 
 import { default as ConsoleView } from '../ui/components/console-view';
 
-const shards = [{
-    name: 'shard0'
-}, {
-    name: 'shard1'
-}, {
-    name :'shard2'
-}, {
-    name: 'shard3'
-}];
+import { shards } from './data';
 
 const log = {
     log: '234',
