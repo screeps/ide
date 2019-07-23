@@ -5,10 +5,8 @@ tslib_1.__exportStar(require("./start"), exports);
 tslib_1.__exportStar(require("./auth"), exports);
 tslib_1.__exportStar(require("./commit"), exports);
 tslib_1.__exportStar(require("./commit-all"), exports);
-tslib_1.__exportStar(require("./revert"), exports);
-tslib_1.__exportStar(require("./revertAll"), exports);
 tslib_1.__exportStar(require("./on-did-change"), exports);
-tslib_1.__exportStar(require("./copyBranch"), exports);
+tslib_1.__exportStar(require("./copy-branch"), exports);
 tslib_1.__exportStar(require("./on-did-change-files"), exports);
 tslib_1.__exportStar(require("./change-project-branch"), exports);
 //# sourceMappingURL=index.js.map

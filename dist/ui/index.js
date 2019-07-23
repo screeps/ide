@@ -23,4 +23,7 @@ exports.PATH_BTN_DELETE = item_1.BTN_DELETE;
 exports.PATH_BTN_UPDATE = item_1.BTN_UPDATE;
 exports.PATH_BTN_RELOAD = item_1.BTN_RELOAD;
 exports.PATH_BTN_CANCEL = item_1.BTN_CANCEL;
+var controls_1 = require("./components/memory-view/components/controls");
+exports.MEMORY_MAIN_VIEW = controls_1.MEMORY_MAIN_VIEW;
+exports.MEMORY_SEGMENTS_VIEW = controls_1.MEMORY_SEGMENTS_VIEW;
 //# sourceMappingURL=index.js.map

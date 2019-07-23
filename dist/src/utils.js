@@ -210,4 +210,17 @@ function getScreepsProjectSrc(project, src = '') {
     return path.resolve(project, src);
 }
 exports.getScreepsProjectSrc = getScreepsProjectSrc;
+function applyTooltip(selector, title) {
+    const elementRef = document.querySelector(selector);
+    let disposable;
+    if (!elementRef) {
+        return;
+    }
+    ;
+    disposable = atom.tooltips.add(elementRef, {
+        title
+    });
+    return disposable;
+}
+exports.applyTooltip = applyTooltip;
 //# sourceMappingURL=utils.js.map

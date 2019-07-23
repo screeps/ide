@@ -6,7 +6,7 @@ const ANIMATION_MIN_TIME = 1500;
 function progress(target, name, descriptor) {
     const original = descriptor.value;
     descriptor.value = async function (...args) {
-        showProgress(this.viewRef);
+        showProgress(this);
         let result;
         try {
             result = await original.apply(this, args);
@@ -14,29 +14,21 @@ function progress(target, name, descriptor) {
         catch (err) {
             // Noop.
         }
-        hideProgress(this.viewRef);
+        hideProgress(this);
         return result;
     };
     return descriptor;
 }
 exports.progress = progress;
-function showProgress(viewRef) {
+function showProgress(component) {
     animationStartTime = new Date().getTime();
-    if (!viewRef.current) {
-        return;
-    }
-    viewRef.current.state.isProgressing = true;
-    viewRef.current.setState(Object.assign({}, viewRef.current.state));
+    component.state = { isProgressing: true };
 }
-function hideProgress(viewRef) {
+function hideProgress(component) {
     const now = new Date().getTime();
     const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
     setTimeout(() => {
-        if (!viewRef.current) {
-            return;
-        }
-        viewRef.current.state.isProgressing = false;
-        viewRef.current.setState(Object.assign({}, viewRef.current.state));
+        component.state = { isProgressing: false };
     }, delay > 0 ? delay : 0);
 }
 //# sourceMappingURL=progress.js.map

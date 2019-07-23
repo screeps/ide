@@ -1,72 +1,62 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
-class ConsoleInputView extends React.Component {
-    constructor(props) {
-        super(props);
-        this._inputRef = React.createRef();
-        this._history = [];
-        this._historyIndex = 0;
-        this.onKeyUpHandler = (event) => {
-            if (event.key !== 'ArrowUp') {
-                return;
-            }
-            if (!this._inputRef.current) {
-                return;
-            }
-            if (this._historyIndex < this._history.length - 1) {
-                this._historyIndex++;
-                this._inputRef.current.value = this._history[this._historyIndex];
-                return;
-            }
-            this._inputRef.current.value = '';
-            this._historyIndex = this._history.length;
-        };
-        this.onKeyDownHandler = (event) => {
-            if (event.key !== 'ArrowDown') {
-                return;
-            }
-            if (!this._inputRef.current) {
-                return;
-            }
-            if (this._historyIndex > 0) {
-                this._historyIndex--;
-                this._inputRef.current.value = this._history[this._historyIndex];
-                return;
-            }
-            this._inputRef.current.value = '';
-            this._historyIndex = -1;
-        };
-        this.onKeyPressHandler = (event) => {
-            if (event.key !== 'Enter') {
-                return;
-            }
-            if (!event.target.value) {
-                return;
-            }
-            this.props.onInput && this.props.onInput(event.target.value);
-            this._history.unshift(event.target.value);
-            event.target.value = '';
-            this._historyIndex = -1;
-        };
-        this.onSubmit = (event) => {
-            event.preventDefault();
-        };
-    }
-    componentDidMount() {
-        if (!this._inputRef.current) {
+const react_1 = require("react");
+function default_1({ onInput }) {
+    const [value, setValue] = react_1.useState('');
+    const [history, setHistory] = react_1.useState([]);
+    const [historyIndex, setHistoryIndex] = react_1.useState(-1);
+    react_1.useEffect(() => {
+        if (historyIndex >= 0 && historyIndex < history.length) {
+            setValue(history[historyIndex]);
             return;
         }
-        this._inputRef.current.addEventListener('keyup', this.onKeyUpHandler);
-        this._inputRef.current.addEventListener('keydown', this.onKeyDownHandler);
+        if (historyIndex === -1) {
+            setValue('');
+            return;
+        }
+    }, [historyIndex]);
+    return (React.createElement("div", { className: 'screeps-console__input' },
+        React.createElement("form", { onSubmit: onSubmit },
+            React.createElement("fieldset", { className: 'screeps-field' },
+                React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'Command...', autoComplete: '', onChange: onChange, onKeyUp: onKeyPress, tabIndex: 0, value: value }),
+                React.createElement("div", { className: 'underline' })))));
+    function onKeyPress({ key }) {
+        switch (key) {
+            case 'ArrowUp': {
+                historyUp();
+                break;
+            }
+            case 'ArrowDown': {
+                historyDown();
+                break;
+            }
+        }
     }
-    render() {
-        return (React.createElement("div", { className: 'screeps-console__input' },
-            React.createElement("form", { onSubmit: this.onSubmit },
-                React.createElement("fieldset", { className: 'screeps-field' },
-                    React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'Command...', ref: this._inputRef, autoComplete: '', onKeyPress: this.onKeyPressHandler, tabIndex: 0 }),
-                    React.createElement("div", { className: 'underline' })))));
+    function historyUp() {
+        if (historyIndex >= (history.length - 1)) {
+            return;
+        }
+        setHistoryIndex(historyIndex + 1);
+    }
+    function historyDown() {
+        if (historyIndex < 0) {
+            return;
+        }
+        setHistoryIndex(historyIndex - 1);
+    }
+    function onChange(event) {
+        const target = event.target;
+        const value = target.value;
+        setValue(value);
+    }
+    function onSubmit(event) {
+        onInput && onInput(value);
+        setValue('');
+        setHistory([value, ...history]);
+        setHistoryIndex(-1);
+        event.preventDefault();
     }
 }
-exports.default = ConsoleInputView;
+exports.default = default_1;
 //# sourceMappingURL=console-input.js.map

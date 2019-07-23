@@ -15,7 +15,7 @@ function default_1(props) {
         React.createElement("header", null,
             React.createElement("div", { className: 'logotype' }),
             React.createElement("button", { className: 'btn _cross', onClick: onCancel })),
-        React.createElement("form", null,
+        React.createElement("form", { className: '--indented' },
             React.createElement("fieldset", { className: 'screeps-field' },
                 React.createElement("legend", null,
                     projectPathLabel,

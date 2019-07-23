@@ -27,4 +27,4 @@ async function copyBranch(branch) {
     return newName;
 }
 exports.copyBranch = copyBranch;
-//# sourceMappingURL=copyBranch.js.map
+//# sourceMappingURL=copy-branch.js.map

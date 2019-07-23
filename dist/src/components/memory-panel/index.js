@@ -17,11 +17,50 @@ exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.MEMORY_URI = 'atom://screeps-ide/memory';
 class MemoryPanel {
     constructor(state = {}) {
-        this.viewRef = React.createRef();
         this._memorySbj = new rxjs_1.Subject();
         this.memory$ = this._memorySbj.asObservable();
         this._tooltips = {};
         this._tooltipsDisposables = null;
+        // public get state(): any {
+        //     if (!this.viewRef.current) {
+        //         return {
+        //         };
+        //     }
+        //     // @ts-ignore
+        //     return this.viewRef.current.state;
+        // }
+        // public set state(state: any) {
+        //     if (!this.viewRef.current) {
+        //         return;
+        //     }
+        //     // @ts-ignore
+        //     this.viewRef.current.state = {
+        //         // @ts-ignore
+        //         ...this.viewRef.current.state,
+        //         ...state
+        //     };
+        //     // @ts-ignore
+        //     this.viewRef.current.setState(
+        //         // @ts-ignore
+        //         this.viewRef.current.state
+        //     );
+        // }
+        this._state = {
+            memory: utils_1.getWatches()
+        };
+        this.onChangeView = (view) => {
+            this.state = { view };
+            switch (this.state.view) {
+                case ui_1.MEMORY_MAIN_VIEW: {
+                    this.initMemoryPipeSubscription();
+                    break;
+                }
+                case ui_1.MEMORY_SEGMENTS_VIEW: {
+                    this.onSegment(this.state.segment, this.state.shard);
+                    break;
+                }
+            }
+        };
         // Private component actions.
         this.onInput = (path) => {
             const memory = [...this.state.memory, { path }];
@@ -32,11 +71,12 @@ class MemoryPanel {
         this.onClose = () => {
             this.destroy();
         };
-        this.onShard = async () => {
-            this.initMemoryPipeSubscription();
+        this.onShard = async (shard) => {
+            this.state = { shard };
+            this.onChangeView(this.state.view);
         };
         this.element = document.createElement('div');
-        this.render(state);
+        this.state = state;
         setTimeout(() => {
             const pane = atom.workspace.paneForItem(this);
             if (!pane) {
@@ -88,17 +128,11 @@ class MemoryPanel {
         })();
     }
     get state() {
-        if (!this.viewRef.current) {
-            return {};
-        }
-        return this.viewRef.current.state;
+        return this._state;
     }
     set state(state) {
-        if (!this.viewRef.current) {
-            return;
-        }
-        this.viewRef.current.state = Object.assign({}, this.viewRef.current.state, state);
-        this.viewRef.current.setState(this.viewRef.current.state);
+        this._state = Object.assign({}, this._state, state);
+        this.render(this.state);
     }
     initMemoryPipeSubscription() {
         if (this._pipe$) {
@@ -135,8 +169,8 @@ class MemoryPanel {
             });
         });
     }
-    render({ shard = 'shard0', memory = utils_1.getWatches(), segment = '0' }) {
-        ReactDOM.render(React.createElement(ui_1.MemoryView, { ref: this.viewRef, onInput: this.onInput, onClose: this.onClose, shard: shard, onShard: () => this.onShard(), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) }), this.element);
+    render({ view = '', shard = 'shard0', shards = [], memory = [], segment = '0', segmentData = '', isProgressing = false }) {
+        ReactDOM.render(React.createElement(ui_1.MemoryView, { view: view, onChangeView: (view) => this.onChangeView(view), isProgressing: isProgressing, onInput: this.onInput, onClose: this.onClose, shard: shard, shards: shards, onShard: (shard) => this.onShard(shard), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, segmentData: segmentData, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) }), this.element);
     }
     async onMemory(path, shard) {
         let response;
@@ -161,27 +195,16 @@ class MemoryPanel {
             if (this._tooltips[path]) {
                 this.onMemoryCancel(path);
             }
+            let d;
             const subscriptions = this._tooltips[path] = new atom_1.CompositeDisposable();
-            let ref = document.getElementById(`${ui_1.PATH_BTN_DELETE}${path || 'root'}`);
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Delete from memory' });
-                subscriptions.add(disposable);
-            }
-            ref = document.getElementById(`${ui_1.PATH_BTN_UPDATE}${path || 'root'}`);
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Save' });
-                subscriptions.add(disposable);
-            }
-            ref = document.getElementById(`${ui_1.PATH_BTN_RELOAD}${path || 'root'}`);
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Reload' });
-                subscriptions.add(disposable);
-            }
-            ref = document.getElementById(`${ui_1.PATH_BTN_CANCEL}${path || 'root'}`);
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Cancel changes' });
-                subscriptions.add(disposable);
-            }
+            d = utils_2.applyTooltip(`#${ui_1.PATH_BTN_DELETE}${path || 'root'}`, 'Delete from memory');
+            d && subscriptions.add(d);
+            d = utils_2.applyTooltip(`#${ui_1.PATH_BTN_UPDATE}${path || 'root'}`, 'Save');
+            d && subscriptions.add(d);
+            d = utils_2.applyTooltip(`#${ui_1.PATH_BTN_RELOAD}${path || 'root'}`, 'Reload');
+            d && subscriptions.add(d);
+            d = utils_2.applyTooltip(`#${ui_1.PATH_BTN_CANCEL}${path || 'root'}`, 'Cancel changes');
+            d && subscriptions.add(d);
         });
     }
     async onMemoryUpdate(path, value, shard) {
@@ -223,6 +246,9 @@ class MemoryPanel {
         delete this._tooltips[path];
     }
     async onSegment(segment, shard) {
+        this.state = {
+            segment
+        };
         let response;
         try {
             response = await this._api.getUserMemorySegment({ segment, shard });
@@ -231,9 +257,7 @@ class MemoryPanel {
             return;
         }
         this.state = {
-            segmentData: response.data,
-            _segmentData: response.data,
-            segmentHasChange: false
+            segmentData: response.data
         };
     }
     async onSegmentUpdate(segment, data, shard) {
@@ -244,9 +268,7 @@ class MemoryPanel {
             return;
         }
         this.state = {
-            segmentData: data,
-            _segmentData: data,
-            segmentHasChange: false
+            segmentData: data
         };
     }
     _applyTooltips() {
@@ -254,22 +276,14 @@ class MemoryPanel {
             if (this._tooltipsDisposables) {
                 this._tooltipsDisposables.dispose();
             }
-            this._tooltipsDisposables = new atom_1.CompositeDisposable();
-            const showMainMemoryBtnRef = document.getElementById('screeps-memory__control-main');
-            if (showMainMemoryBtnRef) {
-                const disposable = atom.tooltips.add(showMainMemoryBtnRef, { title: 'Main memory' });
-                this._tooltipsDisposables.add(disposable);
-            }
-            const showSegmentsMemoryBtnRef = document.getElementById('screeps-memory__control-segments');
-            if (showSegmentsMemoryBtnRef) {
-                const disposable = atom.tooltips.add(showSegmentsMemoryBtnRef, { title: 'Segments memory' });
-                this._tooltipsDisposables.add(disposable);
-            }
-            const closeMemoryBtnRef = document.getElementById('screeps-memory__control-close');
-            if (closeMemoryBtnRef) {
-                const disposable = atom.tooltips.add(closeMemoryBtnRef, { title: 'Close panel' });
-                this._tooltipsDisposables.add(disposable);
-            }
+            let d;
+            const subscriptions = this._tooltipsDisposables = new atom_1.CompositeDisposable();
+            d = utils_2.applyTooltip('#screeps-memory__control-main', 'Main memory');
+            d && subscriptions.add(d);
+            d = utils_2.applyTooltip('#screeps-memory__control-segments', 'Segments memory');
+            d && subscriptions.add(d);
+            d = utils_2.applyTooltip('#screeps-memory__control-close', 'Close panel');
+            d && subscriptions.add(d);
         });
     }
     destroy() {
@@ -299,9 +313,6 @@ class MemoryPanel {
     getTitle() {
         return 'Memory';
     }
-    // isPermanentDockItem() {
-    //     return true;
-    // }
     getAllowedLocations() {
         return ['bottom', 'top'];
     }

@@ -1,24 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+const react_1 = require("react");
 const message_item_1 = require("./message-item");
-class ConsoleMessagesListView extends React.Component {
-    constructor(props) {
-        super(props);
-        this.messagesBottomRef = null;
-        this.state = {};
-    }
-    render() {
-        return (React.createElement("div", { className: 'screeps-console__messages' },
-            this.props.messages.map((message, index) => {
-                return (React.createElement(message_item_1.default, { key: index, message: message }));
-            }),
-            React.createElement("div", { ref: (el) => this.messagesBottomRef = el })));
-    }
-    componentDidUpdate() {
-        //@ts-ignore
-        this.messagesBottomRef.scrollIntoView({ behavior: "smooth" });
-    }
+function default_1({ messages }) {
+    const messagesBottomRef = react_1.useRef(null);
+    react_1.useEffect(() => {
+        if (!messagesBottomRef.current) {
+            return;
+        }
+        // @ts-ignore
+        messagesBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+    return (React.createElement("div", { className: 'screeps-console__messages' },
+        messages.map((message, index) => {
+            return (React.createElement(message_item_1.default, { key: index, message: message }));
+        }),
+        React.createElement("div", { ref: messagesBottomRef })));
 }
-exports.default = ConsoleMessagesListView;
+exports.default = default_1;
 //# sourceMappingURL=messages-list.js.map

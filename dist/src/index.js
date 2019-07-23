@@ -64,8 +64,6 @@ function activate(state) {
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.commit.name}`]: commands_1.commit,
         [`${config_1.PACKAGE_NAME}:${commands_1.commitAll.name}`]: commands_1.commitAll,
-        [`${config_1.PACKAGE_NAME}:${commands_1.revert.name}`]: commands_1.revert,
-        [`${config_1.PACKAGE_NAME}:${commands_1.revertAll.name}`]: commands_1.revertAll,
         [`${config_1.PACKAGE_NAME}:${commands_1.changeProjectBranch.name}`]: commands_1.changeProjectBranch
     }));
     if (config_1.configGetter('showOnStartup')) {

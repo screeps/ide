@@ -13,8 +13,10 @@ exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.CONSOLE_URI = 'atom://screeps-ide/console';
 class ConsolePanel {
     constructor(state = {}) {
-        this.viewRef = React.createRef();
         this._tooltipsDisposables = null;
+        this._state = {
+            messages: []
+        };
         this.element = document.createElement('div');
         this.render(state);
         setTimeout(() => {
@@ -30,7 +32,7 @@ class ConsolePanel {
                 this._user = await utils_1.getUser();
                 this._socket = utils_1.getSocket();
                 this._service = new service_1.Service();
-                // this.state = { shard: this._user.shard };
+                this.state = { shard: this._user.shard };
                 this._service.shards$
                     .pipe(operators_1.tap((shards) => this.state = { shards }))
                     .subscribe();
@@ -49,20 +51,16 @@ class ConsolePanel {
         })();
     }
     get state() {
-        if (!this.viewRef.current) {
-            return {};
-        }
-        return this.viewRef.current.state;
+        return this._state;
     }
     set state(state) {
-        if (!this.viewRef.current) {
-            return;
-        }
-        this.viewRef.current.state = Object.assign({}, this.viewRef.current.state, state);
-        this.viewRef.current.setState(this.viewRef.current.state);
+        this._state = Object.assign({}, this._state, state);
+        this.render(this.state);
     }
-    render({ shard }) {
-        ReactDOM.render(React.createElement(ui_1.ConsoleView, { ref: this.viewRef, shard: shard, onShard: () => this.onShard(), onInput: (expression) => this.onInput(expression), onClose: () => this.onClose(), onPause: () => this.onPause(), onResume: () => this.onResume() }), this.element);
+    render({ shard, shards, messages = [] }) {
+        ReactDOM.render(
+        // @ts-ignore
+        React.createElement(ui_1.ConsoleView, { ref: this.viewRef, shard: shard, shards: shards, messages: messages, onShard: (shard) => this.onShard(shard), onInput: (expression) => this.onInput(expression), onClose: () => this.onClose(), onPause: () => this.onPause(), onResume: () => this.onResume(), onClean: () => this.onClean() }), this.element);
     }
     // Private component actions.
     async onInput(expression) {
@@ -78,7 +76,8 @@ class ConsolePanel {
             // Noop.
         }
     }
-    async onShard() {
+    async onShard(shard) {
+        this.state = { shard };
     }
     async onClose() {
         this.destroy();
@@ -149,32 +148,26 @@ class ConsolePanel {
         });
         this._applyTooltips();
     }
+    async onClean() {
+        this.state = {
+            messages: []
+        };
+    }
     _applyTooltips() {
         setTimeout(() => {
             if (this._tooltipsDisposables) {
                 this._tooltipsDisposables.dispose();
             }
-            this._tooltipsDisposables = new atom_1.CompositeDisposable();
-            const clearConsoleBtnRef = document.getElementById('screeps-console__delete');
-            if (clearConsoleBtnRef) {
-                const disposable = atom.tooltips.add(clearConsoleBtnRef, { title: 'Clear' });
-                this._tooltipsDisposables.add(disposable);
-            }
-            const closeConsoleBtnRef = document.getElementById('screeps-console__close');
-            if (closeConsoleBtnRef) {
-                const disposable = atom.tooltips.add(closeConsoleBtnRef, { title: 'Close panel' });
-                this._tooltipsDisposables.add(disposable);
-            }
-            const pauseConsoleBtnRef = document.getElementById('screeps-console__pause');
-            if (pauseConsoleBtnRef) {
-                const disposable = atom.tooltips.add(pauseConsoleBtnRef, { title: 'Pause tracking' });
-                this._tooltipsDisposables.add(disposable);
-            }
-            const playConsoleBtnRef = document.getElementById('screeps-console__play');
-            if (playConsoleBtnRef) {
-                const disposable = atom.tooltips.add(playConsoleBtnRef, { title: 'Resume tracking' });
-                this._tooltipsDisposables.add(disposable);
-            }
+            let d;
+            const subscriptions = this._tooltipsDisposables = new atom_1.CompositeDisposable();
+            d = utils_1.applyTooltip('#screeps-console__delete', 'Clear');
+            d && subscriptions.add(d);
+            d = utils_1.applyTooltip('#screeps-console__close', 'Close panel');
+            d && subscriptions.add(d);
+            d = utils_1.applyTooltip('#screeps-console__pause', 'Pause tracking');
+            d && subscriptions.add(d);
+            d = utils_1.applyTooltip('#screeps-console__play', 'Resume tracking');
+            d && subscriptions.add(d);
         });
     }
     destroy() {

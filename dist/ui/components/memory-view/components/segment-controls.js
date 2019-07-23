@@ -5,38 +5,25 @@ const segments = [];
 for (let i = 0; i < 100; i++) {
     segments.push(i);
 }
-class MemorySegmentControlsView extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onSegment = (event) => {
-            this.setState(Object.assign({}, this.state, { segment: event.target.value }));
-            this.props.onSegment && this.props.onSegment(event.target.value);
-        };
-        this.onRefresh = () => {
-            this.props.onSegment && this.props.onSegment(this.state.segment);
-        };
-        this.onUpdate = (event) => {
-            this.props.onUpdate && this.props.onUpdate(event.target.value);
-        };
-        this.state = {
-            segment: props.segment,
-            hasChange: props.hasChange
-        };
+function default_1(props) {
+    return (React.createElement("div", { className: 'screeps-memory__segment-controls' },
+        "Segment #:",
+        React.createElement("select", { className: 'input-select', onChange: onSegment, value: props.segment }, segments.map((name) => {
+            return (React.createElement("option", { key: name, value: name }, name));
+        })),
+        React.createElement("button", { type: 'button', className: 'btn', onClick: onRefresh },
+            React.createElement("i", { className: 'sc-icon-cached' })),
+        React.createElement("button", { type: 'button', className: 'btn', onClick: onUpdate, disabled: !props.hasChange },
+            React.createElement("i", { className: 'sc-icon-done' }))));
+    function onSegment(event) {
+        props.onSegment && props.onSegment(event.target.value);
     }
-    componentWillReceiveProps(nextProps) {
-        this.setState(Object.assign({}, this.state, { segment: nextProps.segment, hasChange: nextProps.hasChange }));
+    function onRefresh() {
+        props.onSegment && props.onSegment(props.segment);
     }
-    render() {
-        return (React.createElement("div", { className: 'screeps-memory__segment-controls' },
-            "Segment #:",
-            React.createElement("select", { className: 'btn', onChange: this.onSegment, value: this.state.segment }, segments.map((name) => {
-                return (React.createElement("option", { key: name, value: name }, name));
-            })),
-            React.createElement("button", { type: 'button', className: 'btn', onClick: this.onRefresh },
-                React.createElement("i", { className: 'sc-icon-cached' })),
-            React.createElement("button", { type: 'button', className: 'btn', onClick: this.onUpdate, disabled: !this.state.hasChange },
-                React.createElement("i", { className: 'sc-icon-done' }))));
+    function onUpdate(event) {
+        props.onUpdate && props.onUpdate(event.target.value);
     }
 }
-exports.default = MemorySegmentControlsView;
+exports.default = default_1;
 //# sourceMappingURL=segment-controls.js.map
