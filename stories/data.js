@@ -27,8 +27,5 @@ export const memory = [
     { path: "creeps", value: "undefined" },
     { path: "rooms", value: "undefined" },
     { path: "shard", value: "shard0" },
-    { path: "busyCreeps", value: "undefined" },
     { path: "tasks", value: "" },
-    { path: "blanks", value: "undefined" },
-    { path: "test", value: "undefined" }
 ];

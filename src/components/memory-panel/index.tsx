@@ -13,7 +13,9 @@ import {
     PATH_BTN_DELETE,
     PATH_BTN_UPDATE,
     PATH_BTN_RELOAD,
-    PATH_BTN_CANCEL
+    PATH_BTN_CANCEL,
+    MEMORY_MAIN_VIEW,
+    MEMORY_SEGMENTS_VIEW
 } from '../../../ui';
 import { Service } from '../../service';
 import { Api } from '../../api';
@@ -21,14 +23,13 @@ import { Socket } from '../../socket';
 import { getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
 import { progress } from '../../decoratos';
-import { getApi, getSocket, getUser } from '../../utils';
+import { getApi, getSocket, getUser, applyTooltip } from '../../utils';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const MEMORY_URI = 'atom://screeps-ide/memory';
 
 export class MemoryPanel {
     public element: HTMLElement;
-    public viewRef = React.createRef<MemoryView>();
 
     private _memorySbj: Subject<IMemoryPath[]> = new Subject<IMemoryPath[]>();
     public memory$: Observable<IMemoryPath[]> = this._memorySbj.asObservable();
@@ -39,28 +40,50 @@ export class MemoryPanel {
     // @ts-ignore
     _pipe$: Subject<void> | null;
 
-    public get state(): any {
-        if (!this.viewRef.current) {
-            return {
-            };
-        }
+    // public get state(): any {
+    //     if (!this.viewRef.current) {
+    //         return {
+    //         };
+    //     }
 
-        return this.viewRef.current.state;
+    //     // @ts-ignore
+    //     return this.viewRef.current.state;
+    // }
+
+    // public set state(state: any) {
+    //     if (!this.viewRef.current) {
+    //         return;
+    //     }
+
+    //     // @ts-ignore
+    //     this.viewRef.current.state = {
+    //         // @ts-ignore
+    //         ...this.viewRef.current.state,
+    //         ...state
+    //     };
+
+    //     // @ts-ignore
+    //     this.viewRef.current.setState(
+    //         // @ts-ignore
+    //         this.viewRef.current.state
+    //     );
+    // }
+
+    private _state = {
+        memory: getWatches()
+    };
+
+    public get state(): any {
+        return this._state;
     }
 
     public set state(state: any) {
-        if (!this.viewRef.current) {
-            return;
-        }
-
-        this.viewRef.current.state = {
-            ...this.viewRef.current.state,
+        this._state = {
+            ...this._state,
             ...state
         };
 
-        this.viewRef.current.setState(
-            this.viewRef.current.state
-        );
+        this.render(this.state);
     }
 
     // @ts-ignore
@@ -73,10 +96,10 @@ export class MemoryPanel {
     private _service: Service;
 
     constructor(
-        state: IMemoryViewState = {} as IMemoryViewState
+        state: any = {}
     ) {
         this.element = document.createElement('div');
-        this.render(state);
+        this.state = state;
 
         setTimeout(() => {
             const pane = atom.workspace.paneForItem(this);
@@ -185,17 +208,26 @@ export class MemoryPanel {
     }
 
     render({
+        view = '',
         shard = 'shard0',
-        memory = getWatches(),
-        segment = '0'
+        shards = [],
+        memory = [],
+        segment = '0',
+        segmentData = '',
+        isProgressing = false
     }) {
         ReactDOM.render(
-            <MemoryView ref={ this.viewRef }
+            <MemoryView
+                view={ view }
+                onChangeView={ (view) => this.onChangeView(view) }
+                isProgressing={ isProgressing }
+
                 onInput={ this.onInput }
                 onClose={ this.onClose }
 
                 shard={ shard }
-                onShard={ () => this.onShard() }
+                shards={ shards }
+                onShard={ (shard) => this.onShard(shard) }
 
                 memory={ memory }
                 onMemory={ (...args) => this.onMemory(...args) }
@@ -206,12 +238,30 @@ export class MemoryPanel {
                 onMemoryCancel={ (...args) => this.onMemoryCancel(...args) }
 
                 segment={ segment }
+                segmentData={ segmentData }
                 onSegment={ (...args) => this.onSegment(...args) }
                 onSegmentRefresh={ (...args) => this.onSegment(...args) }
                 onSegmentUpdate={ (...args) => this.onSegmentUpdate(...args) }
             />,
             this.element as HTMLElement
         )
+    }
+
+    onChangeView = (view: string) => {
+        this.state = { view }
+
+        switch(this.state.view) {
+            case MEMORY_MAIN_VIEW: {
+                this.initMemoryPipeSubscription();
+
+                break;
+            }
+            case MEMORY_SEGMENTS_VIEW: {
+                this.onSegment(this.state.segment, this.state.shard);
+
+                break;
+            }
+        }
     }
 
     // Private component actions.
@@ -227,8 +277,10 @@ export class MemoryPanel {
         this.destroy();
     }
 
-    onShard = async (): Promise<void> => {
-        this.initMemoryPipeSubscription();
+    onShard = async (shard: string): Promise<void> => {
+        this.state = { shard };
+
+        this.onChangeView(this.state.view);
     }
 
     @progress
@@ -260,35 +312,17 @@ export class MemoryPanel {
                 this.onMemoryCancel(path);
             }
 
+            let d;
             const subscriptions = this._tooltips[path] = new CompositeDisposable();
 
-            let ref = document.getElementById(`${ PATH_BTN_DELETE }${ path || 'root' }`);
-
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Delete from memory' });
-                subscriptions.add(disposable);
-            }
-
-            ref = document.getElementById(`${ PATH_BTN_UPDATE }${ path || 'root' }`);
-
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Save' });
-                subscriptions.add(disposable);
-            }
-
-            ref = document.getElementById(`${ PATH_BTN_RELOAD }${ path || 'root' }`);
-
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Reload' });
-                subscriptions.add(disposable);
-            }
-
-            ref = document.getElementById(`${ PATH_BTN_CANCEL }${ path || 'root' }`);
-
-            if (ref) {
-                const disposable = atom.tooltips.add(ref, { title: 'Cancel changes' });
-                subscriptions.add(disposable);
-            }
+            d = applyTooltip(`#${ PATH_BTN_DELETE }${ path || 'root' }`, 'Delete from memory');
+            d && subscriptions.add(d);
+            d = applyTooltip(`#${ PATH_BTN_UPDATE }${ path || 'root' }`, 'Save');
+            d && subscriptions.add(d);
+            d = applyTooltip(`#${ PATH_BTN_RELOAD }${ path || 'root' }`, 'Reload');
+            d && subscriptions.add(d);
+            d = applyTooltip(`#${ PATH_BTN_CANCEL }${ path || 'root' }`, 'Cancel changes');
+            d && subscriptions.add(d);
         });
     }
 
@@ -343,6 +377,10 @@ export class MemoryPanel {
 
     @progress
     async onSegment(segment: string, shard: string): Promise<void> {
+        this.state = {
+            segment
+        };
+
         let response: IUserMemorySegmentResponse;
         try {
             response = await this._api.getUserMemorySegment({ segment, shard });
@@ -351,9 +389,7 @@ export class MemoryPanel {
         }
 
         this.state = {
-            segmentData: response.data,
-            _segmentData: response.data,
-            segmentHasChange: false
+            segmentData: response.data
         };
     }
 
@@ -366,9 +402,7 @@ export class MemoryPanel {
         }
 
         this.state = {
-            segmentData: data,
-            _segmentData: data,
-            segmentHasChange: false
+            segmentData: data
         };
     }
 
@@ -378,25 +412,15 @@ export class MemoryPanel {
                 this._tooltipsDisposables.dispose();
             }
 
-            this._tooltipsDisposables = new CompositeDisposable();
+            let d;
+            const subscriptions = this._tooltipsDisposables = new CompositeDisposable();
 
-            const showMainMemoryBtnRef = document.getElementById('screeps-memory__control-main');
-            if (showMainMemoryBtnRef) {
-                const disposable = atom.tooltips.add(showMainMemoryBtnRef, { title: 'Main memory' });
-                this._tooltipsDisposables.add(disposable);
-            }
-
-            const showSegmentsMemoryBtnRef = document.getElementById('screeps-memory__control-segments');
-            if (showSegmentsMemoryBtnRef) {
-                const disposable = atom.tooltips.add(showSegmentsMemoryBtnRef, { title: 'Segments memory' });
-                this._tooltipsDisposables.add(disposable);
-            }
-
-            const closeMemoryBtnRef = document.getElementById('screeps-memory__control-close');
-            if (closeMemoryBtnRef) {
-                const disposable = atom.tooltips.add(closeMemoryBtnRef, { title: 'Close panel' });
-                this._tooltipsDisposables.add(disposable);
-            }
+            d = applyTooltip('#screeps-memory__control-main', 'Main memory');
+            d && subscriptions.add(d);
+            d = applyTooltip('#screeps-memory__control-segments', 'Segments memory');
+            d && subscriptions.add(d);
+            d = applyTooltip('#screeps-memory__control-close', 'Close panel');
+            d && subscriptions.add(d);
         });
     }
 
@@ -432,10 +456,6 @@ export class MemoryPanel {
     getTitle() {
         return 'Memory';
     }
-
-    // isPermanentDockItem() {
-    //     return true;
-    // }
 
     getAllowedLocations() {
         return ['bottom', 'top'];

@@ -15,81 +15,55 @@ interface IMemoryMainViewProps {
     onCancel?: Function;
 }
 
-interface IMemoryMainViewState {
-    memory: IMemoryPath[];
-}
+export default function(props: IMemoryMainViewProps) {
+    return (
+        <div className='screeps-memory__main'>
+            <div className='screeps-memory__main-items'>
+                { props.memory.map(({ path, value }) => {
+                    return (<MemoryItemView key={ path }
+                        path={ path }
+                        value={ value }
+                        isEdit={ false }
 
-export default class MemoryMainView extends React.Component<IMemoryMainViewProps> {
-    //@ts-ignore
-    props: IMemoryMainViewProps;
-
-    state: IMemoryMainViewState;
-
-    constructor(props: IMemoryMainViewProps) {
-        super(props);
-
-        this.state = {
-            memory: props.memory
-        }
-    }
-
-    componentWillReceiveProps(nextProps: IMemoryMainViewProps) {
-        if (nextProps.memory) {
-            this.setState({
-                memory: nextProps.memory
-            });
-        }
-    }
-
-    public render() {
-        return (
-            <div className='screeps-memory__main'>
-                <div className='screeps-memory__main-items'>
-                    { this.state.memory.map(({ path, value }) => {
-                        return (<MemoryItemView key={ path }
-                            path={ path }
-                            value={ value }
-
-                            onClick={ () => this.onClick(path) }
-                            onReload={ () => this.onReload(path) }
-                            onDelete={ () => this.onDelete(path) }
-                            onSave={ (value: any) => this.onSave(path, value) }
-                            onRemovePath={ () => this.onRemovePath(path) }
-                            onCancel={() => this.onCancel(path)}
-                        />)
-                    })}
-                </div>
-                <hr className='screeps-hr' />
-                <MemoryInputView onInput={ this.onInput } />
+                        onClick={ () => onClick(path) }
+                        onReload={ () => onReload(path) }
+                        onDelete={ () => onDelete(path) }
+                        onSave={ (value: any) => onSave(path, value) }
+                        onRemovePath={ () => onRemovePath(path) }
+                        onCancel={() => onCancel(path)}
+                    />)
+                })}
             </div>
-        );
+            <hr className='screeps-hr' />
+            <MemoryInputView onInput={ onInput } />
+        </div>
+    );
+
+    async function onClick(path: string): Promise<void> {
+        props.onClick && await props.onClick(path);
     }
 
-    onClick = async (path: string): Promise<void> => {
-        this.props.onClick && await this.props.onClick(path);
+    function onReload(path: string) {
+        props.onReload && props.onReload(path);
     }
 
-    onReload = (path: string) => {
-        this.props.onReload && this.props.onReload(path);
+    function onSave(path: string, value: any) {
+        props.onSave && props.onSave(path, value);
     }
 
-    onSave = (path: string, value: any) => {
-        this.props.onSave && this.props.onSave(path, value);
+    function onDelete(path: string) {
+        props.onDelete && props.onDelete(path);
     }
 
-    onDelete = (path: string) => {
-        this.props.onDelete && this.props.onDelete(path);
+    function onRemovePath(path: string) {
+        props.onRemovePath && props.onRemovePath(path);
     }
 
-    onRemovePath = (path: string) => {
-        this.props.onRemovePath && this.props.onRemovePath(path);
+    function onInput(path: string) {
+        props.onInput && props.onInput(path);
     }
 
-    onInput = (path: string) => {
-        this.props.onInput && this.props.onInput(path);
-    }
-
-    onCancel = (path: string) => {
-        this.props.onCancel && this.props.onCancel(path);
+    function onCancel(path: string) {
+        props.onCancel && props.onCancel(path);
     }
 }

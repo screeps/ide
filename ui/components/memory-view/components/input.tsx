@@ -1,48 +1,47 @@
 import * as React from 'react';
+import { useState } from 'react';
 
 interface IMemoryInputViewProps {
-    onInput?: Function;
+    onInput?(name: string): void;
 }
 
-class MemoryInputView extends React.Component<IMemoryInputViewProps> {
-    constructor(props: IMemoryInputViewProps) {
-        super(props);
+export default function({
+    onInput
+}: IMemoryInputViewProps) {
+    const [value, setValue] = useState('');
+
+    return (
+        <div className='screeps-memory__input'>
+            <form onSubmit={ onSubmit }>
+                <fieldset className='screeps-field'>
+                    <input
+                        className='native-key-bindings'
+
+                        type='text'
+                        placeholder='Add new memory watch path here, e.g. "creeps.Jhon"'
+
+                        autoComplete=''
+
+                        onChange={ onChange }
+
+                        value={ value }/>
+                    <div className='underline' />
+                </fieldset>
+            </form>
+        </div>
+    );
+
+    function onChange(event: React.ChangeEvent) {
+        const target = event.target as HTMLInputElement;
+        const value = target.value;
+
+        setValue(value);
     }
 
-    onKeyPressHandler = (event: any) => {
-        if (event.key !== 'Enter') {
-            return;
-        }
+    function onSubmit(event: React.FormEvent) {
+        onInput && onInput(value);
+        setValue('');
 
-        if (!event.target.value) {
-            return;
-        }
-
-        this.props.onInput && this.props.onInput(event.target.value);
-
-        event.target.value = '';
-    }
-
-    onSubmit = (event: any) => {
         event.preventDefault();
     }
-
-    public render() {
-        return (
-            <div className='screeps-memory__input'>
-                <form onSubmit={ this.onSubmit }>
-                    <fieldset className='screeps-field'>
-                        <input className='native-key-bindings' type='text' placeholder='Add new memory watch path here, e.g. "creeps.Jhon"'
-
-                            autoComplete=''
-
-                            onKeyPress={ this.onKeyPressHandler }/>
-                        <div className='underline' />
-                    </fieldset>
-                </form>
-            </div>
-        );
-    }
 }
-
-export default MemoryInputView;

@@ -6,7 +6,7 @@ export function progress(target: any, name: any, descriptor: any) {
     const original = descriptor.value;
 
     descriptor.value = async function(...args: any[]) {
-        showProgress(this.viewRef);
+        showProgress(this);
 
         let result;
         try {
@@ -15,7 +15,7 @@ export function progress(target: any, name: any, descriptor: any) {
             // Noop.
         }
 
-        hideProgress(this.viewRef);
+        hideProgress(this);
         return result;
     };
 
@@ -23,31 +23,17 @@ export function progress(target: any, name: any, descriptor: any) {
 }
 
 
-function showProgress(viewRef: any) {
+function showProgress(component: any) {
     animationStartTime = new Date() .getTime();
 
-    if (!viewRef.current) {
-        return;
-    }
-
-    viewRef.current.state.isProgressing = true;
-    viewRef.current.setState({
-        ...viewRef.current.state
-    });
+    component.state = { isProgressing: true };
 }
 
-function hideProgress(viewRef: any) {
+function hideProgress(component: any) {
     const now = new Date() .getTime();
     const delay = ANIMATION_MIN_TIME - (now - animationStartTime);
 
     setTimeout(() => {
-        if (!viewRef.current) {
-            return;
-        }
-
-        viewRef.current.state.isProgressing = false;
-        viewRef.current.setState({
-            ...viewRef.current.state
-        });
+        component.state = { isProgressing: false };
     }, delay > 0 ? delay : 0);
 }

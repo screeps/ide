@@ -1,6 +1,7 @@
 /// <reference path='./index.d.ts' />
 
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 import {
     MEMORY_MAIN_VIEW,
@@ -11,156 +12,113 @@ import { default as MemoryMainView } from './components/main';
 import { default as MemorySegmentView } from './components/segment';
 import { default as MemorySegmentControlsView } from './components/segment-controls';
 
-export default class MemoryView extends React.Component<IMemoryViewProps> {
-    //@ts-ignore
-    props: IMemoryViewProps;
+export default function(props: IMemoryViewProps) {
+    let memoryView, memoryControls;
 
-    state: IMemoryViewState;
+    const [segmentData, setSegmentData] = useState<string>(props.segmentData || '');
+    const [segmentHasChange, setSegmentHasChange] = useState<boolean>(false);
 
-    constructor(props: IMemoryViewProps) {
-        super(props);
+    useEffect(() => {
+        onSegmentChange(props.segmentData);
+    }, [props.segmentData]);
 
-        this.state = {
-            isProgressing: false,
-            shard: props.shard,
-            shards: props.shards || [],
-            view: MEMORY_MAIN_VIEW,
-            segment: props.segment,
-            segmentData: '',
-            _segmentData: '',
-            segmentHasChange: false,
-            memory: props.memory || []
-        };
+    if (props.view === MEMORY_MAIN_VIEW) {
+        memoryView = (<MemoryMainView
+            memory={ props.memory || [] }
+
+            onInput={ onInput }
+
+            onClick={ onMemory }
+            onSave={ onMemoryUpdate }
+            onReload={ onMemoryRefresh }
+            onDelete={ onMemoryDelete }
+            onRemovePath={ onMemoryRemove }
+            onCancel={ onMemoryCancel }
+        />);
     }
 
-    public render() {
-        let view, segmentControls;
+    if (props.view === MEMORY_SEGMENTS_VIEW) {
+        memoryView = (<MemorySegmentView 
+            segment={ segmentData }
 
-        if (this.state.view === MEMORY_MAIN_VIEW) {
-            view = (<MemoryMainView
-                memory={ this.state.memory }
+            onChange={ onSegmentChange }
+        />);
+        memoryControls = (<MemorySegmentControlsView
+            segment={ props.segment }
+            hasChange={ segmentHasChange }
 
-                onInput={ this.onInput }
-
-                onClick={ this.onMemory }
-                onSave={ this.onMemoryUpdate }
-                onReload={ this.onMemoryRefresh }
-                onDelete={ this.onMemoryDelete }
-                onRemovePath={ this.onMemoryRemove }
-                onCancel={ this.onMemoryCancel }
-
-            />);
-        }
-
-        if (this.state.view === MEMORY_SEGMENTS_VIEW) {
-            view = (<MemorySegmentView 
-                segment={ this.state.segmentData }
-
-                onChange={ this.onSegmentChange }
-            />);
-            segmentControls = (<MemorySegmentControlsView
-                segment={ this.state.segment }
-                hasChange={ this.state.segmentHasChange }
-
-                onSegment={ this.onSegment }
-                onRefresh={ this.onSegmentRefresh }
-                onUpdate={ this.onSegmentUpdate }
-            />);
-        }
-
-        return (
-            <div className='screeps-ide screeps-memory screeps-memory__view'>
-                <MemoryControlsView
-                    shard={ this.state.shard }
-                    shards={ this.state.shards }
-
-                    onShard={ this.onShard }
-                    onClose={ this.onClose }
-                    onToggleView={ this.onToggleView }
-                >
-                    { segmentControls }
-                </MemoryControlsView>
-                <hr className={ 'screeps-hr' + (this.state.isProgressing ? ' screeps-hr--inprogress' : '') } />
-                { view }
-            </div>
-        );
+            onSegment={ onSegment }
+            onUpdate={ onSegmentUpdate }
+        />);
     }
 
-    onInput = (path: string) => {
-        this.props.onInput && this.props.onInput(path);
+    return (
+        <div className='screeps-ide screeps-memory screeps-memory__view'>
+            <MemoryControlsView
+                shard={ props.shard }
+                shards={ props.shards || [] }
+
+                onShard={ onShard }
+                onClose={ onClose }
+                onToggleView={ onToggleView }
+            >
+                { memoryControls }
+            </MemoryControlsView>
+            <hr className={ 'screeps-hr' + (props.isProgressing ? ' screeps-hr--inprogress' : '') } />
+            { memoryView }
+        </div>
+    );
+
+    function onInput(path: string) {
+        props.onInput && props.onInput(path);
     }
 
-    onShard = (shard: string) => {
-        this.state.shard = shard;
-        this.setState({ ...this.state, shard });
-
-        this.props.onShard && this.props.onShard(shard);
-
-        if (this.state.view === MEMORY_SEGMENTS_VIEW) {
-            this.onSegment(this.state.segment);
-        }
+    function onShard(shard: string) {
+        props.onShard && props.onShard(shard);
     }
 
-    onClose = () => {
-        this.props.onClose && this.props.onClose();
+    function onClose() {
+        props.onClose && props.onClose();
     }
 
-    onToggleView = (view: string) => {
-        this.state.view = view;
-        this.setState({ ...this.state, view });
-
-        if (view === MEMORY_SEGMENTS_VIEW) {
-            this.onSegment(this.state.segment);
-        }
+    function onToggleView(view: string) {
+        props.onChangeView && props.onChangeView(view);
     }
 
-    onMemory = async (path: string): Promise<void> => {
-        this.props.onMemory && await this.props.onMemory(path, this.state.shard);
+    async function onMemory (path: string): Promise<void> {
+        props.onMemory && await props.onMemory(path, props.shard);
     }
 
-    onMemoryUpdate = (path: string, value: string) => {
-        this.props.onMemoryUpdate && this.props.onMemoryUpdate(path, value, this.state.shard);
+    function onMemoryUpdate(path: string, value: string) {
+        props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
     }
 
-    onMemoryRefresh = (path: string) => {
-        this.props.onMemoryRefresh && this.props.onMemoryRefresh(path, this.state.shard);
+    function onMemoryRefresh(path: string) {
+        props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
     }
 
-    onMemoryRemove = (path: string) => {
-        this.props.onMemoryRemove && this.props.onMemoryRemove(path, this.state.shard);
+    function onMemoryRemove(path: string) {
+        props.onMemoryRemove && props.onMemoryRemove(path, props.shard);
     }
 
-    onMemoryDelete = (path: string) => {
-        this.props.onMemoryDelete && this.props.onMemoryDelete(path);
+    function onMemoryDelete(path: string) {
+        props.onMemoryDelete && props.onMemoryDelete(path);
     }
 
-    onMemoryCancel = (path: string) => {
-        this.props.onMemoryCancel && this.props.onMemoryCancel(path);
+    function onMemoryCancel(path: string) {
+        props.onMemoryCancel && props.onMemoryCancel(path);
     }
 
-    onSegment = (segment: string) => {
-        this.props.onSegment && this.props.onSegment(segment, this.state.shard);
-
-        this.setState({ ...this.state, segment });
+    function onSegment(segment: string) {
+        props.onSegment && props.onSegment(segment, props.shard);
     }
 
-    onSegmentChange = (data: string) => {
-        this.setState({
-            ...this.state,
-            segmentData: data,
-            segmentHasChange: this.state._segmentData !== data
-        });
+    function onSegmentChange(data: string) {
+        setSegmentData(data);
+        setSegmentHasChange(props.segmentData ? data !== props.segmentData : data !== '' );
     }
 
-    onSegmentRefresh = () => {
-        const { segment, shard } = this.state;
-
-        this.props.onSegmentRefresh && this.props.onSegmentRefresh(segment, shard);
-    }
-
-    onSegmentUpdate = () => {
-        const { segment, segmentData, shard } = this.state;
-
-        this.props.onSegmentUpdate && this.props.onSegmentUpdate(segment, segmentData, shard);
+    function onSegmentUpdate() {
+        props.onSegmentUpdate && props.onSegmentUpdate(props.segment, segmentData, props.shard);
     }
 }

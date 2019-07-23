@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRef, useState, useEffect, useImperativeHandle, forwardRef } from 'react'
 
 //@ts-ignore
 import JSONEditor from 'jsoneditor';
@@ -8,42 +9,32 @@ interface IMemoryJSONEditorViewProps {
     value: any;
 }
 
-export default class MemoryJSONEditorView extends React.Component<IMemoryJSONEditorViewProps> {
-    //@ts-ignore
-    props: IMemoryJSONEditorViewProps;
+export default forwardRef(function(props: IMemoryJSONEditorViewProps, ref) {
+    const [editorRef, setEditorRef] = useState();
+    const editorContainerRef = useRef(null);
 
-    editorRef: JSONEditor;
-    editorContainerRef: React.RefObject<any>;
+    useEffect(() => {
+        const editorRef = new JSONEditor(editorContainerRef.current, {
+            name: props.name || 'Memory'
+        }, props.value || 'undefined');
 
-    constructor(props: IMemoryJSONEditorViewProps) {
-        super(props);
+        setEditorRef(editorRef);
+    }, [editorContainerRef])
 
-        this.editorContainerRef = React.createRef();
+    useImperativeHandle(ref, () => ({
+        getValue,
+        setValue
+    }));
+
+    return (
+        <div className='native-key-bindings' ref={ editorContainerRef }></div>
+    );
+
+    function getValue() {
+        return editorRef.get();
     }
 
-    componentDidMount() {
-        this.editorRef = new JSONEditor(this.editorContainerRef.current, {
-            name: this.props.name || 'Memory'
-        }, this.props.value || 'undefined');
+    function setValue(value: any) {
+        editorRef.set(value);
     }
-
-    componentWillReceiveProps(nextProps: IMemoryJSONEditorViewProps) {
-        if (nextProps.value) {
-            this.setValue(nextProps.value);
-        }
-    }
-
-    public render() {
-        return (
-            <div className='native-key-bindings' ref={ this.editorContainerRef }></div>
-        );
-    }
-
-    getValue(): any {
-        return this.editorRef.get();
-    }
-
-    setValue(value: any): void {
-        this.editorRef.set(value);
-    }
-}
+})

@@ -14,3 +14,7 @@ export {
     BTN_RELOAD as PATH_BTN_RELOAD,
     BTN_CANCEL as PATH_BTN_CANCEL
 } from './components/memory-view/components/item';
+export {
+    MEMORY_MAIN_VIEW,
+    MEMORY_SEGMENTS_VIEW
+} from './components/memory-view/components/controls';

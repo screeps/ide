@@ -1,5 +1,5 @@
 const path = require('path');
-import { File, Directory } from 'atom';
+import { File, Directory, DisposableLike } from 'atom';
 
 import { Api } from './api';
 import { Socket } from './socket';
@@ -246,4 +246,19 @@ export async function getScreepsProjectConfig(project: string): Promise<any> {
 
 export function getScreepsProjectSrc(project: string, src: string = ''): string {
     return path.resolve(project, src);
+}
+
+export function applyTooltip(selector: string, title: string): DisposableLike | void {
+    const elementRef = document.querySelector(selector) as HTMLElement;
+    let disposable;
+
+    if (!elementRef) {
+        return;
+    };
+
+    disposable = atom.tooltips.add(elementRef, {
+        title
+    });
+
+    return disposable;
 }

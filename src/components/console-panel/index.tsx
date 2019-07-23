@@ -11,7 +11,7 @@ import { Api } from '../../api';
 import { Socket } from '../../socket';
 import { Service } from '../../service';
 import { User } from '../../services/user';
-import { getApi, getSocket, getUser } from '../../utils';
+import { getApi, getSocket, getUser, applyTooltip } from '../../utils';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const CONSOLE_URI = 'atom://screeps-ide/console';
@@ -226,23 +226,17 @@ export class ConsolePanel implements ViewModel {
                 this._tooltipsDisposables.dispose();
             }
 
-            const _tooltipsDisposables = this._tooltipsDisposables = new CompositeDisposable();
+            let d;
+            const subscriptions = this._tooltipsDisposables = new CompositeDisposable();
 
-            function _applyTooltip(btnClass: string, title: string) {
-                const btnRef = document.getElementById(btnClass);
-
-                if (!btnRef) {
-                    return;
-                }
-
-                const disposable = atom.tooltips.add(btnRef, { title });
-                _tooltipsDisposables.add(disposable);
-            }
-
-            _applyTooltip('screeps-console__delete', 'Clear');
-            _applyTooltip('screeps-console__close', 'Close panel');
-            _applyTooltip('screeps-console__pause', 'Pause tracking');
-            _applyTooltip('screeps-console__play', 'Resume tracking');
+            d = applyTooltip('#screeps-console__delete', 'Clear');
+            d && subscriptions.add(d);
+            d = applyTooltip('#screeps-console__close', 'Close panel');
+            d && subscriptions.add(d);
+            d = applyTooltip('#screeps-console__pause', 'Pause tracking');
+            d && subscriptions.add(d);
+            d = applyTooltip('#screeps-console__play', 'Resume tracking');
+            d && subscriptions.add(d);
         });
     }
 

@@ -6,43 +6,19 @@ interface IMemorySegmentViewProps {
     onChange?: Function;
 }
 
-interface IMemorySegmentViewState {
-    segment: string;
-}
+export default function(props: IMemorySegmentViewProps) {
+    return (
+        <div className='screeps-memory__segment'>
+            <textarea className='native-key-bindings' 
 
-export default class MemorySegmentView extends React.Component<IMemorySegmentViewProps> {
-    //@ts-ignore
-    props: IMemorySegmentViewProps;
+            placeholder='NO DATA'
+            value={ props.segment } 
 
-    state: IMemorySegmentViewState;
+            onChange={ onChange }/>
+        </div>
+    );
 
-    constructor(props: IMemorySegmentViewProps) {
-        super(props);
-
-        this.state = {
-            segment: props.segment
-        }
-    }
-
-    componentWillReceiveProps(nextProps: IMemorySegmentViewProps) {
-        if (nextProps.segment !== this.state.segment) {
-            this.setState({ segment: nextProps.segment ? nextProps.segment : '' });
-        }
-    }
-
-    public render() {
-        return (
-            <div className='screeps-memory__segment'>
-                <textarea className='native-key-bindings' value={ this.state.segment } onChange={ this.onChange } placeholder='NO DATA'/>
-            </div>
-        );
-    }
-
-    onChange = (event: any) => {
-        this.setState({
-            segment: event.target.value
-        });
-
-        this.props.onChange && this.props.onChange(event.target.value);
+    function onChange(event: any) {
+        props.onChange && props.onChange(event.target.value);
     }
 }

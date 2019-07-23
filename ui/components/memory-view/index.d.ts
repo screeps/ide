@@ -3,21 +3,11 @@ interface IMemoryPath {
     value: any;
 }
 
-interface IMemoryViewState {
-    isProgressing: boolean;
-
-    shard: any;
-    shards: any;
-    view: string;
-    memory: IMemoryPath[];
-
-    segment: string;
-    segmentData: string;
-    _segmentData: string;
-    segmentHasChange: boolean;
-}
-
 interface IMemoryViewProps {
+    view?: string;
+    onChangeView?(view: string): void;
+    isProgressing?: boolean;
+
     onInput?: Function;
     onClose?: Function;
 
@@ -34,6 +24,7 @@ interface IMemoryViewProps {
     onMemoryCancel(path: string): Promise<void>;
 
     segment: string;
+    segmentData: string;
     onSegment(segment: string, shard: string): Promise<void>;
     onSegmentRefresh(segment: string, shard: string): Promise<void>;
     onSegmentUpdate(segment: string, data: string, shard: string): Promise<void>;
