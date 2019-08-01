@@ -16,7 +16,7 @@ import BranchesView from '../../../ui/components/branches-view';
 let progressStartTime: number = 0;
 const ANIMATION_MIN_TIME = 1500;
 
-export function BranchesBlock({ branch, branches = [] }: any) {
+export function BranchesBlock({ branch, branches = [], active }: any) {
     const [inProgress, setInProgress] = useState(false);
     const [progress, setProgress] = useState(false);
 
@@ -41,6 +41,8 @@ export function BranchesBlock({ branch, branches = [] }: any) {
 
             branch={ branch }
             branches={ branches }
+
+            active={ active }
 
             onCopyBranch={ onCopyBranch }
             onSelectBranch={ onSelectBranch }

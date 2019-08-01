@@ -44,7 +44,9 @@ export default function(props: IBranchesViewProps) {
                     }
 
                     return (
-                        <li className='tab screeps-branches-view__item' key={_id}>
+                        <li className={ 'tab screeps-branches-view__item' + (
+                            props.active === branch ? ' --active' : ''
+                        )} key={_id}>
                             <button className='btn btn--clear' onClick={() => onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
                             <button className='btn btn--clear' onClick={() => onSelectBranch(branch)}>{ branch }</button>
                             { world } { sim }

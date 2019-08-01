@@ -102,7 +102,12 @@ export class ScreepsPanel implements ViewModel {
 
         ReactDOM.render(
             <div className='screeps-ide screeps-panel'>
-                <BranchesBlock branch={ branch } branches={ branches } />
+                <BranchesBlock
+                    branch={ branch }
+                    branches={ branches }
+
+                    active={ activeBranchTextEditor }
+                />
                 { modulesView }
                 <footer>
                     <button className='btn btn-primary' onClick={ this.createProject }>

@@ -38,4 +38,14 @@ storiesOf('UI Components|Branches View', module)
                 branches={ branches }
             />
         </atom-dock>
+    ))
+    .add('View Active Branch', () => (
+        <atom-dock>
+            <BranchesView
+                branch={ branch }
+                branches={ branches }
+
+                active={ 'simulation' }
+            />
+        </atom-dock>
     ));

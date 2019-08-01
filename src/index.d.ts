@@ -5,5 +5,8 @@ interface IState {
 
     modules: {
         [key: string]: IModules;
-    }
+    },
+
+    activeBranchTextEditor?: string;
+    activeModuleTextEditor?: string;
 }
