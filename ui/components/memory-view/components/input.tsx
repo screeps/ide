@@ -18,7 +18,7 @@ export default function({
                         className='native-key-bindings'
 
                         type='text'
-                        placeholder='Add new memory watch path here, e.g. "creeps.Jhon"'
+                        placeholder='Add new memory watch path here, e.g. "creeps.John"'
 
                         autoComplete=''
 
