@@ -417,7 +417,7 @@ export class MemoryPanel {
 
             d = applyTooltip('#screeps-memory__control-main', 'Main memory');
             d && subscriptions.add(d);
-            d = applyTooltip('#screeps-memory__control-segments', 'Segments memory');
+            d = applyTooltip('#screeps-memory__control-segments', 'Segments');
             d && subscriptions.add(d);
             d = applyTooltip('#screeps-memory__control-close', 'Close panel');
             d && subscriptions.add(d);
