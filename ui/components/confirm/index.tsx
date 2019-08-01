@@ -27,9 +27,7 @@ export default function({
                 <button className='btn _cross' onClick={ onCancel }/>
             </header>
             <form className='--indented'>
-                <fieldset className='screeps-field'>
-                    <legend>{ legend }</legend>
-                </fieldset>
+                <legend>{ legend }</legend>
             </form>
             <footer>
                 <button
