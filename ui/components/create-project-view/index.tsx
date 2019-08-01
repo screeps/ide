@@ -11,6 +11,8 @@ type CreateProjectProps = {
     downloadReadonly: boolean;
     submitBtn: string;
 
+    onClick(): void,
+
     onCancel(): void;
     onSubmit(data: {
         projectPath: string;
@@ -48,6 +50,7 @@ export default function(props: CreateProjectProps) {
 
                         value={ projectPath }
                         onChange={onInput}
+                        onClick={props.onClick}
 
                         required={ true }
                         readOnly={ projectPathReadonly }
