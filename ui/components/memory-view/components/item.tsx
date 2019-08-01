@@ -91,7 +91,7 @@ export default function(props: IMemoryItemViewProps) {
     }
 
     return (
-        <div className='screeps-memory__item'>
+        <div className='screeps-memory__item' data-path={ props.path }>
             <div className='screeps-memory__item-path'>
                 <label className={ props.path ? '' : '--italic' }>
                     { props.path || 'Memory root' }

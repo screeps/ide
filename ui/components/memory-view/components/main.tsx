@@ -71,8 +71,18 @@ export default function(props: IMemoryMainViewProps) {
         return props.onRemovePath && props.onRemovePath(path);
     }
 
-    function onInput(path: string) {
-        return props.onInput && props.onInput(path);
+    async function onInput(path: string) {
+        try {
+            props.onInput && await props.onInput(path);
+            setTimeout(() => {
+                const pathRef = document.querySelector(`.screeps-memory__item[data-path='${ path }']`);
+                if (pathRef) {
+                    pathRef.scrollIntoView();
+                }
+            });
+        } catch(err) {
+            throw err;
+        }
     }
 
     function onCancel(path: string) {
