@@ -12,7 +12,8 @@ export function progress(target: any, name: any, descriptor: any) {
         try {
             result = await original.apply(this, args);
         } catch (err) {
-            // Noop.
+            hideProgress(this);
+            throw err;
         }
 
         hideProgress(this);

@@ -70,47 +70,47 @@ export default function(props: IMemoryViewProps) {
     );
 
     function onInput(path: string) {
-        props.onInput && props.onInput(path);
+        return props.onInput && props.onInput(path);
     }
 
     function onShard(shard: string) {
-        props.onShard && props.onShard(shard);
+        return props.onShard && props.onShard(shard);
     }
 
     function onClose() {
-        props.onClose && props.onClose();
+        return props.onClose && props.onClose();
     }
 
     function onToggleView(view: string) {
-        props.onChangeView && props.onChangeView(view);
+        return props.onChangeView && props.onChangeView(view);
     }
 
-    async function onMemory (path: string): Promise<void> {
-        props.onMemory && await props.onMemory(path, props.shard);
+    function onMemory (path: string) {
+        return props.onMemory && props.onMemory(path, props.shard);
     }
 
     function onMemoryUpdate(path: string, value: string) {
-        props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
+        return props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
     }
 
     function onMemoryRefresh(path: string) {
-        props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
+        return props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
     }
 
     function onMemoryRemove(path: string) {
-        props.onMemoryRemove && props.onMemoryRemove(path, props.shard);
+        return props.onMemoryRemove && props.onMemoryRemove(path, props.shard);
     }
 
     function onMemoryDelete(path: string) {
-        props.onMemoryDelete && props.onMemoryDelete(path);
+        return props.onMemoryDelete && props.onMemoryDelete(path);
     }
 
     function onMemoryCancel(path: string) {
-        props.onMemoryCancel && props.onMemoryCancel(path);
+        return props.onMemoryCancel && props.onMemoryCancel(path);
     }
 
     function onSegment(segment: string) {
-        props.onSegment && props.onSegment(segment, props.shard);
+        return props.onSegment && props.onSegment(segment, props.shard);
     }
 
     function onSegmentChange(data: string) {
@@ -119,6 +119,6 @@ export default function(props: IMemoryViewProps) {
     }
 
     function onSegmentUpdate() {
-        props.onSegmentUpdate && props.onSegmentUpdate(props.segment, segmentData, props.shard);
+        return props.onSegmentUpdate && props.onSegmentUpdate(props.segment, segmentData, props.shard);
     }
 }

@@ -24,6 +24,7 @@ import { getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
 import { progress } from '../../decoratos';
 import { getApi, getSocket, getUser, applyTooltip } from '../../utils';
+import { default as confirm } from '../confirm-modal';
 
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const MEMORY_URI = 'atom://screeps-ide/memory';
@@ -290,6 +291,16 @@ export class MemoryPanel {
 
     @progress
     async onMemoryUpdate(path: string, value: any, shard: string): Promise<void> {
+        if (!path) {
+            try {
+                await confirm({
+                    legend: 'You are going to rewrite the entire Memory tree. Doing so is not recommended and could result in replacing some of your variables that are already changed with an obsolete state. It is better to create a watch for a specific sub-tree and commit it instead.\n\nDo you really want to proceed?'
+                });
+            } catch (err) {
+                throw err;
+            }
+        }
+
         try {
             await this._api.setUserMemory({ path, value, shard });
         } catch (err) {

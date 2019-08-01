@@ -39,31 +39,31 @@ export default function(props: IMemoryMainViewProps) {
         </div>
     );
 
-    async function onClick(path: string): Promise<void> {
-        props.onClick && await props.onClick(path);
+    function onClick(path: string) {
+        return props.onClick && props.onClick(path);
     }
 
     function onReload(path: string) {
-        props.onReload && props.onReload(path);
+        return props.onReload && props.onReload(path);
     }
 
     function onSave(path: string, value: any) {
-        props.onSave && props.onSave(path, value);
+        return props.onSave && props.onSave(path, value);
     }
 
     function onDelete(path: string) {
-        props.onDelete && props.onDelete(path);
+        return props.onDelete && props.onDelete(path);
     }
 
     function onRemovePath(path: string) {
-        props.onRemovePath && props.onRemovePath(path);
+        return props.onRemovePath && props.onRemovePath(path);
     }
 
     function onInput(path: string) {
-        props.onInput && props.onInput(path);
+        return props.onInput && props.onInput(path);
     }
 
     function onCancel(path: string) {
-        props.onCancel && props.onCancel(path);
+        return props.onCancel && props.onCancel(path);
     }
 }

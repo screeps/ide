@@ -109,11 +109,15 @@ export default function(props: IMemoryItemViewProps) {
         props.onClick && await props.onClick(props.path);
     }
 
-    function onSave() {
-        onCancel();
+    async function onSave() {
+        try {
+            // @ts-ignore
+            props.onSave && await props.onSave(editorRef.current.getValue());
 
-        // @ts-ignore
-        props.onSave && props.onSave(editorRef.current.getValue());
+            onCancel();
+        } catch(err) {
+            // Noop.
+        }
     }
 
     function onReload() {
