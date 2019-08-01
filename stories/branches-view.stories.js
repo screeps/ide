@@ -28,4 +28,14 @@ storiesOf('UI Components|Branches View', module)
                 branches={ branches }
             />
         </atom-dock>
+    ))
+    .add('View Progressing', () => (
+        <atom-dock>
+            <BranchesView
+                isProgressing={ true }
+
+                branch={ branch }
+                branches={ branches }
+            />
+        </atom-dock>
     ));
