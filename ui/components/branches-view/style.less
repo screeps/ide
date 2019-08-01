@@ -1,4 +1,7 @@
 .screeps-branches-view {
+    display: flex;
+    flex-direction: column;
+
     color: rgba(234, 237, 255, 0.7);
     font-family: 'Segoe UI';
     font-size: 12px;
@@ -9,12 +12,16 @@
     }
 
     &__items {
-        flex-direction: column;
-        height: auto !important;
-        margin: 0;
-        padding: 0;
-    
-        list-style: none;
+        overflow: auto !important;
+
+        ul {
+            flex-direction: column;
+            height: auto !important;
+            margin: 0;
+            padding: 0;
+
+            list-style: none;
+        }
     }
 
     &__item {
@@ -43,10 +50,10 @@
     &__header {
         display: flex;
         align-items: center;
-    
+        min-height: 32px;
         padding-left: 5px;
         padding-right: 5px;
-    
+
         line-height: 32px;
     
         span {
