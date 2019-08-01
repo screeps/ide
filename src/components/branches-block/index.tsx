@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
@@ -12,9 +13,32 @@ import {
 
 import BranchesView from '../../../ui/components/branches-view';
 
+let progressStartTime: number = 0;
+const ANIMATION_MIN_TIME = 1500;
+
 export function BranchesBlock({ branch, branches = [] }: any) {
+    const [inProgress, setInProgress] = useState(false);
+    const [progress, setProgress] = useState(false);
+
+    useEffect(() => {
+        const now = new Date() .getTime();
+
+        if (progress) {
+            progressStartTime = now;
+            setInProgress(true);
+
+            return;
+        }
+
+        const delay = ANIMATION_MIN_TIME - (now - progressStartTime);
+
+        setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
+    }, [progress]);
+
     return (
         <BranchesView
+            isProgressing={ inProgress }
+
             branch={ branch }
             branches={ branches }
 
@@ -28,7 +52,7 @@ export function BranchesBlock({ branch, branches = [] }: any) {
     );
 
     async function onCopyBranch(branch: string): Promise<void> {
-        console.log('BranchesBlock::onCopyBranch');
+        setProgress(true);
 
         try {
             let api;
@@ -58,10 +82,12 @@ export function BranchesBlock({ branch, branches = [] }: any) {
         } catch(err) {
             // Noop.
         }
+
+        setProgress(false);
     }
 
     async function onSelectBranch(_branch: string): Promise<void> {
-        console.log(2, 'BranchesBlock::onSelectBranch');
+        setProgress(true);
 
         try {
             const _api = await getApi();
@@ -91,10 +117,12 @@ export function BranchesBlock({ branch, branches = [] }: any) {
         } catch(err) {
             // Noop.
         }
+
+        setProgress(false);
     }
 
     async function onDeleteBranch(branch: string): Promise<void> {
-        console.log('BranchesBlock::onDeleteBranch');
+        setProgress(true);
 
         try {
             await confirm({
@@ -106,19 +134,31 @@ export function BranchesBlock({ branch, branches = [] }: any) {
             await _api.deleteUserBranch(branch);
             const { list: branches } = await _api.getUserBranches();
 
+            const state = __state.getValue();
+
             __state.next({
-                ...__state.getValue(),
+                ...state,
                 branches
             });
+
+            let { branch: currentBranch } = state;
+
+            if (branch === currentBranch) {
+                const ibranch = branches.find(({ activeWorld }) => activeWorld);
+                ibranch && onSelectBranch(ibranch.branch);
+            }
         } catch(err) {
             // Noop.
         }
+
+        setProgress(false);
     }
 
     async function onSetActiveSim(_branch: string): Promise<void> {
+        setProgress(true);
+
         try {
             const _api = await getApi();
-
             await _api.setActiveSim(_branch);
 
             const state = __state.getValue();
@@ -142,16 +182,18 @@ export function BranchesBlock({ branch, branches = [] }: any) {
                 ...state,
                 branches
             })
-            // ttps://screeps.com/api/user/set-active-branch
         } catch(err) {
             // Noop.
         }
+
+        setProgress(false);
     }
 
     async function onSetActiveWorld(_branch: string): Promise<void> {
+        setProgress(true);
+
         try {
             const _api = await getApi();
-
             await _api.setActiveWorld(_branch);
 
             const state = __state.getValue();
@@ -175,10 +217,11 @@ export function BranchesBlock({ branch, branches = [] }: any) {
                 ...state,
                 branches
             })
-            // ttps://screeps.com/api/user/set-active-branch
         } catch(err) {
             // Noop.
         }
+
+        setProgress(false);
     }
 
 }
