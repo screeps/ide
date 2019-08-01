@@ -40,35 +40,6 @@ export class MemoryPanel {
     // @ts-ignore
     _pipe$: Subject<void> | null;
 
-    // public get state(): any {
-    //     if (!this.viewRef.current) {
-    //         return {
-    //         };
-    //     }
-
-    //     // @ts-ignore
-    //     return this.viewRef.current.state;
-    // }
-
-    // public set state(state: any) {
-    //     if (!this.viewRef.current) {
-    //         return;
-    //     }
-
-    //     // @ts-ignore
-    //     this.viewRef.current.state = {
-    //         // @ts-ignore
-    //         ...this.viewRef.current.state,
-    //         ...state
-    //     };
-
-    //     // @ts-ignore
-    //     this.viewRef.current.setState(
-    //         // @ts-ignore
-    //         this.viewRef.current.state
-    //     );
-    // }
-
     private _state = {
         memory: getWatches()
     };
@@ -123,7 +94,7 @@ export class MemoryPanel {
                 this._service.shards$
                     .pipe(tap((shards: any) => this.state = { shards }))
                     .subscribe();
-        
+
                 const subscriptions = new CompositeDisposable();
                 this.memory$
                     .pipe(tap((memory: IMemoryPath[]) => this.state = { memory }))
@@ -132,21 +103,12 @@ export class MemoryPanel {
                     }))
                     .pipe(tap((memory: IMemoryPath[]) => {
                         memory.forEach(({ path }) => {
-                            const ref = document.getElementById(`${ PATH_BTN_REMOVE }${ path || 'root' }`);
-        
-                            if (!ref) {
-                                return;
-                            }
-        
-                            const disposable = atom.tooltips.add(ref, {
-                                title: 'Delete watch'
-                            });
-        
-                            subscriptions.add(disposable);
+                            const d = applyTooltip(`#${ PATH_BTN_REMOVE }${ path || 'root' }`, 'Remove watch');
+                            d && subscriptions.add(d);
                         });
                     }))
                     .subscribe();
-        
+
                 this._applyTooltips();
             } catch (err) {
                 setTimeout(() => {
