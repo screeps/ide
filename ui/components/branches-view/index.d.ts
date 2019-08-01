@@ -6,6 +6,8 @@ interface IBranch {
 }
 
 interface IBranchesViewProps {
+    isProgressing?: boolean;
+
     branch: string;
     branches: IBranch[];
 
