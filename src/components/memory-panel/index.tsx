@@ -45,6 +45,7 @@ export class MemoryPanel {
     _pipe$: Subject<void> | null;
 
     private _state = {
+        view: MEMORY_MAIN_VIEW,
         memory: getWatches()
     };
 
@@ -93,7 +94,7 @@ export class MemoryPanel {
                 this._socket = getSocket();
                 this._service = new Service()
 
-                this.onChangeView(this.state.view || MEMORY_MAIN_VIEW);
+                this.onChangeView(this.state.view);
 
                 this._service.shards$
                     .pipe(tap((shards: any) => this.state = { shards }))
@@ -174,7 +175,7 @@ export class MemoryPanel {
     }
 
     render({
-        view = '',
+        view = MEMORY_MAIN_VIEW,
         shard = 'shard0',
         shards = [],
         memory = [],
