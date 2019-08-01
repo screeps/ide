@@ -13,10 +13,9 @@ interface IModulesViewProps {
     branch: string;
     modules: IModules;
 
+    active?: string;
+
     onCreateModule?(module: string): Promise<void>;
     onSelectModule?(module: string): Promise<void>;
     onDeleteModule?(module: string): Promise<void>;
-
-    onApplyChanges?(): Promise<void>;
-    onRevertChanges?(): Promise<void>;
 }

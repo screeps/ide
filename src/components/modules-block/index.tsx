@@ -15,12 +15,20 @@ Object.values(effects).forEach((effect) => effect.subscribe());
 
 import ModulesView from '../../../ui/components/modules-view';
 
-export function ModulesBlock({ branch, modules }: { branch: any, modules: IModules }) {
+type ModulesBlockProps  = {
+    branch: string;
+    modules: IModules;
+    active: string;
+}
+
+export function ModulesBlock(props: ModulesBlockProps) {
 
     return (
         <ModulesView
-            branch={ branch }
-            modules={ modules }
+            branch={ props.branch }
+            modules={ props.modules }
+
+            active={ props.active }
 
             onCreateModule={(...args) => onCreateModule(...args)}
             onSelectModule={(...args) => onSelectModule(...args)}
@@ -29,15 +37,15 @@ export function ModulesBlock({ branch, modules }: { branch: any, modules: IModul
     )
 
     async function onCreateModule(module: string): Promise<void> {
-        store.dispatch(CreateModuleAction(branch, module));
-        store.dispatch(OpenTextEditorAction(branch, module));
+        store.dispatch(CreateModuleAction(props.branch, module));
+        store.dispatch(OpenTextEditorAction(props.branch, module));
     }
 
     async function onSelectModule(module: string): Promise<void> {
-        store.dispatch(OpenTextEditorAction(branch, module));
+        store.dispatch(OpenTextEditorAction(props.branch, module));
     }
 
     async function onDeleteModule(module: string): Promise<void> {
-        store.dispatch(DeleteModuleAction(branch, module));
+        store.dispatch(DeleteModuleAction(props.branch, module));
     }
 }

@@ -19,6 +19,7 @@ import { UpdateModulesAction } from './actions';
 
 import './reducers';
 import * as effects from './effects';
+import { SetActiveModule } from './actions';
 import { default as store } from '../../store';
 import { CreateProjectAction } from '../../store/actions';
 
@@ -69,26 +70,34 @@ export class ScreepsPanel implements ViewModel {
             }
         })()
 
-        // TODO: тут надо сделать выставление статуса активный модуль
-        atom.workspace.onDidChangeActivePaneItem((pane) => {
-            if (!(pane instanceof TextEditor)) {
-                return;
+        atom.workspace.getCenter().onDidChangeActivePaneItem((pane) => {
+            let branch = null;
+            let module = null;
+
+            if (pane instanceof TextEditor) {
+                const path = pane.getPath() as string;
+                const matches = /[\\\/]\.branches[\\\/]([^\\]+)[\\\/]([^\\]+)\.js/.exec(path);
+
+                if (matches) {
+                    [, branch, module] = matches;
+                }
             }
 
-            // @ts-ignore
-            // console.log(pane.getPath());
-
-            // const path = pane.getPath() as string;
-            // store.dispatch(ActiveModule())
+            store.dispatch(SetActiveModule(branch, module));
         });
     }
 
-    render({ branch, branches, modules }: IState) {
+    render({ branch, branches, modules, activeBranchTextEditor, activeModuleTextEditor }: IState) {
         const _modules = modules[branch];
 
         let modulesView;
         if (_modules) {
-            modulesView = (<ModulesBlock branch={ branch } modules={ _modules } />);
+            modulesView = (<ModulesBlock
+                branch={ branch }
+                modules={ _modules }
+
+                active={ `@${ activeBranchTextEditor }/${ activeModuleTextEditor }.js`}
+            />);
         }
 
         ReactDOM.render(

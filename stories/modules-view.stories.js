@@ -7,7 +7,14 @@ import { linkTo } from '@storybook/addon-links';
 import { default as ModulesView } from '../ui/components/modules-view';
 
 const branch = 'default';
-const modules = [];
+const modules = {
+    'role.builder': {
+        modified: true
+    },
+    'role.harvester': {
+    },
+    'role.upgrader': {}
+};
 
 storiesOf('UI Components|Modules View', module)
     .add('View', () => (
@@ -15,6 +22,8 @@ storiesOf('UI Components|Modules View', module)
             <ModulesView
                 branch={ branch }
                 modules={ modules }
+
+                active={ `@${ branch }/${ 'role.harvester' }.js` }
             />
         </atom-dock>
     ));

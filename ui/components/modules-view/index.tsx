@@ -21,16 +21,16 @@ export default function(props: IModulesViewProps) {
                 <ul className='tab-bar'>
                     <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                         props.modules[MAIN_MODULE] && props.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
-                        props.modules[MAIN_MODULE] && props.modules[MAIN_MODULE].active ? ' active' : ''
+                        props.active  === `@${ props.branch }/${ MAIN_MODULE }.js` ? ' active' : ''
                     )}>
                         <button className='btn btn--clear' onClick={() => onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
                         <div className='modified-icon'></div>
                     </li>
-                    {_getAdditionalModules(props.modules).map(([ moduleName, { modified, active }]) => {
+                    {_getAdditionalModules(props.modules).map(([ moduleName, { modified }]) => {
                         return (
                     <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                         modified ? ' modified' : '' ) +  (
-                        active ? ' active' : ''
+                        props.active === `@${ props.branch }/${ moduleName }.js` ? ' active' : ''
                     )} key={moduleName}>
                         <button className='btn btn--clear' onClick={() => onSelectModule(moduleName)}>{ moduleName }</button>
                         <div className='close-icon' onClick={() => onDeleteModule(moduleName)}></div>
