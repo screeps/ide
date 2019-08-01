@@ -33,8 +33,8 @@ class ModulesView extends React.Component<IModulesViewProps> {
                     </button> */}
                 </div>
                 <hr className={ 'screeps-hr' } />
-                <div>
-                    <ul className='tab-bar screeps-modules-view__items'>
+                <div className='screeps-modules-view__items'>
+                    <ul className='tab-bar'>
                         <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                             this.props.modules[MAIN_MODULE] && this.props.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
                             this.props.modules[MAIN_MODULE] && this.props.modules[MAIN_MODULE].active ? ' active' : ''
@@ -54,18 +54,18 @@ class ModulesView extends React.Component<IModulesViewProps> {
                             );
                         })}
                     </ul>
-                    <div className='screeps-modules-view__new'>
-                        <form>
-                            <fieldset className='screeps-field'>
-                                <input className='native-key-bindings' type='text' placeholder='New module name...'
+                </div>
+                <div className='screeps-modules-view__new'>
+                    <form>
+                        <fieldset className='screeps-field'>
+                            <input className='native-key-bindings' type='text' placeholder='New module name...'
 
-                                    autoComplete=''
+                                autoComplete=''
 
-                                    onKeyPress={ this.onKeyPressHandler }/>
-                                <div className='underline' />
-                            </fieldset>
-                        </form>
-                    </div>
+                                onKeyPress={ this.onKeyPressHandler }/>
+                            <div className='underline' />
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         );

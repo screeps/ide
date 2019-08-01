@@ -11,6 +11,9 @@
 }
 
 .screeps-modules-view {
+    display: flex;
+    flex-direction: column;
+
     color: rgba(234, 237, 255, 0.7);
     font-family: 'Segoe UI';
     font-size: 12px;
@@ -19,38 +22,44 @@
         outline: none;
         box-shadow: inherit !important;
     }
-}
 
-.screeps-modules-view ul {
-    flex-direction: column;
-    height: auto;
-    margin: 0;
-    padding: 0;
-
-    list-style: none;
-}
-
-.screeps-modules-view ul li {
-    position: relative;
-
-    display: flex;
-    flex-direction: row;
-    flex: 1 0 auto !important;
-    min-height: 30px;
-
-    &.tab {
-        border-left: none;
+    &__items {
+        overflow: auto;
     }
 
-    .btn {
-        text-align: left;
+    ul {
+        flex-direction: column;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+
+        list-style: none;
+
+        li {
+            position: relative;
+
+            display: flex;
+            flex-direction: row;
+            flex: 1 0 auto !important;
+            min-height: 30px;
+
+            &.tab {
+                border-left: none;
+            }
+
+            .btn {
+                text-align: left;
+            }
+        }
     }
+    
 }
 
 .screeps-modules-view__header {
     display: flex;
     align-items: center;
-
+    min-height: 32px;
     padding-left: 5px;
     padding-right: 5px;
 
