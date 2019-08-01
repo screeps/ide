@@ -3,12 +3,25 @@
     flex-direction: column;
     height: 100%;
 
-    & > button {
-        margin: 5px;
-    }
-
-    & > button:first-of-type {
+    & > footer {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        min-height: 64px;
         margin-top: auto;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        button {
+            flex: 1;
+            margin: 0 4px;
+            min-height: 26px;
+        }
+
+        div {
+            display: flex;
+            margin-top: 4px;
+        }
     }
 
     &:before {
@@ -25,14 +38,5 @@
         font-family: 'screepsicons' !important;
         font-size: 200px;
         text-align: center;
-    }
-
-    & > div:last-child {
-        display: flex;
-
-        button {
-            flex: 1;
-            margin: 5px;
-        }
     }
 }

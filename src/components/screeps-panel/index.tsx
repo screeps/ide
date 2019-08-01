@@ -95,17 +95,19 @@ export class ScreepsPanel implements ViewModel {
             <div className='screeps-ide screeps-panel'>
                 <BranchesBlock branch={ branch } branches={ branches } />
                 { modulesView }
-                <button className='btn btn-primary' onClick={ this.createProject }>
-                    Create New Project
-                </button>
-                <div>
-                    <button className='btn' onClick={ this.openMemoryPanel } >
-                        Memory
+                <footer>
+                    <button className='btn btn-primary' onClick={ this.createProject }>
+                        Create New Project
                     </button>
-                    <button className='btn' onClick={ this.openConsolePanel } >
-                        Console
-                    </button>
-                </div>
+                    <div>
+                        <button className='btn' onClick={ this.openMemoryPanel } >
+                            Memory
+                        </button>
+                        <button className='btn' onClick={ this.openConsolePanel } >
+                            Console
+                        </button>
+                    </div>
+                </footer>
             </div>,
             this.element as HTMLElement
         )
