@@ -19,7 +19,7 @@ export default function(props: IMemoryViewProps) {
     const [segmentHasChange, setSegmentHasChange] = useState<boolean>(false);
 
     useEffect(() => {
-        onSegmentChange(props.segmentData);
+        onSegmentChange(props.segmentData || '');
     }, [props.segmentData]);
 
     if (props.view === MEMORY_MAIN_VIEW) {
