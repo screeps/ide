@@ -1,10 +1,14 @@
 /// <reference path='./index.d.ts' />
 
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 
 const MAIN_MODULE = 'main';
 
 export default function(props: IModulesViewProps) {
+    const [value, setValue] = useState('');
+
+    useEffect(() => setValue(''), [props.branch]);
 
     return (
         <div className='screeps-ide screeps-modules-view'>
@@ -36,13 +40,15 @@ export default function(props: IModulesViewProps) {
                 </ul>
             </div>
             <div className='screeps-modules-view__new'>
-                <form>
+                <form onSubmit={ onSubmit }>
                     <fieldset className='screeps-field'>
                         <input className='native-key-bindings' type='text' placeholder='New module name...'
 
                             autoComplete=''
 
-                            onKeyPress={ onKeyPressHandler }/>
+                            onChange={ onChange }
+
+                            value={ value }/>
                         <div className='underline' />
                     </fieldset>
                 </form>
@@ -58,18 +64,18 @@ export default function(props: IModulesViewProps) {
         props.onDeleteModule && props.onDeleteModule(module);
     }
 
-    function onKeyPressHandler(event: any) {
-        if (event.key !== 'Enter') {
-            return;
-        }
+    function onChange(event: React.ChangeEvent) {
+        const target = event.target as HTMLInputElement;
+        const value = target.value;
 
-        if (!event.target.value) {
-            return;
-        }
+        setValue(value);
+    }
 
-        props.onCreateModule && props.onCreateModule(event.target.value);
+    function onSubmit(event: React.FormEvent) {
+        props.onCreateModule && props.onCreateModule(value);
+        setValue('');
 
-        event.target.value = '';
+        event.preventDefault();
     }
 
     function _getAdditionalModules(modules: {
