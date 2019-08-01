@@ -16,11 +16,9 @@ const PROJECT_ROOT_HEADER = '.project-root-header';
 const PROJECT_SCREEPS_BRANCH = '.project-branch';
 const PROJECT_EMPTY_BTN = 'screeps-download-btn';
 
-export function consumeTreeView(treeView: any) {
-    const updateIcon = () => {
-        store.dispatch({ type: 'UPDATE_ICON', payload: {}});
-    };
+let IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION = false;
 
+export function consumeTreeView(treeView: any) {
     store.effect(async (state: IState, { type }: Action) => {
         if (![ADD_PROJECT, 'UPDATE_ICON', 'CHANGE_PROJECT'].includes(type)) {
             return state;
@@ -51,22 +49,38 @@ export function consumeTreeView(treeView: any) {
     })
     .subscribe();
 
-    const treeViewPackage = atom.packages.getActivePackage('tree-view');
-    // @ts-ignore
-    atom.commands.add(treeViewPackage.mainModule.treeView.element, {
-        'tree-view:expand-item': updateIcon
-    });
-
     atom.project.onDidChangePaths((paths) => {
         if (paths.length) {
             store.dispatch({ type: 'ADD_PROJECT', payload: {}});
+
+            !IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION && applyExpandItemSubscription();
+
             return;
         }
 
         store.dispatch({ type: 'REMOVE_PROJECT', payload: {}});
     });
 
-    updateIcon();
+    const projects = atom.project.getPaths();
+    if (projects.length) {
+        IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION = true;
+
+        setTimeout(applyExpandItemSubscription);
+
+        updateIcon();
+    }
+}
+
+function updateIcon() {
+    store.dispatch({ type: 'UPDATE_ICON', payload: {}});
+}
+
+function applyExpandItemSubscription() {
+    const treeViewPackage: any = atom.packages.getActivePackage('tree-view');
+
+    atom.commands.add(treeViewPackage.mainModule.treeView.element, {
+        'tree-view:expand-item': updateIcon
+    });
 }
 
 function assignScreepsSrcIcon(treeView: any, projectPath: string, cfg: any) {
