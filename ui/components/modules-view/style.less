@@ -53,47 +53,30 @@
             }
         }
     }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        min-height: 32px;
+        padding-left: 5px;
+        padding-right: 5px;
     
-}
-
-.screeps-modules-view__header {
-    display: flex;
-    align-items: center;
-    min-height: 32px;
-    padding-left: 5px;
-    padding-right: 5px;
-
-    line-height: 32px;
-
-    span {
-        text-transform: uppercase;
-    }
-
-    button {
-        position: relative;
-        z-index: 1;
-    }
-
-    button:nth-child(2) {
-        overflow: hidden;
-
-        cursor: pointer;
-        color: #4A5FD2 !important;
-        font-weight: bold;
-        text-overflow: ellipsis;
-    }
-
-    button:nth-child(3),
-    button:nth-child(4) {
-        font-size: 16px;
-    }
-
-    button:last-child {
-        margin-right: 40px;
-    }
-
-    button:focus {
-        outline: none;
+        line-height: 32px;
+    
+        span:first-child {
+            text-transform: uppercase;
+        }
+    
+        span:nth-child(2) {
+            overflow: hidden;
+            padding: 0 10px;
+    
+            cursor: pointer;
+            color: #4A5FD2 !important;
+            font-weight: bold;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 }
 

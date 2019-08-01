@@ -21,16 +21,7 @@ class ModulesView extends React.Component<IModulesViewProps> {
             <div className='screeps-ide screeps-modules-view'>
                 <div className='screeps-modules-view__header'>
                     <span>Branch</span>
-                    <button className='btn btn--clear'>
-                        { this.props.branch }
-                    </button>
-
-                    {/* <button className='btn btn--clear' onClick={() => this.onApplyChanges()} disabled={ !this.hasChanges() }>
-                        <i className='sc-icon-done' />
-                    </button> */}
-                    {/* <button className='btn btn--clear' onClick={() => this.onRevertChanges()} disabled={ !this.hasChanges() }>
-                        <i className='sc-icon-revert' />
-                    </button> */}
+                    <span>{ this.props.branch }</span>
                 </div>
                 <hr className={ 'screeps-hr' } />
                 <div className='screeps-modules-view__items'>
