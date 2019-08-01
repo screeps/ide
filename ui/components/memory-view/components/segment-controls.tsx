@@ -9,6 +9,9 @@ export interface IMemorySegmentControlsViewProps {
     onUpdate: Function;
 }
 
+export const BTN_SAVE = 'screeps-memory__segment-controls-save';
+export const BTN_RELOAD = 'screeps-memory__segment-controls-reload';
+
 const segments: number[] = [];
 for (let i = 0; i < 100; i++) {
     segments.push(i);
@@ -23,10 +26,12 @@ export default function(props: IMemorySegmentControlsViewProps) {
                     return (<option key={ name } value={ name }>{ name }</option>);
                 })}
             </select>
-            <button type='button' className='btn' onClick={ onRefresh }>
+            <button id={ `${ BTN_RELOAD }` }
+                type='button' className='btn' onClick={ onRefresh }>
                 <i className='sc-icon-cached' />
             </button>
-            <button type='button' className='btn' onClick={ onUpdate } disabled={ !props.hasChange }>
+            <button id={ `${ BTN_SAVE }` }
+                type='button' className='btn' onClick={ onUpdate } disabled={ !props.hasChange }>
                 <i className='sc-icon-done' />
             </button>
         </div>

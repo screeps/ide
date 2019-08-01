@@ -18,3 +18,7 @@ export {
     MEMORY_MAIN_VIEW,
     MEMORY_SEGMENTS_VIEW
 } from './components/memory-view/components/controls';
+export {
+    BTN_SAVE as BTN_SEGMENTS_SAVE,
+    BTN_RELOAD as BTN_SEGMENTS_RELOAD
+} from './components/memory-view/components/segment-controls';

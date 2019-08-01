@@ -14,6 +14,8 @@ import {
     PATH_BTN_UPDATE,
     PATH_BTN_RELOAD,
     PATH_BTN_CANCEL,
+    BTN_SEGMENTS_SAVE,
+    BTN_SEGMENTS_RELOAD,
     MEMORY_MAIN_VIEW,
     MEMORY_SEGMENTS_VIEW
 } from '../../../ui';
@@ -37,6 +39,7 @@ export class MemoryPanel {
 
     private _tooltips: { [key: string]: CompositeDisposable } = {};
     private _tooltipsDisposables: CompositeDisposable | null = null;
+    private _segmentsTooltipsDisposables: CompositeDisposable | null = null;
 
     // @ts-ignore
     _pipe$: Subject<void> | null;
@@ -90,7 +93,7 @@ export class MemoryPanel {
                 this._socket = getSocket();
                 this._service = new Service()
 
-                this.initMemoryPipeSubscription();
+                this.onChangeView(this.state.view || MEMORY_MAIN_VIEW);
 
                 this._service.shards$
                     .pipe(tap((shards: any) => this.state = { shards }))
@@ -220,6 +223,20 @@ export class MemoryPanel {
                 break;
             }
             case MEMORY_SEGMENTS_VIEW: {
+                setTimeout(() => {
+                    if (this._segmentsTooltipsDisposables) {
+                        this._segmentsTooltipsDisposables.dispose();
+                    }
+
+                    let d;
+                    const subscriptions = this._segmentsTooltipsDisposables = new CompositeDisposable();
+
+                    d = applyTooltip(`#${ BTN_SEGMENTS_SAVE }`, 'Save');
+                    d && subscriptions.add(d);
+                    d = applyTooltip(`#${ BTN_SEGMENTS_RELOAD }`, 'Reload');
+                    d && subscriptions.add(d);
+                });
+
                 this.onSegment(this.state.segment, this.state.shard);
 
                 break;
