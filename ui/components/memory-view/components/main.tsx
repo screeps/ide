@@ -15,11 +15,23 @@ interface IMemoryMainViewProps {
     onCancel?: Function;
 }
 
+function sort(a: IMemoryPath, b: IMemoryPath) {
+    if(a.path < b.path) {
+        return -1;
+    }
+
+    if(a.path > b.path) {
+        return 1;
+    }
+
+    return 0;
+}
+
 export default function(props: IMemoryMainViewProps) {
     return (
         <div className='screeps-memory__main'>
             <div className='screeps-memory__main-items'>
-                { props.memory.map(({ path, value }) => {
+                { props.memory.sort(sort).map(({ path, value }) => {
                     return (<MemoryItemView key={ path }
                         path={ path }
                         value={ value }
