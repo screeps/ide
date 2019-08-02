@@ -10,7 +10,6 @@ import { PACKAGE_NAME, configGetter } from './config';
 import {
     commit,
     commitAll,
-    onDidChangeFiles,
     changeProjectBranch
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
@@ -37,8 +36,6 @@ export function initialize(state: IState) {
     __state.next(state);
 
     Object.values(effects).forEach((effect) => effect.subscribe());
-
-    atom.project.onDidChangeFiles(onDidChangeFiles);
 }
 
 export function activate(state: IState) {
