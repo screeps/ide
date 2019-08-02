@@ -14,6 +14,7 @@ import { BranchesBlock } from '../branches-block';
 import { ModulesBlock } from '../modules-block';
 import { CONSOLE_URI } from '../console-panel';
 import { MEMORY_URI } from '../memory-panel';
+import { default as ResizablePanel } from '../../../ui/components/resizable-panel';
 
 import { UpdateModulesAction } from './actions';
 
@@ -102,12 +103,14 @@ export class ScreepsPanel implements ViewModel {
 
         ReactDOM.render(
             <div className='screeps-ide screeps-panel'>
-                <BranchesBlock
-                    branch={ branch }
-                    branches={ branches }
+                <ResizablePanel>
+                    <BranchesBlock
+                        branch={ branch }
+                        branches={ branches }
 
-                    active={ activeBranchTextEditor }
-                />
+                        active={ activeBranchTextEditor }
+                    />
+                </ResizablePanel>
                 { modulesView }
                 <footer>
                     <button className='btn btn-primary' onClick={ this.createProject }>

@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import { fromEvent } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+
 // import { default as MemorySegmentVeiw } from '../components/segment';
 
 interface IResizablePanelProps {
@@ -20,37 +23,25 @@ export default class ResizablePanel extends React.Component<IResizablePanelProps
     public render() {
         return (
             <div ref={ this.elementRef } className='screeps-ide screeps-resizable-panel'>
-                <div className='panel-divider' onMouseDown={ this.onResizeStart }/>
                 { this.props.children }
+                <div className='panel-divider' onMouseDown={ this.onResizeStart }/>
             </div>
         );
     }
 
-    onResizeStart = (event: any) => {
-        this.clientY = event.clientY;
+    onResizeStart = () => {
+        const up$ = fromEvent(document.body, 'mouseup');
+        const move$ = fromEvent(document.body, 'mousemove');
 
-        document.addEventListener('mousemove', this.onResize);
-        document.addEventListener('mouseup', this.onResizeStop);
-    }
-
-    onResize = (event: any) => {
-        if (!this.elementRef.current) {
-            return;
-        }
-
-        const parent = this.elementRef.current.parentElement;
-
-        const offsetY = event.clientY - this.clientY;
-        this.clientY = event.clientY;
-
-        const height = parseInt(parent.style.height, 10);
-
-        parent.style.height = `${ height - offsetY }px`
-    }
-
-    onResizeStop = () => {
-        document.removeEventListener('mousemove', this.onResize);
-        document.removeEventListener('mouseup', this.onResizeStop);
+        move$.pipe(takeUntil(up$))
+            // @ts-ignore
+            .pipe(tap(({ movementY }) => {
+                const element = this.elementRef.current;
+                const height = parseInt(element.offsetHeight, 10);
+        
+                element.style.height = `${ height + movementY }px`;
+            }))
+            .subscribe();
     }
 
 }
