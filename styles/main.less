@@ -122,3 +122,23 @@
 [screeps-dist='screeps-dist'] .project-root-header > span:first-child {
     pointer-events: none;
 }
+
+.tab-bar[is='atom-tabs'] li .title[data-path*='screeps-ide'] {
+    &:before {
+        content: "\e900";
+
+        display: flex;
+        height: 30px;
+        align-items: center;
+        float: left;
+        margin-right: -30px;
+
+        font-family: 'screepsicons' !important;
+    }
+}
+
+.tab-bar[is='atom-tabs'] li.active .title[data-path*='screeps-ide'] {
+    &:before {
+        color: #568af2;
+    }
+}
