@@ -7,6 +7,7 @@ const MAIN_MODULE = 'main';
 
 export default function(props: IModulesViewProps) {
     const [value, setValue] = useState('');
+    const [isValid, setValid] = useState(true);
 
     useEffect(() => setValue(''), [props.branch]);
 
@@ -40,7 +41,8 @@ export default function(props: IModulesViewProps) {
                 </ul>
             </div>
             <div className='screeps-modules-view__new'>
-                <form onSubmit={ onSubmit }>
+                <form className={ [!isValid ? '--invalid' : ''].join(' ') }
+                    onSubmit={ onSubmit }>
                     <fieldset className='screeps-field'>
                         <input className='native-key-bindings' type='text' placeholder='New module name...'
 
@@ -51,6 +53,7 @@ export default function(props: IModulesViewProps) {
                             value={ value }/>
                         <div className='underline' />
                     </fieldset>
+                    <div className='error'>Already exist</div>
                 </form>
             </div>
         </div>
@@ -68,14 +71,22 @@ export default function(props: IModulesViewProps) {
         const target = event.target as HTMLInputElement;
         const value = target.value;
 
+        const isExist = Object.entries(props.modules)
+            .some(([module]) => module === value);
+
+        setValid(!isExist && value !== MAIN_MODULE);
         setValue(value);
     }
 
     function onSubmit(event: React.FormEvent) {
+        event.preventDefault();
+
+        if (!isValid) {
+            return;
+        }
+
         props.onCreateModule && props.onCreateModule(value);
         setValue('');
-
-        event.preventDefault();
     }
 
     function _getAdditionalModules(modules: {
