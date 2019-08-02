@@ -19,6 +19,12 @@
             transition: opacity .3s ease;
         }
 
+        &:not(.--indented) {
+            .error {
+                bottom: -20px;
+            }
+        }
+
         &.--invalid {
             input  ~ .underline {
                 border-color: @text-color-fail;
