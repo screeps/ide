@@ -7,10 +7,8 @@ const actions_1 = require("../components/screeps-panel/actions");
 const PROJECT_ROOT_HEADER = '.project-root-header';
 const PROJECT_SCREEPS_BRANCH = '.project-branch';
 const PROJECT_EMPTY_BTN = 'screeps-download-btn';
+let IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION = false;
 function consumeTreeView(treeView) {
-    const updateIcon = () => {
-        store_1.default.dispatch({ type: 'UPDATE_ICON', payload: {} });
-    };
     store_1.default.effect(async (state, { type }) => {
         if (![actions_1.ADD_PROJECT, 'UPDATE_ICON', 'CHANGE_PROJECT'].includes(type)) {
             return state;
@@ -31,21 +29,31 @@ function consumeTreeView(treeView) {
         });
     })
         .subscribe();
-    const treeViewPackage = atom.packages.getActivePackage('tree-view');
-    // @ts-ignore
-    atom.commands.add(treeViewPackage.mainModule.treeView.element, {
-        'tree-view:expand-item': updateIcon
-    });
     atom.project.onDidChangePaths((paths) => {
         if (paths.length) {
             store_1.default.dispatch({ type: 'ADD_PROJECT', payload: {} });
+            !IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION && applyExpandItemSubscription();
             return;
         }
         store_1.default.dispatch({ type: 'REMOVE_PROJECT', payload: {} });
     });
-    updateIcon();
+    const projects = atom.project.getPaths();
+    if (projects.length) {
+        IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION = true;
+        setTimeout(applyExpandItemSubscription);
+        updateIcon();
+    }
 }
 exports.consumeTreeView = consumeTreeView;
+function updateIcon() {
+    store_1.default.dispatch({ type: 'UPDATE_ICON', payload: {} });
+}
+function applyExpandItemSubscription() {
+    const treeViewPackage = atom.packages.getActivePackage('tree-view');
+    atom.commands.add(treeViewPackage.mainModule.treeView.element, {
+        'tree-view:expand-item': updateIcon
+    });
+}
 function assignScreepsSrcIcon(treeView, projectPath, cfg) {
     const dataPath = utils_1.getScreepsProjectSrc(projectPath, cfg.src);
     const entry = treeView.entryForPath(dataPath);

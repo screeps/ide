@@ -26,4 +26,7 @@ exports.PATH_BTN_CANCEL = item_1.BTN_CANCEL;
 var controls_1 = require("./components/memory-view/components/controls");
 exports.MEMORY_MAIN_VIEW = controls_1.MEMORY_MAIN_VIEW;
 exports.MEMORY_SEGMENTS_VIEW = controls_1.MEMORY_SEGMENTS_VIEW;
+var segment_controls_1 = require("./components/memory-view/components/segment-controls");
+exports.BTN_SEGMENTS_SAVE = segment_controls_1.BTN_SAVE;
+exports.BTN_SEGMENTS_RELOAD = segment_controls_1.BTN_RELOAD;
 //# sourceMappingURL=index.js.map

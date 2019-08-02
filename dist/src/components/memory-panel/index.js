@@ -13,6 +13,7 @@ const service_1 = require("../../service");
 const utils_1 = require("../../utils");
 const decoratos_1 = require("../../decoratos");
 const utils_2 = require("../../utils");
+const confirm_modal_1 = require("../confirm-modal");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.MEMORY_URI = 'atom://screeps-ide/memory';
 class MemoryPanel {
@@ -21,31 +22,9 @@ class MemoryPanel {
         this.memory$ = this._memorySbj.asObservable();
         this._tooltips = {};
         this._tooltipsDisposables = null;
-        // public get state(): any {
-        //     if (!this.viewRef.current) {
-        //         return {
-        //         };
-        //     }
-        //     // @ts-ignore
-        //     return this.viewRef.current.state;
-        // }
-        // public set state(state: any) {
-        //     if (!this.viewRef.current) {
-        //         return;
-        //     }
-        //     // @ts-ignore
-        //     this.viewRef.current.state = {
-        //         // @ts-ignore
-        //         ...this.viewRef.current.state,
-        //         ...state
-        //     };
-        //     // @ts-ignore
-        //     this.viewRef.current.setState(
-        //         // @ts-ignore
-        //         this.viewRef.current.state
-        //     );
-        // }
+        this._segmentsTooltipsDisposables = null;
         this._state = {
+            view: ui_1.MEMORY_MAIN_VIEW,
             memory: utils_1.getWatches()
         };
         this.onChangeView = (view) => {
@@ -56,6 +35,17 @@ class MemoryPanel {
                     break;
                 }
                 case ui_1.MEMORY_SEGMENTS_VIEW: {
+                    setTimeout(() => {
+                        if (this._segmentsTooltipsDisposables) {
+                            this._segmentsTooltipsDisposables.dispose();
+                        }
+                        let d;
+                        const subscriptions = this._segmentsTooltipsDisposables = new atom_1.CompositeDisposable();
+                        d = utils_2.applyTooltip(`#${ui_1.BTN_SEGMENTS_SAVE}`, 'Save');
+                        d && subscriptions.add(d);
+                        d = utils_2.applyTooltip(`#${ui_1.BTN_SEGMENTS_RELOAD}`, 'Reload');
+                        d && subscriptions.add(d);
+                    });
                     this.onSegment(this.state.segment, this.state.shard);
                     break;
                 }
@@ -90,7 +80,7 @@ class MemoryPanel {
                 this._user = await utils_2.getUser();
                 this._socket = utils_2.getSocket();
                 this._service = new service_1.Service();
-                this.initMemoryPipeSubscription();
+                this.onChangeView(this.state.view);
                 this._service.shards$
                     .pipe(operators_1.tap((shards) => this.state = { shards }))
                     .subscribe();
@@ -102,14 +92,8 @@ class MemoryPanel {
                 }))
                     .pipe(operators_1.tap((memory) => {
                     memory.forEach(({ path }) => {
-                        const ref = document.getElementById(`${ui_1.PATH_BTN_REMOVE}${path || 'root'}`);
-                        if (!ref) {
-                            return;
-                        }
-                        const disposable = atom.tooltips.add(ref, {
-                            title: 'Delete watch'
-                        });
-                        subscriptions.add(disposable);
+                        const d = utils_2.applyTooltip(`#${ui_1.PATH_BTN_REMOVE}${path || 'root'}`, 'Remove watch');
+                        d && subscriptions.add(d);
                     });
                 }))
                     .subscribe();
@@ -169,7 +153,7 @@ class MemoryPanel {
             });
         });
     }
-    render({ view = '', shard = 'shard0', shards = [], memory = [], segment = '0', segmentData = '', isProgressing = false }) {
+    render({ view = ui_1.MEMORY_MAIN_VIEW, shard = 'shard0', shards = [], memory = [], segment = '0', segmentData = '', isProgressing = false }) {
         ReactDOM.render(React.createElement(ui_1.MemoryView, { view: view, onChangeView: (view) => this.onChangeView(view), isProgressing: isProgressing, onInput: this.onInput, onClose: this.onClose, shard: shard, shards: shards, onShard: (shard) => this.onShard(shard), memory: memory, onMemory: (...args) => this.onMemory(...args), onMemoryRefresh: (...args) => this.onMemory(...args), onMemoryRemove: (...args) => this.onMemoryRemove(...args), onMemoryDelete: (...args) => this.onMemoryDelete(...args), onMemoryUpdate: (...args) => this.onMemoryUpdate(...args), onMemoryCancel: (...args) => this.onMemoryCancel(...args), segment: segment, segmentData: segmentData, onSegment: (...args) => this.onSegment(...args), onSegmentRefresh: (...args) => this.onSegment(...args), onSegmentUpdate: (...args) => this.onSegmentUpdate(...args) }), this.element);
     }
     async onMemory(path, shard) {
@@ -208,6 +192,16 @@ class MemoryPanel {
         });
     }
     async onMemoryUpdate(path, value, shard) {
+        if (!path) {
+            try {
+                await confirm_modal_1.default({
+                    legend: 'You are going to rewrite the entire Memory tree. Doing so is not recommended and could result in replacing some of your variables that are already changed with an obsolete state. It is better to create a watch for a specific sub-tree and commit it instead.\n\nDo you really want to proceed?'
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+        }
         try {
             await this._api.setUserMemory({ path, value, shard });
         }
@@ -280,7 +274,7 @@ class MemoryPanel {
             const subscriptions = this._tooltipsDisposables = new atom_1.CompositeDisposable();
             d = utils_2.applyTooltip('#screeps-memory__control-main', 'Main memory');
             d && subscriptions.add(d);
-            d = utils_2.applyTooltip('#screeps-memory__control-segments', 'Segments memory');
+            d = utils_2.applyTooltip('#screeps-memory__control-segments', 'Segments');
             d && subscriptions.add(d);
             d = utils_2.applyTooltip('#screeps-memory__control-close', 'Close panel');
             d && subscriptions.add(d);

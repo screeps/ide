@@ -7,7 +7,7 @@ function default_1({ onInput }) {
     return (React.createElement("div", { className: 'screeps-memory__input' },
         React.createElement("form", { onSubmit: onSubmit },
             React.createElement("fieldset", { className: 'screeps-field' },
-                React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'Add new memory watch path here, e.g. "creeps.Jhon"', autoComplete: '', onChange: onChange, value: value }),
+                React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'Add new memory watch path here, e.g. "creeps.John"', autoComplete: '', onChange: onChange, value: value }),
                 React.createElement("div", { className: 'underline' })))));
     function onChange(event) {
         const target = event.target;

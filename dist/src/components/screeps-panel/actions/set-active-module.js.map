@@ -1,0 +1,1 @@
+{"version":3,"file":"set-active-module.js","sourceRoot":"","sources":["../../../../../src/components/screeps-panel/actions/set-active-module.ts"],"names":[],"mappings":";;AAEa,QAAA,iBAAiB,GAAG,mBAAmB,CAAC;AACrD,SAAgB,eAAe,CAAC,MAAqB,EAAE,MAAqB;IACxE,OAAO;QACH,IAAI,EAAE,yBAAiB;QACvB,OAAO,EAAE;YACL,MAAM;YACN,MAAM;SACT;KACJ,CAAA;AACL,CAAC;AARD,0CAQC"}

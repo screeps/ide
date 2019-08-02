@@ -1,15 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+const react_1 = require("react");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const state_1 = require("../../state");
 const utils_1 = require("../../utils");
 const branches_view_1 = require("../../../ui/components/branches-view");
-function BranchesBlock({ branch, branches = [] }) {
-    return (React.createElement(branches_view_1.default, { branch: branch, branches: branches, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
+let progressStartTime = 0;
+const ANIMATION_MIN_TIME = 1500;
+function BranchesBlock({ branch, branches = [], active }) {
+    const [inProgress, setInProgress] = react_1.useState(false);
+    const [progress, setProgress] = react_1.useState(false);
+    react_1.useEffect(() => {
+        const now = new Date().getTime();
+        if (progress) {
+            progressStartTime = now;
+            setInProgress(true);
+            return;
+        }
+        const delay = ANIMATION_MIN_TIME - (now - progressStartTime);
+        setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
+    }, [progress]);
+    return (React.createElement(branches_view_1.default, { isProgressing: inProgress, branch: branch, branches: branches, active: active, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
     async function onCopyBranch(branch) {
-        console.log('BranchesBlock::onCopyBranch');
+        setProgress(true);
         try {
             let api;
             try {
@@ -34,9 +49,10 @@ function BranchesBlock({ branch, branches = [] }) {
         catch (err) {
             // Noop.
         }
+        setProgress(false);
     }
     async function onSelectBranch(_branch) {
-        console.log(2, 'BranchesBlock::onSelectBranch');
+        setProgress(true);
         try {
             const _api = await utils_1.getApi();
             const { branch, modules: _modules } = await _api.getUserCode(_branch);
@@ -51,9 +67,10 @@ function BranchesBlock({ branch, branches = [] }) {
         catch (err) {
             // Noop.
         }
+        setProgress(false);
     }
     async function onDeleteBranch(branch) {
-        console.log('BranchesBlock::onDeleteBranch');
+        setProgress(true);
         try {
             await confirm_modal_1.default({
                 submitBtn: 'Delete',
@@ -62,13 +79,21 @@ function BranchesBlock({ branch, branches = [] }) {
             const _api = await utils_1.getApi();
             await _api.deleteUserBranch(branch);
             const { list: branches } = await _api.getUserBranches();
-            state_1.default.next(Object.assign({}, state_1.default.getValue(), { branches }));
+            const state = state_1.default.getValue();
+            state_1.default.next(Object.assign({}, state, { branches }));
+            let { branch: currentBranch } = state;
+            if (branch === currentBranch) {
+                const ibranch = branches.find(({ activeWorld }) => activeWorld);
+                ibranch && onSelectBranch(ibranch.branch);
+            }
         }
         catch (err) {
             // Noop.
         }
+        setProgress(false);
     }
     async function onSetActiveSim(_branch) {
+        setProgress(true);
         try {
             const _api = await utils_1.getApi();
             await _api.setActiveSim(_branch);
@@ -86,13 +111,14 @@ function BranchesBlock({ branch, branches = [] }) {
                 return data;
             });
             state_1.default.next(Object.assign({}, state, { branches }));
-            // ttps://screeps.com/api/user/set-active-branch
         }
         catch (err) {
             // Noop.
         }
+        setProgress(false);
     }
     async function onSetActiveWorld(_branch) {
+        setProgress(true);
         try {
             const _api = await utils_1.getApi();
             await _api.setActiveWorld(_branch);
@@ -110,11 +136,11 @@ function BranchesBlock({ branch, branches = [] }) {
                 return data;
             });
             state_1.default.next(Object.assign({}, state, { branches }));
-            // ttps://screeps.com/api/user/set-active-branch
         }
         catch (err) {
             // Noop.
         }
+        setProgress(false);
     }
 }
 exports.BranchesBlock = BranchesBlock;

@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+exports.BTN_SAVE = 'screeps-memory__segment-controls-save';
+exports.BTN_RELOAD = 'screeps-memory__segment-controls-reload';
 const segments = [];
 for (let i = 0; i < 100; i++) {
     segments.push(i);
@@ -11,9 +13,9 @@ function default_1(props) {
         React.createElement("select", { className: 'input-select', onChange: onSegment, value: props.segment }, segments.map((name) => {
             return (React.createElement("option", { key: name, value: name }, name));
         })),
-        React.createElement("button", { type: 'button', className: 'btn', onClick: onRefresh },
+        React.createElement("button", { id: `${exports.BTN_RELOAD}`, type: 'button', className: 'btn', onClick: onRefresh },
             React.createElement("i", { className: 'sc-icon-cached' })),
-        React.createElement("button", { type: 'button', className: 'btn', onClick: onUpdate, disabled: !props.hasChange },
+        React.createElement("button", { id: `${exports.BTN_SAVE}`, type: 'button', className: 'btn', onClick: onUpdate, disabled: !props.hasChange },
             React.createElement("i", { className: 'sc-icon-done' }))));
     function onSegment(event) {
         props.onSegment && props.onSegment(event.target.value);

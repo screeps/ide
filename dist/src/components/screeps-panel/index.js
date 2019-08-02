@@ -11,11 +11,13 @@ const branches_block_1 = require("../branches-block");
 const modules_block_1 = require("../modules-block");
 const console_panel_1 = require("../console-panel");
 const memory_panel_1 = require("../memory-panel");
+const resizable_panel_1 = require("../../../ui/components/resizable-panel");
 const actions_1 = require("./actions");
 require("./reducers");
 const effects = require("./effects");
+const actions_2 = require("./actions");
 const store_1 = require("../../store");
-const actions_2 = require("../../store/actions");
+const actions_3 = require("../../store/actions");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.SCREEPS_URI = 'atom://screeps-ide/screeps';
 class ScreepsPanel {
@@ -49,33 +51,37 @@ class ScreepsPanel {
                 this.destroy();
             }
         })();
-        // TODO: тут надо сделать выставление статуса активный модуль
-        atom.workspace.onDidChangeActivePaneItem((pane) => {
-            if (!(pane instanceof atom_1.TextEditor)) {
-                return;
+        atom.workspace.getCenter().onDidChangeActivePaneItem((pane) => {
+            let branch = null;
+            let module = null;
+            if (pane instanceof atom_1.TextEditor) {
+                const path = pane.getPath();
+                const matches = /[\\\/]\.branches[\\\/]([^\\]+)[\\\/]([^\\]+)\.js/.exec(path);
+                if (matches) {
+                    [, branch, module] = matches;
+                }
             }
-            // @ts-ignore
-            // console.log(pane.getPath());
-            // const path = pane.getPath() as string;
-            // store.dispatch(ActiveModule())
+            store_1.default.dispatch(actions_2.SetActiveModule(branch, module));
         });
     }
-    render({ branch, branches, modules }) {
+    render({ branch, branches, modules, activeBranchTextEditor, activeModuleTextEditor }) {
         const _modules = modules[branch];
         let modulesView;
         if (_modules) {
-            modulesView = (React.createElement(modules_block_1.ModulesBlock, { branch: branch, modules: _modules }));
+            modulesView = (React.createElement(modules_block_1.ModulesBlock, { branch: branch, modules: _modules, active: `@${activeBranchTextEditor}/${activeModuleTextEditor}.js` }));
         }
         ReactDOM.render(React.createElement("div", { className: 'screeps-ide screeps-panel' },
-            React.createElement(branches_block_1.BranchesBlock, { branch: branch, branches: branches }),
+            React.createElement(resizable_panel_1.default, null,
+                React.createElement(branches_block_1.BranchesBlock, { branch: branch, branches: branches, active: activeBranchTextEditor })),
             modulesView,
-            React.createElement("button", { className: 'btn btn-primary', onClick: this.createProject }, "Create New Project"),
-            React.createElement("div", null,
-                React.createElement("button", { className: 'btn', onClick: this.openMemoryPanel }, "Memory"),
-                React.createElement("button", { className: 'btn', onClick: this.openConsolePanel }, "Console"))), this.element);
+            React.createElement("footer", null,
+                React.createElement("button", { className: 'btn btn-primary', onClick: this.createProject }, "Create New Project"),
+                React.createElement("div", null,
+                    React.createElement("button", { className: 'btn', onClick: this.openMemoryPanel }, "Memory"),
+                    React.createElement("button", { className: 'btn', onClick: this.openConsolePanel }, "Console")))), this.element);
     }
     createProject() {
-        store_1.default.dispatch(actions_2.CreateProjectAction());
+        store_1.default.dispatch(actions_3.CreateProjectAction());
     }
     openMemoryPanel() {
         atom.workspace.open(memory_panel_1.MEMORY_URI, {

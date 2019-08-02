@@ -12,7 +12,7 @@ function default_1(props) {
     const [segmentData, setSegmentData] = react_1.useState(props.segmentData || '');
     const [segmentHasChange, setSegmentHasChange] = react_1.useState(false);
     react_1.useEffect(() => {
-        onSegmentChange(props.segmentData);
+        onSegmentChange(props.segmentData || '');
     }, [props.segmentData]);
     if (props.view === controls_1.MEMORY_MAIN_VIEW) {
         memoryView = (React.createElement(main_1.default, { memory: props.memory || [], onInput: onInput, onClick: onMemory, onSave: onMemoryUpdate, onReload: onMemoryRefresh, onDelete: onMemoryDelete, onRemovePath: onMemoryRemove, onCancel: onMemoryCancel }));
@@ -26,44 +26,44 @@ function default_1(props) {
         React.createElement("hr", { className: 'screeps-hr' + (props.isProgressing ? ' screeps-hr--inprogress' : '') }),
         memoryView));
     function onInput(path) {
-        props.onInput && props.onInput(path);
+        return props.onInput && props.onInput(path);
     }
     function onShard(shard) {
-        props.onShard && props.onShard(shard);
+        return props.onShard && props.onShard(shard);
     }
     function onClose() {
-        props.onClose && props.onClose();
+        return props.onClose && props.onClose();
     }
     function onToggleView(view) {
-        props.onChangeView && props.onChangeView(view);
+        return props.onChangeView && props.onChangeView(view);
     }
-    async function onMemory(path) {
-        props.onMemory && await props.onMemory(path, props.shard);
+    function onMemory(path) {
+        return props.onMemory && props.onMemory(path, props.shard);
     }
     function onMemoryUpdate(path, value) {
-        props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
+        return props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
     }
     function onMemoryRefresh(path) {
-        props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
+        return props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
     }
     function onMemoryRemove(path) {
-        props.onMemoryRemove && props.onMemoryRemove(path, props.shard);
+        return props.onMemoryRemove && props.onMemoryRemove(path, props.shard);
     }
     function onMemoryDelete(path) {
-        props.onMemoryDelete && props.onMemoryDelete(path);
+        return props.onMemoryDelete && props.onMemoryDelete(path);
     }
     function onMemoryCancel(path) {
-        props.onMemoryCancel && props.onMemoryCancel(path);
+        return props.onMemoryCancel && props.onMemoryCancel(path);
     }
     function onSegment(segment) {
-        props.onSegment && props.onSegment(segment, props.shard);
+        return props.onSegment && props.onSegment(segment, props.shard);
     }
     function onSegmentChange(data) {
         setSegmentData(data);
         setSegmentHasChange(props.segmentData ? data !== props.segmentData : data !== '');
     }
     function onSegmentUpdate() {
-        props.onSegmentUpdate && props.onSegmentUpdate(props.segment, segmentData, props.shard);
+        return props.onSegmentUpdate && props.onSegmentUpdate(props.segment, segmentData, props.shard);
     }
 }
 exports.default = default_1;

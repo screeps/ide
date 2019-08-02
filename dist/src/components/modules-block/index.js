@@ -7,17 +7,17 @@ require("./reducers");
 const effects = require("./effects");
 Object.values(effects).forEach((effect) => effect.subscribe());
 const modules_view_1 = require("../../../ui/components/modules-view");
-function ModulesBlock({ branch, modules }) {
-    return (React.createElement(modules_view_1.default, { branch: branch, modules: modules, onCreateModule: (...args) => onCreateModule(...args), onSelectModule: (...args) => onSelectModule(...args), onDeleteModule: (...args) => onDeleteModule(...args) }));
+function ModulesBlock(props) {
+    return (React.createElement(modules_view_1.default, { branch: props.branch, modules: props.modules, active: props.active, onCreateModule: (...args) => onCreateModule(...args), onSelectModule: (...args) => onSelectModule(...args), onDeleteModule: (...args) => onDeleteModule(...args) }));
     async function onCreateModule(module) {
-        store_1.default.dispatch(actions_1.CreateModuleAction(branch, module));
-        store_1.default.dispatch(actions_1.OpenTextEditorAction(branch, module));
+        store_1.default.dispatch(actions_1.CreateModuleAction(props.branch, module));
+        store_1.default.dispatch(actions_1.OpenTextEditorAction(props.branch, module));
     }
     async function onSelectModule(module) {
-        store_1.default.dispatch(actions_1.OpenTextEditorAction(branch, module));
+        store_1.default.dispatch(actions_1.OpenTextEditorAction(props.branch, module));
     }
     async function onDeleteModule(module) {
-        store_1.default.dispatch(actions_1.DeleteModuleAction(branch, module));
+        store_1.default.dispatch(actions_1.DeleteModuleAction(props.branch, module));
     }
 }
 exports.ModulesBlock = ModulesBlock;

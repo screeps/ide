@@ -45,7 +45,7 @@ function default_1(props) {
     if (props.path) {
         deleteBtn = (React.createElement("div", { id: `${exports.BTN_REMOVE}${props.path}`, className: 'close-icon', onClick: () => onDelete(props.path) }));
     }
-    return (React.createElement("div", { className: 'screeps-memory__item' },
+    return (React.createElement("div", { className: 'screeps-memory__item', "data-path": props.path },
         React.createElement("div", { className: 'screeps-memory__item-path' },
             React.createElement("label", { className: props.path ? '' : '--italic' }, props.path || 'Memory root'),
             deleteBtn),
@@ -55,10 +55,15 @@ function default_1(props) {
         setIsEdit(!isEdit);
         props.onClick && await props.onClick(props.path);
     }
-    function onSave() {
-        onCancel();
-        // @ts-ignore
-        props.onSave && props.onSave(editorRef.current.getValue());
+    async function onSave() {
+        try {
+            // @ts-ignore
+            props.onSave && await props.onSave(editorRef.current.getValue());
+            onCancel();
+        }
+        catch (err) {
+            // Noop.
+        }
     }
     function onReload() {
         props.onReload && props.onReload();

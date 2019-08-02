@@ -11,7 +11,7 @@ function default_1({ legend, submitBtn, onCancel: cancel, onSubmit: submit }) {
         React.createElement("header", null,
             React.createElement("div", { className: 'logotype' }),
             React.createElement("button", { className: 'btn _cross', onClick: onCancel })),
-        React.createElement("form", { className: '--indented' },
+        React.createElement("form", { className: '--indented', onSubmit: onSubmit },
             React.createElement("fieldset", { className: 'screeps-field' },
                 React.createElement("legend", null, legend),
                 React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'message', onChange: onInput, required: true, autoFocus: true, tabIndex: 1 }),

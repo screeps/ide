@@ -12,7 +12,8 @@ function progress(target, name, descriptor) {
             result = await original.apply(this, args);
         }
         catch (err) {
-            // Noop.
+            hideProgress(this);
+            throw err;
         }
         hideProgress(this);
         return result;

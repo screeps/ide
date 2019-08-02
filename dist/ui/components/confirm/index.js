@@ -10,8 +10,7 @@ function default_1({ legend, submitBtn, onCancel: cancel, onSubmit: submit }) {
             React.createElement("div", { className: 'logotype' }),
             React.createElement("button", { className: 'btn _cross', onClick: onCancel })),
         React.createElement("form", { className: '--indented' },
-            React.createElement("fieldset", { className: 'screeps-field' },
-                React.createElement("legend", null, legend))),
+            React.createElement("legend", null, legend)),
         React.createElement("footer", null,
             React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: onCancel }, "Cancel"),
             React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', onClick: onSubmit }, submitBtn))));

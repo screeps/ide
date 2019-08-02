@@ -20,7 +20,7 @@ function default_1(props) {
                 React.createElement("legend", null,
                     projectPathLabel,
                     ":"),
-                React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'project-path', value: projectPath, onChange: onInput, required: true, readOnly: projectPathReadonly, autoFocus: true, tabIndex: 1 }),
+                React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'project-path', value: projectPath, onChange: onInput, onClick: props.onClick, required: true, readOnly: projectPathReadonly, autoFocus: true, tabIndex: 1 }),
                 React.createElement("div", { className: 'underline' })),
             React.createElement("fieldset", { className: 'screeps-field' },
                 React.createElement("legend", null, "Select branch"),

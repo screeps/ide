@@ -2,69 +2,60 @@
 /// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
+const react_1 = require("react");
 const MAIN_MODULE = 'main';
-class ModulesView extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onKeyPressHandler = (event) => {
-            if (event.key !== 'Enter') {
-                return;
-            }
-            if (!event.target.value) {
-                return;
-            }
-            this.props.onCreateModule && this.props.onCreateModule(event.target.value);
-            event.target.value = '';
-        };
-        this._getAdditionalModules = (modules) => {
-            return Object.entries(modules).filter(([name, { deleted }]) => {
-                return name !== MAIN_MODULE && !deleted;
-            });
-        };
-        // console.log('ModulesView::constructor', props.modules);
+function default_1(props) {
+    const [value, setValue] = react_1.useState('');
+    const [isValid, setValid] = react_1.useState(true);
+    react_1.useEffect(() => setValue(''), [props.branch]);
+    return (React.createElement("div", { className: 'screeps-ide screeps-modules-view' },
+        React.createElement("div", { className: 'screeps-modules-view__header' },
+            React.createElement("span", null, "Branch"),
+            React.createElement("span", null, props.branch)),
+        React.createElement("hr", { className: 'screeps-hr' }),
+        React.createElement("div", { className: 'screeps-modules-view__items' },
+            React.createElement("ul", { className: 'tab-bar' },
+                React.createElement("li", { className: 'tab screeps-modules-view__item screeps-modules-view__module' + (props.modules[MAIN_MODULE] && props.modules[MAIN_MODULE].modified ? ' modified' : '') + (props.active === `@${props.branch}/${MAIN_MODULE}.js` ? ' active' : '') },
+                    React.createElement("button", { className: 'btn btn--clear', onClick: () => onSelectModule(MAIN_MODULE) }, MAIN_MODULE),
+                    React.createElement("div", { className: 'modified-icon' })),
+                _getAdditionalModules(props.modules).map(([moduleName, { modified }]) => {
+                    return (React.createElement("li", { className: 'tab screeps-modules-view__item screeps-modules-view__module' + (modified ? ' modified' : '') + (props.active === `@${props.branch}/${moduleName}.js` ? ' active' : ''), key: moduleName },
+                        React.createElement("button", { className: 'btn btn--clear', onClick: () => onSelectModule(moduleName) }, moduleName),
+                        React.createElement("div", { className: 'close-icon', onClick: () => onDeleteModule(moduleName) })));
+                }))),
+        React.createElement("div", { className: 'screeps-modules-view__new' },
+            React.createElement("form", { className: [!isValid ? '--invalid' : ''].join(' '), onSubmit: onSubmit },
+                React.createElement("fieldset", { className: 'screeps-field' },
+                    React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'New module name...', autoComplete: '', onChange: onChange, value: value }),
+                    React.createElement("div", { className: 'underline' })),
+                React.createElement("div", { className: 'error' }, "Already exist")))));
+    function onSelectModule(module) {
+        props.onSelectModule && props.onSelectModule(module);
     }
-    render() {
-        // console.log('ModulesView::render', '');
-        return (React.createElement("div", { className: 'screeps-ide screeps-modules-view' },
-            React.createElement("div", { className: 'screeps-modules-view__header' },
-                React.createElement("span", null, "Branch"),
-                React.createElement("button", { className: 'btn btn--clear' }, this.props.branch)),
-            React.createElement("hr", { className: 'screeps-hr' }),
-            React.createElement("div", null,
-                React.createElement("ul", { className: 'tab-bar screeps-modules-view__items' },
-                    React.createElement("li", { className: 'tab screeps-modules-view__item screeps-modules-view__module' + (this.props.modules[MAIN_MODULE] && this.props.modules[MAIN_MODULE].modified ? ' modified' : '') + (this.props.modules[MAIN_MODULE] && this.props.modules[MAIN_MODULE].active ? ' active' : '') },
-                        React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(MAIN_MODULE) }, MAIN_MODULE),
-                        React.createElement("div", { className: 'modified-icon' })),
-                    this._getAdditionalModules(this.props.modules).map(([moduleName, { modified, active }]) => {
-                        return (React.createElement("li", { className: 'tab screeps-modules-view__item screeps-modules-view__module' + (modified ? ' modified' : '') + (active ? ' active' : ''), key: moduleName },
-                            React.createElement("button", { className: 'btn btn--clear', onClick: () => this.onSelectModule(moduleName) }, moduleName),
-                            React.createElement("div", { className: 'close-icon', onClick: () => this.onDeleteModule(moduleName) })));
-                    })),
-                React.createElement("div", { className: 'screeps-modules-view__new' },
-                    React.createElement("form", null,
-                        React.createElement("fieldset", { className: 'screeps-field' },
-                            React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'New module name...', autoComplete: '', onKeyPress: this.onKeyPressHandler }),
-                            React.createElement("div", { className: 'underline' })))))));
+    function onDeleteModule(module) {
+        props.onDeleteModule && props.onDeleteModule(module);
     }
-    hasChanges() {
-        return Object.values(this.props.modules)
-            .some(({ modified, deleted }) => !!modified || !!deleted);
+    function onChange(event) {
+        const target = event.target;
+        const value = target.value;
+        const isExist = Object.entries(props.modules)
+            .some(([module]) => module === value);
+        setValid(!isExist && value !== MAIN_MODULE);
+        setValue(value);
     }
-    onCreateModule(module) {
-        this.props.onCreateModule && this.props.onCreateModule(module);
+    function onSubmit(event) {
+        event.preventDefault();
+        if (!isValid) {
+            return;
+        }
+        props.onCreateModule && props.onCreateModule(value);
+        setValue('');
     }
-    onSelectModule(module) {
-        this.props.onSelectModule && this.props.onSelectModule(module);
-    }
-    onDeleteModule(module) {
-        this.props.onDeleteModule && this.props.onDeleteModule(module);
-    }
-    onApplyChanges() {
-        this.props.onApplyChanges && this.props.onApplyChanges();
-    }
-    onRevertChanges() {
-        this.props.onRevertChanges && this.props.onRevertChanges();
+    function _getAdditionalModules(modules) {
+        return Object.entries(modules).filter(([name, { deleted }]) => {
+            return name !== MAIN_MODULE && !deleted;
+        });
     }
 }
-exports.default = ModulesView;
+exports.default = default_1;
 //# sourceMappingURL=index.js.map
