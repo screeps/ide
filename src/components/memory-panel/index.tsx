@@ -100,11 +100,12 @@ export class MemoryPanel {
                     .pipe(tap((shards: any) => this.state = { shards }))
                     .subscribe();
 
-                const subscriptions = new CompositeDisposable();
+                let subscriptions = new CompositeDisposable();
                 this.memory$
                     .pipe(tap((memory: IMemoryPath[]) => this.state = { memory }))
                     .pipe(tap(() => {
                         subscriptions.dispose();
+                        subscriptions = new CompositeDisposable();
                     }))
                     .pipe(tap((memory: IMemoryPath[]) => {
                         memory.forEach(({ path }) => {
