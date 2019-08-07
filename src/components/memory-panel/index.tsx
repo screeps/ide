@@ -92,7 +92,9 @@ export class MemoryPanel {
                 this._api = await getApi();
                 this._user = await getUser();
                 this._socket = getSocket();
-                this._service = new Service()
+                this._service = new Service();
+
+                this.state = { shard: this._user.shard };
 
                 this.onChangeView(this.state.view);
 
