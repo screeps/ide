@@ -129,30 +129,6 @@ export function getModulePath(branch: string, module: string): string {
     return path.resolve(`${ branchPath }/${ module }${ extension }`);
 }
 
-export function getModuleByPath(modulePath: string): string | null {
-    const projectPath = atom.project.getPaths()[0];
-
-    if (!projectPath) {
-        return null;
-    }
-
-    const srcDir = configGetter('src');
-    const fullPath = path.resolve(projectPath, srcDir);
-
-    if (!modulePath.includes(fullPath) || modulePath === fullPath) {
-        return null;
-    }
-
-    const matches = modulePath.match(/([^\\]+)$/gm);
-
-    if (matches && matches[0]) {
-        const match = matches[0];
-        return match.replace(/\.js$/, '');
-    }
-
-    return null;
-}
-
 export async function readUserCode(fullPath: string): Promise<IModulesData> {
     const dir = new Directory(fullPath);
     const entries = dir.getEntriesSync();

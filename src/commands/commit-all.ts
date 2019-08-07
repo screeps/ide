@@ -11,7 +11,7 @@ export async function commitAll(event: CustomEvent) {
     let projectRef = target.parentElement;
 
     while(projectRef && !projectRef.classList.contains('project-root')) {
-        projectRef = target.parentElement;
+        projectRef = projectRef.parentElement;
 
         if (projectRef === document.body) {
             return;
