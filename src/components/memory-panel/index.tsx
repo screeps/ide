@@ -250,7 +250,14 @@ export class MemoryPanel {
 
     // Private component actions.
     onInput = (path: string) => {
-        const memory = [...this.state.memory, { path } as IMemoryPath];
+        let { memory } = this.state;
+
+        const isExist = memory.some((_: IMemoryPath) => _.path === path);
+        if (isExist) {
+            return;
+        }
+
+        memory = [...memory, { path } as IMemoryPath];
         this._memorySbj.next(memory);
 
         putWatches(memory);
