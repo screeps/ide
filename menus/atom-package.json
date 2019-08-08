@@ -6,7 +6,7 @@
             {
                 "label": "Screeps",
                 "submenu": [
-                    { "label": "Commit All to Choosed Branch", "command": "screeps-ide:commitAll" },
+                    { "label": "Commit All", "command": "screeps-ide:commitAll" },
                     { "label": "Change Branch", "command": "screeps-ide:changeProjectBranch" }
                 ]
             },
@@ -20,7 +20,7 @@
             {
                 "label": "Screeps",
                 "submenu": [
-                    { "label": "Commit File to Choosed Branch", "command": "screeps-ide:commit" }
+                    { "label": "Commit", "command": "screeps-ide:commit" }
                 ]
             },
 
