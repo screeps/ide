@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface IConsoleInputViewProps {
     onInput?(expression: string): void;
@@ -24,11 +24,22 @@ export default function({
         }
     }, [historyIndex]);
 
+    const inputRef = useRef(null);
+    useEffect(() => {
+        try {
+            // @ts-ignore
+            inputRef.current.focus();
+        } catch(err) {
+            // Noop.
+        }
+    }, [inputRef]);
+
     return (
         <div className='screeps-console__input'>
             <form onSubmit={ onSubmit }>
                 <fieldset className='screeps-field'>
                     <input className='native-key-bindings' type='text' placeholder='Command...'
+                        ref={ inputRef }
                         autoComplete=''
 
                         onChange={ onChange }
