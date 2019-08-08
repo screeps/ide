@@ -31,6 +31,8 @@ export class AtomModal {
             visible: true
         });
 
+        document.body.addEventListener('keyup', this.onEscape);
+
         ReactDOM.render(
             <Component ref={ this.ref }
                 { ...props }
@@ -48,10 +50,19 @@ export class AtomModal {
 
     destroy() {
         this._atomModalPanelRef.destroy();
+        document.body.removeEventListener('keyup', this.onEscape);
     }
 
     setState(state: any) {
         this.ref.current.setState(state);
+    }
+
+    onEscape = (event: KeyboardEvent) => {
+        if (event.code !== 'Escape') {
+            return;
+        }
+
+        this.onCancel();
     }
 
     onCancel = () => {
