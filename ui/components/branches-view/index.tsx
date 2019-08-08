@@ -2,6 +2,9 @@
 
 import * as React from 'react';
 
+export const BTN_CLONE = 'screeps-branches__item-clone-';
+export const BTN_DELETE = 'screeps-branches__item-delete-';
+
 export default function(props: IBranchesViewProps) {
 
     return (
@@ -18,7 +21,9 @@ export default function(props: IBranchesViewProps) {
                     let world;
 
                     if (!activeSim && !activeWorld) {
-                        deleteButton = <div className='close-icon' onClick={() => onDeleteBranch(branch)}></div>;
+                        deleteButton = <div id={ `${ BTN_DELETE }-${ _id }`}
+                            className='close-icon' onClick={() => onDeleteBranch(branch)}>
+                        </div>;
                     }
 
                     if (activeWorld) {
@@ -47,7 +52,10 @@ export default function(props: IBranchesViewProps) {
                         <li className={ 'tab screeps-branches-view__item' + (
                             props.active === branch ? ' --active' : ''
                         )} key={_id}>
-                            <button className='btn btn--clear' onClick={() => onCopyBranch(branch)}><i className='sc-icon-copy' /></button>
+                            <button id={ `${ BTN_CLONE }-${ _id }`}
+                                className='btn btn--clear' onClick={() => onCopyBranch(branch)}>
+                                <i className='sc-icon-copy' />
+                            </button>
                             <button className='btn btn--clear' onClick={() => onSelectBranch(branch)}>{ branch }</button>
                             { world } { sim }
                             { deleteButton }

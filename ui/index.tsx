@@ -5,7 +5,11 @@ export { default as ConsoleView } from './components/console-view';
 export { default as MemoryView } from './components/memory-view';
 export { default as ResizablePanel } from './components/resizable-panel';
 export { default as WelcomeView } from './components/welcome-view';
-export { default as BranchesView } from './components/branches-view';
+export {
+    BTN_CLONE as BTN_BRANCHES_CLONE,
+    BTN_DELETE as BTN_BRANCHES_DELETE,
+    default as BranchesView
+} from './components/branches-view';
 
 export {
     BTN_REMOVE as PATH_BTN_REMOVE,

@@ -1,3 +1,5 @@
+import { CompositeDisposable } from 'atom';
+
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
@@ -8,13 +10,20 @@ import {
     getBranchPath, 
     readUserCode,
     getApi,
-    combineModules
+    combineModules,
+    applyTooltip
 } from '../../utils';
 
-import BranchesView from '../../../ui/components/branches-view';
+import {
+    BTN_BRANCHES_CLONE,
+    BTN_BRANCHES_DELETE,
+    BranchesView
+} from '../../../ui';
 
 let progressStartTime: number = 0;
 const ANIMATION_MIN_TIME = 1500;
+
+let subscriptions = new CompositeDisposable();
 
 export function BranchesBlock({ branch, branches = [], active }: any) {
     const [inProgress, setInProgress] = useState(false);
@@ -34,6 +43,24 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
 
         setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
     }, [progress]);
+
+    useEffect(() => {
+        console.log('effect::branches');
+
+        setTimeout(() => {
+            subscriptions.dispose();
+            subscriptions = new CompositeDisposable();
+
+            for (let { _id } of branches) {
+                let d;
+                d = applyTooltip(`#${ BTN_BRANCHES_CLONE }-${ _id }`, 'Clone branch');
+                d && subscriptions.add(d);
+                d = applyTooltip(`#${ BTN_BRANCHES_DELETE }-${ _id }`, 'Delete branch');
+                d && subscriptions.add(d);
+            }
+        });
+        
+    }, [branches])
 
     return (
         <BranchesView
