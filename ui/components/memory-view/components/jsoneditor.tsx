@@ -18,6 +18,16 @@ export default forwardRef(function(props: IMemoryJSONEditorViewProps, ref) {
             name: props.name || 'Memory'
         }, props.value || 'undefined');
 
+        // TODO: Block error: Cannot read property '0' of undefined;
+        const _onMultiSelect = editorRef._onMultiSelect;
+        editorRef._onMultiSelect = () => {
+            try {
+                _onMultiSelect.bind(editorRef);
+            } catch(err) {
+                // Noop.
+            }
+        }
+
         setEditorRef(editorRef);
     }, [editorContainerRef])
 
@@ -27,7 +37,7 @@ export default forwardRef(function(props: IMemoryJSONEditorViewProps, ref) {
     }));
 
     return (
-        <div className='native-key-bindings' ref={ editorContainerRef }></div>
+        <div className='native-key-bindings' draggable={ false } ref={ editorContainerRef }></div>
     );
 
     function getValue() {
