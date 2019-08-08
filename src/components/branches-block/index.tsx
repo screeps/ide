@@ -45,8 +45,6 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
     }, [progress]);
 
     useEffect(() => {
-        console.log('effect::branches');
-
         setTimeout(() => {
             subscriptions.dispose();
             subscriptions = new CompositeDisposable();
