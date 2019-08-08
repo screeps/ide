@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { default as MemoryJSONEditorView } from './jsoneditor';
 
 interface IMemoryItemViewProps {
+    id: string;
     path: string;
     value: any;
     isEdit: boolean;
@@ -49,7 +50,7 @@ export default function(props: IMemoryItemViewProps) {
         let deleteBtn;
         if (props.path) {
             deleteBtn = (
-                <button id={ `${ BTN_DELETE }${ props.path }` }
+                <button id={ `${ BTN_DELETE }${ props.id }` }
                     type='button' className='btn btn--clear' onClick={ onRemovePath } title='Delete from memory'>
                     <i className='sc-icon-delete' />
                 </button>
@@ -59,15 +60,15 @@ export default function(props: IMemoryItemViewProps) {
         jsonEditor = (
             <div className='screeps-memory__json-editor'>
                 <div className='screeps-memory__json-editor-controlls'>
-                    <button id={ `${ BTN_UPDATE }${ props.path || 'root' }` }
+                    <button id={ `${ BTN_UPDATE }${ props.id }` }
                         type='button' className='btn btn--clear' onClick={ onSave }>
                         <i className='sc-icon-done' />
                     </button>
-                    <button id={ `${ BTN_RELOAD }${ props.path || 'root' }` }
+                    <button id={ `${ BTN_RELOAD }${ props.id }` }
                         type='button' className='btn btn--clear' onClick={ onReload }>
                         <i className='sc-icon-cached' />
                     </button>
-                    <button id={ `${ BTN_CANCEL }${ props.path || 'root' }` }
+                    <button id={ `${ BTN_CANCEL }${ props.id }` }
                         type='button' className='btn btn--clear' onClick={ onCancel }>
                         <i className='sc-icon-clear' />
                     </button>
@@ -83,7 +84,7 @@ export default function(props: IMemoryItemViewProps) {
 
     if (props.path) {
         deleteBtn = (
-            <div id={ `${ BTN_REMOVE }${ props.path }` }
+            <div id={ `${ BTN_REMOVE }${ props.id }` }
                 className='close-icon'
                 onClick={() => onDelete(props.path)}
             />

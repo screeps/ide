@@ -22,7 +22,7 @@ import {
 import { Service } from '../../service';
 import { Api } from '../../api';
 import { Socket } from '../../socket';
-import { getWatches, putWatches } from '../../utils';
+import { guid, getWatches, putWatches } from '../../utils';
 import { User } from '../../services/user';
 import { progress } from '../../decoratos';
 import { getApi, getSocket, getUser, applyTooltip } from '../../utils';
@@ -75,6 +75,7 @@ export class MemoryPanel {
         state: any = {}
     ) {
         this.element = document.createElement('div');
+        delete state.memory;
         this.state = state;
 
         setTimeout(() => {
@@ -110,8 +111,8 @@ export class MemoryPanel {
                         subscriptions = new CompositeDisposable();
                     }))
                     .pipe(tap((memory: IMemoryPath[]) => {
-                        memory.forEach(({ path }) => {
-                            const d = applyTooltip(`#${ PATH_BTN_REMOVE }${ path || 'root' }`, 'Remove watch');
+                        memory.forEach(({ _id }) => {
+                            const d = applyTooltip(`#${ PATH_BTN_REMOVE }${ _id }`, 'Remove watch');
                             d && subscriptions.add(d);
                         });
                     }))
@@ -257,7 +258,7 @@ export class MemoryPanel {
             return;
         }
 
-        memory = [...memory, { path } as IMemoryPath];
+        memory = [...memory, { _id: guid(), path } as IMemoryPath];
         this._memorySbj.next(memory);
 
         putWatches(memory);
@@ -295,7 +296,7 @@ export class MemoryPanel {
             return;
         }
 
-        memory[idx] = { path, value };
+        memory[idx] = { ...memory[idx], value };
         this._memorySbj.next([ ...memory ]);
 
         setTimeout(() => {
@@ -305,14 +306,15 @@ export class MemoryPanel {
 
             let d;
             const subscriptions = this._tooltips[path] = new CompositeDisposable();
+            const _id = memory[idx]._id;
 
-            d = applyTooltip(`#${ PATH_BTN_DELETE }${ path || 'root' }`, 'Delete from memory');
+            d = applyTooltip(`#${ PATH_BTN_DELETE }${ _id }`, 'Delete from memory');
             d && subscriptions.add(d);
-            d = applyTooltip(`#${ PATH_BTN_UPDATE }${ path || 'root' }`, 'Save');
+            d = applyTooltip(`#${ PATH_BTN_UPDATE }${ _id }`, 'Save');
             d && subscriptions.add(d);
-            d = applyTooltip(`#${ PATH_BTN_RELOAD }${ path || 'root' }`, 'Reload');
+            d = applyTooltip(`#${ PATH_BTN_RELOAD }${ _id }`, 'Reload');
             d && subscriptions.add(d);
-            d = applyTooltip(`#${ PATH_BTN_CANCEL }${ path || 'root' }`, 'Cancel changes');
+            d = applyTooltip(`#${ PATH_BTN_CANCEL }${ _id }`, 'Cancel changes');
             d && subscriptions.add(d);
         });
     }
@@ -342,7 +344,7 @@ export class MemoryPanel {
             return;
         }
 
-        memory[idx] = { path, value };
+        memory[idx] = { ...memory[idx], value };
         this._memorySbj.next([ ...memory ]);
     }
 

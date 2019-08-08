@@ -13,6 +13,10 @@ let socket: Socket;
 
 const LOCAL_PROJECT_CONFIG = '.screepsiderc';
 
+export function guid() {
+    return parseInt(Math.random().toString().substr(2)).toString(16);
+}
+
 export function $(s: string, el: HTMLElement | Document = document) {
     return el.querySelector(s);
 }
@@ -60,11 +64,11 @@ export function getSocket() {
 }
 
 const _watches: any = [
-    {path: '', value: {}},
-    {path: 'creeps'},
-    {path: 'spawns'},
-    {path: 'rooms'},
-    {path: 'flags'}
+    {_id: 'root', path: '', value: {}},
+    {_id: 'creeps', path: 'creeps'},
+    {_id: 'spawns', path: 'spawns'},
+    {_id: 'rooms', path: 'rooms'},
+    {_id: 'flags', path: 'flags'}
 ];
 const MEMORY_WATCHES = 'memory-watches';
 export function getWatches() {
@@ -78,6 +82,19 @@ export function getWatches() {
         }
 
         watches = JSON.parse(watches);
+        watches = watches.map(({ _id, path, value }: any): any => {
+            if (!_id) {
+                const watcher = _watches.find((_: any) => _.path === path);
+                if (watcher) {
+                    _id = watcher._id;
+                } else {
+                    _id = guid();
+                }
+            }
+
+            return { _id, path, value };
+        });
+
     } catch(err) {
         localStorage.setItem(MEMORY_WATCHES, JSON.stringify(_watches));
         watches = _watches;

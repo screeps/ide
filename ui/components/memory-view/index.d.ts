@@ -1,4 +1,5 @@
 interface IMemoryPath {
+    _id: string;
     path: string;
     value: any;
 }

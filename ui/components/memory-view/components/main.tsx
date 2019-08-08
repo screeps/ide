@@ -31,8 +31,9 @@ export default function(props: IMemoryMainViewProps) {
     return (
         <div className='screeps-memory__main'>
             <div className='screeps-memory__main-items'>
-                { props.memory.sort(sort).map(({ path, value }) => {
-                    return (<MemoryItemView key={ path }
+                { props.memory.sort(sort).map(({ _id, path, value }) => {
+                    return (<MemoryItemView key={ _id }
+                        id={ _id }
                         path={ path }
                         value={ value }
                         isEdit={ false }
