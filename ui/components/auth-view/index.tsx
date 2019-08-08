@@ -62,6 +62,7 @@ export default class AuthView extends React.Component<IAuthModalProps> {
                     <div className='logotype' />
                     <button className='btn _cross' onClick={this.onCancel}/>
                 </header>
+                <div>Your credentials are only used to create an auth token, password will not be stored.</div>
                 <form className={ ['--indented', this.state.isInvalid ? '--invalid' : ''].join(' ') }>
                     <fieldset className='screeps-field'>
                         <input ref={ this._emailRef }
