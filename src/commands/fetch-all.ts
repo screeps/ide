@@ -13,7 +13,7 @@ import { default as confirm } from '../components/confirm-modal';
 
 export async function fetchAll(event: CustomEvent) {
     await confirm({
-        legend: 'Local changes will be overwrite.'
+        legend: 'Local changes will be overwritten.'
     });
 
     const target = event.target as HTMLElement;
