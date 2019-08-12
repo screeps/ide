@@ -1,4 +1,5 @@
 @text-color-fail: #D2554A;
+@text-color-warn: #FF9800;
 
 .screeps-ide {
     form {
@@ -6,22 +7,39 @@
         display: flex;
         flex-direction: column;
 
-        .error {
+        .error,
+        .warning {
             position: absolute;
             bottom: 10px;
 
             display: block;
             opacity: 0;
 
-            color: @text-color-fail;
             font-size: 12px;
 
             transition: opacity .3s ease;
         }
 
+        .error {
+            color: @text-color-fail;
+        }
+
+        .warning {
+            color: @text-color-warn;
+        }
+
         &:not(.--indented) {
-            .error {
+            .error,
+            .warning {
                 bottom: -20px;
+            }
+        }
+
+        &.--invalid,
+        &.--warning {
+            .error,
+            .warning {
+                opacity: 1;
             }
         }
 
@@ -29,9 +47,11 @@
             input  ~ .underline {
                 border-color: @text-color-fail;
             }
+        }
 
-            .error {
-                opacity: 1;
+        &.--warning {
+            input  ~ .underline {
+                border-color: @text-color-warn;
             }
         }
 

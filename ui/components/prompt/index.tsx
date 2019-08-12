@@ -7,6 +7,7 @@ interface IPromptModalProps {
     legend?: string;
     submitBtn?: string;
 
+    onInput?: Function;
     onCancel?: Function;
     onSubmit?: Function;
 }
@@ -15,10 +16,12 @@ export default function({
     legend,
     submitBtn,
 
+    onInput: input,
     onCancel: cancel,
     onSubmit: submit
 }: IPromptModalProps) {
     const [message, setMessage] = useState('');
+    const [warning, setWarning] = useState('');
 
     legend = legend || 'Are you sure? Do you want execute it?';
     submitBtn = submitBtn || 'Ok';
@@ -29,7 +32,7 @@ export default function({
                 <div className='logotype' />
                 <button className='btn _cross' onClick={ onCancel }/>
             </header>
-            <form className='--indented' onSubmit={ onSubmit }>
+            <form className={ ['--indented', warning ? '--warning' : ''].join(' ') } onSubmit={ onSubmit }>
                 <fieldset className='screeps-field'>
                     <legend>{ legend }</legend>
                     <input
@@ -47,6 +50,7 @@ export default function({
                     />
                     <div className='underline' />
                 </fieldset>
+                <div className='warning'>{ warning }</div>
             </form>
             <footer>
                 <button
@@ -72,6 +76,13 @@ export default function({
         const target = event.target as HTMLInputElement;
 
         setMessage(target.value);
+
+        try {
+            const { warning } = (input && input(target.value));
+            setWarning(warning);
+        } catch(err) {
+            setWarning('');
+        }
     }
 
     // Public component output actions.
