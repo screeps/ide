@@ -105,9 +105,9 @@ export default function(props: IMemoryItemViewProps) {
     );
 
     async function onEdit(): Promise<void> {
-        setIsEdit(!isEdit);
-
         props.onClick && await props.onClick(props.path);
+
+        setIsEdit(!isEdit);
     }
 
     async function onSave() {
