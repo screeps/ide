@@ -31,6 +31,8 @@ import { default as confirm } from '../confirm-modal';
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const MEMORY_URI = 'atom://screeps-ide/memory';
 
+const DEFAULT_SEGMENT = '0';
+
 export class MemoryPanel {
     public element: HTMLElement;
 
@@ -183,7 +185,7 @@ export class MemoryPanel {
         shard = 'shard0',
         shards = [],
         memory = [],
-        segment = '0',
+        segment = DEFAULT_SEGMENT,
         segmentData = '',
         isProgressing = false
     }) {
@@ -379,7 +381,7 @@ export class MemoryPanel {
     }
 
     @progress
-    async onSegment(segment: string, shard: string): Promise<void> {
+    async onSegment(segment: string = DEFAULT_SEGMENT, shard: string): Promise<void> {
         this.state = {
             segment
         };
