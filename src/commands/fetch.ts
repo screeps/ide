@@ -12,7 +12,7 @@ import { default as confirm } from '../components/confirm-modal';
 
 export async function fetch(event: CustomEvent) {
     await confirm({
-        legend: 'Local changes will be overwrite.'
+        legend: 'Local changes will be overwritten.'
     });
 
     let api;
