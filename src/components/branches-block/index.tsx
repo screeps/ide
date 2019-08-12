@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-import { CompositeDisposable, Directory } from 'atom';
+import { CompositeDisposable } from 'atom';
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
