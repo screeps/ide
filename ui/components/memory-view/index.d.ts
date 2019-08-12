@@ -18,7 +18,7 @@ interface IMemoryViewProps {
 
     memory?: IMemoryPath[];
     onMemory(path: string, shard: string): Promise<void>;
-    onMemoryRefresh(path: string, shard: string): Promise<void>;
+    onMemoryReload(path: string, shard: string): Promise<void>;
     onMemoryUpdate(path: string, value: any, shard: string): Promise<void>;
     onMemoryRemove(path: string, shard: string): Promise<void>;
     onMemoryDelete(path: string): Promise<void>;

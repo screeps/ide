@@ -30,7 +30,7 @@ export default function(props: IMemoryViewProps) {
 
             onClick={ onMemory }
             onSave={ onMemoryUpdate }
-            onReload={ onMemoryRefresh }
+            onReload={ onMemoryReload }
             onDelete={ onMemoryDelete }
             onRemovePath={ onMemoryRemove }
             onCancel={ onMemoryCancel }
@@ -93,8 +93,8 @@ export default function(props: IMemoryViewProps) {
         return props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
     }
 
-    function onMemoryRefresh(path: string) {
-        return props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
+    function onMemoryReload(path: string) {
+        return props.onMemoryReload && props.onMemoryReload(path, props.shard);
     }
 
     function onMemoryRemove(path: string) {

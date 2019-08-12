@@ -29,7 +29,7 @@ export default forwardRef(function(props: IMemoryJSONEditorViewProps, ref) {
         }
 
         setEditorRef(editorRef);
-    }, [editorContainerRef])
+    }, [editorContainerRef]);
 
     useImperativeHandle(ref, () => ({
         getValue,

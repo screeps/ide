@@ -204,7 +204,7 @@ export class MemoryPanel {
 
                 memory={ memory }
                 onMemory={ (...args) => this.onMemory(...args) }
-                onMemoryRefresh={ (...args) => this.onMemory(...args) }
+                onMemoryReload={ (...args) => this.onMemory(...args) }
                 onMemoryRemove={ (...args) => this.onMemoryRemove(...args) }
                 onMemoryDelete={ (...args) => this.onMemoryDelete(...args) }
                 onMemoryUpdate={ (...args) => this.onMemoryUpdate(...args) }
@@ -278,7 +278,7 @@ export class MemoryPanel {
     }
 
     @progress
-    async onMemory(path: string, shard: string): Promise<void> {
+    async onMemory(path: string, shard: string): Promise<any> {
         let response: IUserMemoryResponse;
         try {
             response = await this._api.getUserMemory({ path, shard });
@@ -319,6 +319,8 @@ export class MemoryPanel {
             d = applyTooltip(`#${ PATH_BTN_CANCEL }${ _id }`, 'Cancel changes');
             d && subscriptions.add(d);
         });
+
+        return value;
     }
 
     @progress

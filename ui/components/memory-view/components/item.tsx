@@ -121,8 +121,11 @@ export default function(props: IMemoryItemViewProps) {
         }
     }
 
-    function onReload() {
-        props.onReload && props.onReload();
+    async function onReload() {
+        const value = props.onReload && await props.onReload();
+
+        // @ts-ignore
+        editorRef.current.setValue(value);
     }
 
     function onCancel() {
