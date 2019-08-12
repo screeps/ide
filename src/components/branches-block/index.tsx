@@ -90,9 +90,20 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
             }
         
             let newName;
+            const _branches: IBranch[] = branches;
             try {
                 newName = await prompt({
-                    legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
+                    legend: 'This branch will be cloned to the new branch. Please enter a new branch name:',
+                    onInput: (newBranch: string) => {
+                        const isExist = _branches.some(({ branch }) => branch === newBranch);
+                        if (!isExist) {
+                            return;
+                        }
+
+                        return {
+                            warning: 'A branch with this name already exists and will be overwritten!'
+                        };
+                    }
                 });
         
                 await api.cloneUserBranch({ branch, newName });

@@ -68,22 +68,22 @@ export default function(props: IBranchesViewProps) {
     );
 
     function onCopyBranch(branch: string) {
-        props.onCopyBranch && props.onCopyBranch(branch);
+        return props.onCopyBranch && props.onCopyBranch(branch);
     }
 
     function onSelectBranch(branch: string) {
-        props.onSelectBranch && props.onSelectBranch(branch);
+        return props.onSelectBranch && props.onSelectBranch(branch);
     }
 
     function onDeleteBranch(branch: string) {
-        props.onDeleteBranch && props.onDeleteBranch(branch);
+        return props.onDeleteBranch && props.onDeleteBranch(branch);
     }
 
     function onSetActiveSim(branch: string) {
-        props.onSetActiveSim && props.onSetActiveSim(branch);
+        return props.onSetActiveSim && props.onSetActiveSim(branch);
     }
 
     function onSetActiveWorld(branch: string) {
-        props.onSetActiveWorld && props.onSetActiveWorld(branch);
+        return props.onSetActiveWorld && props.onSetActiveWorld(branch);
     }
 }
