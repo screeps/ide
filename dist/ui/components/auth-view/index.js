@@ -51,6 +51,7 @@ class AuthView extends React.Component {
             React.createElement("header", null,
                 React.createElement("div", { className: 'logotype' }),
                 React.createElement("button", { className: 'btn _cross', onClick: this.onCancel })),
+            React.createElement("div", null, "Your credentials are only used to create an auth token, password will not be stored."),
             React.createElement("form", { className: ['--indented', this.state.isInvalid ? '--invalid' : ''].join(' ') },
                 React.createElement("fieldset", { className: 'screeps-field' },
                     React.createElement("input", { ref: this._emailRef, className: 'native-key-bindings', type: 'text', name: 'email', placeholder: ' ', onChange: (event) => this.onInput(event), required: true, autoComplete: 'off', tabIndex: 1 }),

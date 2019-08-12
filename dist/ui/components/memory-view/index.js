@@ -15,7 +15,7 @@ function default_1(props) {
         onSegmentChange(props.segmentData || '');
     }, [props.segmentData]);
     if (props.view === controls_1.MEMORY_MAIN_VIEW) {
-        memoryView = (React.createElement(main_1.default, { memory: props.memory || [], onInput: onInput, onClick: onMemory, onSave: onMemoryUpdate, onReload: onMemoryRefresh, onDelete: onMemoryDelete, onRemovePath: onMemoryRemove, onCancel: onMemoryCancel }));
+        memoryView = (React.createElement(main_1.default, { memory: props.memory || [], onInput: onInput, onClick: onMemory, onSave: onMemoryUpdate, onReload: onMemoryReload, onDelete: onMemoryDelete, onRemovePath: onMemoryRemove, onCancel: onMemoryCancel }));
     }
     if (props.view === controls_1.MEMORY_SEGMENTS_VIEW) {
         memoryView = (React.createElement(segment_1.default, { segment: segmentData, onChange: onSegmentChange }));
@@ -43,8 +43,8 @@ function default_1(props) {
     function onMemoryUpdate(path, value) {
         return props.onMemoryUpdate && props.onMemoryUpdate(path, value, props.shard);
     }
-    function onMemoryRefresh(path) {
-        return props.onMemoryRefresh && props.onMemoryRefresh(path, props.shard);
+    function onMemoryReload(path) {
+        return props.onMemoryReload && props.onMemoryReload(path, props.shard);
     }
     function onMemoryRemove(path) {
         return props.onMemoryRemove && props.onMemoryRemove(path, props.shard);

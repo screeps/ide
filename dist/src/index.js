@@ -26,7 +26,6 @@ function initialize(state) {
     }
     state_1.default.next(state);
     Object.values(effects).forEach((effect) => effect.subscribe());
-    atom.project.onDidChangeFiles(commands_1.onDidChangeFiles);
 }
 exports.initialize = initialize;
 function activate(state) {
@@ -64,6 +63,8 @@ function activate(state) {
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${config_1.PACKAGE_NAME}:${commands_1.commit.name}`]: commands_1.commit,
         [`${config_1.PACKAGE_NAME}:${commands_1.commitAll.name}`]: commands_1.commitAll,
+        [`${config_1.PACKAGE_NAME}:${commands_1.fetch.name}`]: commands_1.fetch,
+        [`${config_1.PACKAGE_NAME}:${commands_1.fetchAll.name}`]: commands_1.fetchAll,
         [`${config_1.PACKAGE_NAME}:${commands_1.changeProjectBranch.name}`]: commands_1.changeProjectBranch
     }));
     if (config_1.configGetter('showOnStartup')) {

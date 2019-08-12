@@ -11,13 +11,23 @@ exports.default = react_1.forwardRef(function (props, ref) {
         const editorRef = new jsoneditor_1.default(editorContainerRef.current, {
             name: props.name || 'Memory'
         }, props.value || 'undefined');
+        // TODO: Block error: Cannot read property '0' of undefined;
+        const _onMultiSelect = editorRef._onMultiSelect;
+        editorRef._onMultiSelect = () => {
+            try {
+                _onMultiSelect.bind(editorRef);
+            }
+            catch (err) {
+                // Noop.
+            }
+        };
         setEditorRef(editorRef);
     }, [editorContainerRef]);
     react_1.useImperativeHandle(ref, () => ({
         getValue,
         setValue
     }));
-    return (React.createElement("div", { className: 'native-key-bindings', ref: editorContainerRef }));
+    return (React.createElement("div", { className: 'native-key-bindings', draggable: false, ref: editorContainerRef }));
     function getValue() {
         return editorRef.get();
     }

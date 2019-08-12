@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 const react_1 = require("react");
+let removeEventListener;
 function default_1({ onInput }) {
     const [value, setValue] = react_1.useState('');
     const [history, setHistory] = react_1.useState([]);
@@ -16,10 +17,42 @@ function default_1({ onInput }) {
             return;
         }
     }, [historyIndex]);
+    // TODO: Right way doesn't work in atom. 
+    //- https://stackoverflow.com/questions/52843671/onkeydown-react-event-does-not-fire-in-atom-editor-package
+    const inputRef = react_1.useRef(null);
+    if (inputRef.current) {
+        removeEventListener && removeEventListener();
+        // @ts-ignore
+        inputRef.current.addEventListener('keydown', onKeyPress);
+        removeEventListener = () => {
+            // @ts-ignore
+            inputRef.current.removeEventListener('keydown', onKeyPress);
+            removeEventListener = null;
+        };
+    }
+    react_1.useEffect(() => {
+        try {
+            // @ts-ignore
+            inputRef.current.focus();
+            removeEventListener && removeEventListener();
+            // @ts-ignore
+            inputRef.current.addEventListener('keydown', onKeyPress);
+            removeEventListener = () => {
+                // @ts-ignore
+                inputRef.current.removeEventListener('keydown', onKeyPress);
+                removeEventListener = null;
+            };
+        }
+        catch (err) {
+            // Noop.
+        }
+    }, [inputRef]);
     return (React.createElement("div", { className: 'screeps-console__input' },
         React.createElement("form", { onSubmit: onSubmit },
             React.createElement("fieldset", { className: 'screeps-field' },
-                React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'Command...', autoComplete: '', onChange: onChange, onKeyUp: onKeyPress, tabIndex: 0, value: value }),
+                React.createElement("input", { className: 'native-key-bindings', type: 'text', placeholder: 'Command... ', ref: inputRef, autoComplete: '', onChange: onChange, 
+                    // onKeyDown={ onKeyPress } // Doesn't work
+                    tabIndex: 0, value: value }),
                 React.createElement("div", { className: 'underline' })))));
     function onKeyPress({ key }) {
         switch (key) {

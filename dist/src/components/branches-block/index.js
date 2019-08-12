@@ -1,14 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require('fs');
+const path = require('path');
+const atom_1 = require("atom");
 const React = require("react");
 const react_1 = require("react");
 const prompt_modal_1 = require("../prompt-modal");
 const confirm_modal_1 = require("../confirm-modal");
 const state_1 = require("../../state");
 const utils_1 = require("../../utils");
-const branches_view_1 = require("../../../ui/components/branches-view");
+const ui_1 = require("../../../ui");
 let progressStartTime = 0;
 const ANIMATION_MIN_TIME = 1500;
+let subscriptions = new atom_1.CompositeDisposable();
 function BranchesBlock({ branch, branches = [], active }) {
     const [inProgress, setInProgress] = react_1.useState(false);
     const [progress, setProgress] = react_1.useState(false);
@@ -22,7 +26,20 @@ function BranchesBlock({ branch, branches = [], active }) {
         const delay = ANIMATION_MIN_TIME - (now - progressStartTime);
         setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
     }, [progress]);
-    return (React.createElement(branches_view_1.default, { isProgressing: inProgress, branch: branch, branches: branches, active: active, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
+    react_1.useEffect(() => {
+        setTimeout(() => {
+            subscriptions.dispose();
+            subscriptions = new atom_1.CompositeDisposable();
+            for (let { _id } of branches) {
+                let d;
+                d = utils_1.applyTooltip(`#${ui_1.BTN_BRANCHES_CLONE}-${_id}`, 'Clone branch');
+                d && subscriptions.add(d);
+                d = utils_1.applyTooltip(`#${ui_1.BTN_BRANCHES_DELETE}-${_id}`, 'Delete branch');
+                d && subscriptions.add(d);
+            }
+        });
+    }, [branches]);
+    return (React.createElement(ui_1.BranchesView, { isProgressing: inProgress, branch: branch, branches: branches, active: active, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
     async function onCopyBranch(branch) {
         setProgress(true);
         try {
@@ -34,9 +51,19 @@ function BranchesBlock({ branch, branches = [], active }) {
                 throw err;
             }
             let newName;
+            const _branches = branches;
             try {
                 newName = await prompt_modal_1.default({
-                    legend: 'This branch will be cloned to the new branch. Please enter a new branch name:'
+                    legend: 'This branch will be cloned to the new branch. Please enter a new branch name:',
+                    onInput: (newBranch) => {
+                        const isExist = _branches.some(({ branch }) => branch === newBranch);
+                        if (!isExist) {
+                            return;
+                        }
+                        return {
+                            warning: 'A branch with this name already exists and will be overwritten!'
+                        };
+                    }
                 });
                 await api.cloneUserBranch({ branch, newName });
                 const { list: branches } = await api.getUserBranches();
@@ -85,6 +112,27 @@ function BranchesBlock({ branch, branches = [], active }) {
             if (branch === currentBranch) {
                 const ibranch = branches.find(({ activeWorld }) => activeWorld);
                 ibranch && onSelectBranch(ibranch.branch);
+            }
+            const branchPath = utils_1.getBranchPath(branch);
+            try {
+                fs.rmdirSync(branchPath);
+            }
+            catch (err) {
+                const files = fs.readdirSync(branchPath);
+                files.forEach((modulePath) => {
+                    try {
+                        fs.unlinkSync(path.resolve(branchPath, modulePath));
+                    }
+                    catch (err) {
+                        // Noop.
+                    }
+                });
+                try {
+                    fs.rmdirSync(branchPath);
+                }
+                catch (err) {
+                    // Noop.
+                }
             }
         }
         catch (err) {

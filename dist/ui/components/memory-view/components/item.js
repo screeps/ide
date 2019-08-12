@@ -28,22 +28,22 @@ function default_1(props) {
     else {
         let deleteBtn;
         if (props.path) {
-            deleteBtn = (React.createElement("button", { id: `${exports.BTN_DELETE}${props.path}`, type: 'button', className: 'btn btn--clear', onClick: onRemovePath, title: 'Delete from memory' },
+            deleteBtn = (React.createElement("button", { id: `${exports.BTN_DELETE}${props.id}`, type: 'button', className: 'btn btn--clear', onClick: onRemovePath, title: 'Delete from memory' },
                 React.createElement("i", { className: 'sc-icon-delete' })));
         }
         jsonEditor = (React.createElement("div", { className: 'screeps-memory__json-editor' },
             React.createElement("div", { className: 'screeps-memory__json-editor-controlls' },
-                React.createElement("button", { id: `${exports.BTN_UPDATE}${props.path || 'root'}`, type: 'button', className: 'btn btn--clear', onClick: onSave },
+                React.createElement("button", { id: `${exports.BTN_UPDATE}${props.id}`, type: 'button', className: 'btn btn--clear', onClick: onSave },
                     React.createElement("i", { className: 'sc-icon-done' })),
-                React.createElement("button", { id: `${exports.BTN_RELOAD}${props.path || 'root'}`, type: 'button', className: 'btn btn--clear', onClick: onReload },
+                React.createElement("button", { id: `${exports.BTN_RELOAD}${props.id}`, type: 'button', className: 'btn btn--clear', onClick: onReload },
                     React.createElement("i", { className: 'sc-icon-cached' })),
-                React.createElement("button", { id: `${exports.BTN_CANCEL}${props.path || 'root'}`, type: 'button', className: 'btn btn--clear', onClick: onCancel },
+                React.createElement("button", { id: `${exports.BTN_CANCEL}${props.id}`, type: 'button', className: 'btn btn--clear', onClick: onCancel },
                     React.createElement("i", { className: 'sc-icon-clear' })),
                 deleteBtn),
             React.createElement(jsoneditor_1.default, { ref: editorRef, name: props.path, value: props.value })));
     }
     if (props.path) {
-        deleteBtn = (React.createElement("div", { id: `${exports.BTN_REMOVE}${props.path}`, className: 'close-icon', onClick: () => onDelete(props.path) }));
+        deleteBtn = (React.createElement("div", { id: `${exports.BTN_REMOVE}${props.id}`, className: 'close-icon', onClick: () => onDelete(props.path) }));
     }
     return (React.createElement("div", { className: 'screeps-memory__item', "data-path": props.path },
         React.createElement("div", { className: 'screeps-memory__item-path' },
@@ -52,8 +52,8 @@ function default_1(props) {
         value,
         jsonEditor));
     async function onEdit() {
-        setIsEdit(!isEdit);
         props.onClick && await props.onClick(props.path);
+        setIsEdit(!isEdit);
     }
     async function onSave() {
         try {
@@ -65,8 +65,10 @@ function default_1(props) {
             // Noop.
         }
     }
-    function onReload() {
-        props.onReload && props.onReload();
+    async function onReload() {
+        const value = props.onReload && await props.onReload();
+        // @ts-ignore
+        editorRef.current.setValue(value);
     }
     function onCancel() {
         setIsEdit(false);

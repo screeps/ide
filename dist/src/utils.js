@@ -10,6 +10,10 @@ const auth_1 = require("./commands/auth");
 let api;
 let socket;
 const LOCAL_PROJECT_CONFIG = '.screepsiderc';
+function guid() {
+    return parseInt(Math.random().toString().substr(2)).toString(16);
+}
+exports.guid = guid;
 function $(s, el = document) {
     return el.querySelector(s);
 }
@@ -50,11 +54,11 @@ function getSocket() {
 }
 exports.getSocket = getSocket;
 const _watches = [
-    { path: '', value: {} },
-    { path: 'creeps' },
-    { path: 'spawns' },
-    { path: 'rooms' },
-    { path: 'flags' }
+    { _id: 'root', path: '', value: {} },
+    { _id: 'creeps', path: 'creeps' },
+    { _id: 'spawns', path: 'spawns' },
+    { _id: 'rooms', path: 'rooms' },
+    { _id: 'flags', path: 'flags' }
 ];
 const MEMORY_WATCHES = 'memory-watches';
 function getWatches() {
@@ -65,6 +69,18 @@ function getWatches() {
             throw new Error('empty');
         }
         watches = JSON.parse(watches);
+        watches = watches.map(({ _id, path, value }) => {
+            if (!_id) {
+                const watcher = _watches.find((_) => _.path === path);
+                if (watcher) {
+                    _id = watcher._id;
+                }
+                else {
+                    _id = guid();
+                }
+            }
+            return { _id, path, value };
+        });
     }
     catch (err) {
         localStorage.setItem(MEMORY_WATCHES, JSON.stringify(_watches));
@@ -114,24 +130,6 @@ function getModulePath(branch, module) {
     return path.resolve(`${branchPath}/${module}${extension}`);
 }
 exports.getModulePath = getModulePath;
-function getModuleByPath(modulePath) {
-    const projectPath = atom.project.getPaths()[0];
-    if (!projectPath) {
-        return null;
-    }
-    const srcDir = config_1.configGetter('src');
-    const fullPath = path.resolve(projectPath, srcDir);
-    if (!modulePath.includes(fullPath) || modulePath === fullPath) {
-        return null;
-    }
-    const matches = modulePath.match(/([^\\]+)$/gm);
-    if (matches && matches[0]) {
-        const match = matches[0];
-        return match.replace(/\.js$/, '');
-    }
-    return null;
-}
-exports.getModuleByPath = getModuleByPath;
 async function readUserCode(fullPath) {
     const dir = new atom_1.Directory(fullPath);
     const entries = dir.getEntriesSync();

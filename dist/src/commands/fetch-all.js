@@ -1,7 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = require('path');
+const atom_1 = require("atom");
 const utils_1 = require("../utils");
-async function commitAll(event) {
+const confirm_modal_1 = require("../components/confirm-modal");
+async function fetchAll(event) {
+    await confirm_modal_1.default({
+        legend: 'Local changes will be overwritten.'
+    });
     const target = event.target;
     let projectRef = target.parentElement;
     while (projectRef && !projectRef.classList.contains('project-root')) {
@@ -28,13 +34,13 @@ async function commitAll(event) {
         throw new Error(err);
     }
     const srcPath = utils_1.getScreepsProjectSrc(projectPath, src);
-    const modules = await utils_1.readUserCode(srcPath);
-    try {
-        await api.updateUserCode({ branch, modules });
-    }
-    catch (err) {
-        throw new Error('Error update user code');
+    const { modules } = await api.getUserCode(branch);
+    for (const moduleName in modules) {
+        const content = modules[moduleName];
+        const modulePath = path.resolve(srcPath, moduleName);
+        const moduleFile = new atom_1.File(`${modulePath}.js`);
+        await moduleFile.write(content || '');
     }
 }
-exports.commitAll = commitAll;
-//# sourceMappingURL=commit-all.js.map
+exports.fetchAll = fetchAll;
+//# sourceMappingURL=fetch-all.js.map

@@ -3,7 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require('path');
 const atom_1 = require("atom");
 const utils_1 = require("../utils");
-async function commit(event) {
+const confirm_modal_1 = require("../components/confirm-modal");
+async function fetch(event) {
+    await confirm_modal_1.default({
+        legend: 'Local changes will be overwritten.'
+    });
     let api;
     try {
         api = await utils_1.getApi();
@@ -20,14 +24,6 @@ async function commit(event) {
     if (!path) {
         throw new Error('No data-path');
     }
-    const file = new atom_1.File(path);
-    let content;
-    try {
-        content = await file.read();
-    }
-    catch (err) {
-        throw new Error('Error read file');
-    }
     const projectPath = await getProjectPathByEvent(event);
     const { branch, src } = await utils_1.getScreepsProjectConfig(projectPath);
     if (!branch) {
@@ -37,16 +33,12 @@ async function commit(event) {
     if (!module) {
         throw new Error('Error get module');
     }
-    let { modules } = await api.getUserCode(branch);
-    modules = Object.assign({}, modules, { [module]: content });
-    try {
-        await api.updateUserCode({ branch, modules });
-    }
-    catch (err) {
-        throw new Error('Error update user code');
-    }
+    const { modules } = await api.getUserCode(branch);
+    const content = modules[module];
+    const moduleFile = new atom_1.File(`${path}`);
+    await moduleFile.write(content || '');
 }
-exports.commit = commit;
+exports.fetch = fetch;
 async function getProjectPathByEvent(event) {
     const target = event.target;
     let projectRef = target.parentElement;
@@ -77,4 +69,4 @@ function getModuleByPath(modulePath, projectPath, srcDir = '') {
     }
     return null;
 }
-//# sourceMappingURL=commit.js.map
+//# sourceMappingURL=fetch.js.map

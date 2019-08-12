@@ -14,8 +14,8 @@ function sort(a, b) {
 }
 function default_1(props) {
     return (React.createElement("div", { className: 'screeps-memory__main' },
-        React.createElement("div", { className: 'screeps-memory__main-items' }, props.memory.sort(sort).map(({ path, value }) => {
-            return (React.createElement(item_1.default, { key: path, path: path, value: value, isEdit: false, onClick: () => onClick(path), onReload: () => onReload(path), onDelete: () => onDelete(path), onSave: (value) => onSave(path, value), onRemovePath: () => onRemovePath(path), onCancel: () => onCancel(path) }));
+        React.createElement("div", { className: 'screeps-memory__main-items' }, props.memory.sort(sort).map(({ _id, path, value }) => {
+            return (React.createElement(item_1.default, { key: _id, id: _id, path: path, value: value, isEdit: false, onClick: () => onClick(path), onReload: () => onReload(path), onDelete: () => onDelete(path), onSave: (value) => onSave(path, value), onRemovePath: () => onRemovePath(path), onCancel: () => onCancel(path) }));
         })),
         React.createElement("hr", { className: 'screeps-hr' }),
         React.createElement(input_1.default, { onInput: onInput })));
