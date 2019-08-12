@@ -5,6 +5,8 @@ interface IConsoleInputViewProps {
     onInput?(expression: string): void;
 }
 
+let removeEventListener: any;
+
 export default function({
     onInput
 }: IConsoleInputViewProps) {
@@ -24,11 +26,31 @@ export default function({
         }
     }, [historyIndex]);
 
+    // TODO: Right way doesn't work in atom. 
+    //- https://stackoverflow.com/questions/52843671/onkeydown-react-event-does-not-fire-in-atom-editor-package
     const inputRef = useRef(null);
+    if (inputRef.current) {
+        removeEventListener && removeEventListener();
+        // @ts-ignore
+        inputRef.current.addEventListener('keydown', onKeyPress);
+        removeEventListener = () => {
+            // @ts-ignore
+            inputRef.current.removeEventListener('keydown', onKeyPress);
+            removeEventListener = null;
+        }
+    }
     useEffect(() => {
         try {
             // @ts-ignore
             inputRef.current.focus();
+            removeEventListener && removeEventListener();
+            // @ts-ignore
+            inputRef.current.addEventListener('keydown', onKeyPress);
+            removeEventListener = () => {
+                // @ts-ignore
+                inputRef.current.removeEventListener('keydown', onKeyPress);
+                removeEventListener = null;
+            }
         } catch(err) {
             // Noop.
         }
@@ -38,12 +60,12 @@ export default function({
         <div className='screeps-console__input'>
             <form onSubmit={ onSubmit }>
                 <fieldset className='screeps-field'>
-                    <input className='native-key-bindings' type='text' placeholder='Command...'
+                    <input className='native-key-bindings' type='text' placeholder='Command... '
                         ref={ inputRef }
                         autoComplete=''
 
                         onChange={ onChange }
-                        onKeyUp={ onKeyPress }
+                        // onKeyDown={ onKeyPress } // Doesn't work
 
                         tabIndex={ 0 }
 
@@ -68,7 +90,7 @@ export default function({
     }
 
     function historyUp() {
-        if (historyIndex >= (history.length - 1)) {
+                if (historyIndex >= (history.length - 1)) {
             return;
         }
 
