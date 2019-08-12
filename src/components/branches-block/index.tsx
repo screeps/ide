@@ -1,4 +1,7 @@
-import { CompositeDisposable } from 'atom';
+const fs = require('fs');
+const path = require('path');
+
+import { CompositeDisposable, Directory } from 'atom';
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
@@ -7,7 +10,7 @@ import { default as prompt } from '../prompt-modal';
 import { default as confirm } from '../confirm-modal';
 import { default as __state } from '../../state';
 import {
-    getBranchPath, 
+    getBranchPath,
     readUserCode,
     getApi,
     combineModules,
@@ -184,6 +187,26 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
             if (branch === currentBranch) {
                 const ibranch = branches.find(({ activeWorld }) => activeWorld);
                 ibranch && onSelectBranch(ibranch.branch);
+            }
+
+            const branchPath = getBranchPath(branch);
+            try {
+                fs.rmdirSync(branchPath);
+            } catch(err) {
+                const files = fs.readdirSync(branchPath);
+                files.forEach((modulePath: string) => {
+                    try {
+                        fs.unlinkSync(path.resolve(branchPath, modulePath));
+                    } catch(err) {
+                        // Noop.
+                    }
+                });
+
+                try {
+                    fs.rmdirSync(branchPath);
+                } catch(err) {
+                    // Noop.
+                }
             }
         } catch(err) {
             // Noop.
