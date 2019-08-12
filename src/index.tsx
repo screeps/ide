@@ -10,6 +10,8 @@ import { PACKAGE_NAME, configGetter } from './config';
 import {
     commit,
     commitAll,
+    fetch,
+    fetchAll,
     changeProjectBranch
 } from './commands';
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
@@ -82,6 +84,8 @@ export function activate(state: IState) {
     subscriptions.add(atom.commands.add('atom-workspace', {
         [`${ PACKAGE_NAME }:${ commit.name }`]: commit,
         [`${ PACKAGE_NAME }:${ commitAll.name }`]: commitAll,
+        [`${ PACKAGE_NAME }:${ fetch.name }`]: fetch,
+        [`${ PACKAGE_NAME }:${ fetchAll.name }`]: fetchAll,
         [`${ PACKAGE_NAME }:${ changeProjectBranch.name }`]: changeProjectBranch
     }));
 
