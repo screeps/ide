@@ -8,8 +8,21 @@ const MAIN_MODULE = 'main';
 export default function(props: IModulesViewProps) {
     const [value, setValue] = useState('');
     const [isValid, setValid] = useState(true);
+    const [modules, setModules] = useState<[string, IModule][]>([]); 
 
     useEffect(() => setValue(''), [props.branch]);
+
+    useEffect(() => {
+        const _modules = Object.entries(props.modules).sort(([a], [b]) => {
+            if (a > b) return 1;
+            if (a < b) return -1;
+            return 0;
+        }).filter(([name, { deleted }]) => {
+            return name !== MAIN_MODULE && !deleted;
+        });
+
+        setModules(_modules);
+    }, [props.modules])
 
     return (
         <div className='screeps-ide screeps-modules-view'>
@@ -27,7 +40,7 @@ export default function(props: IModulesViewProps) {
                         <button className='btn btn--clear' onClick={() => onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
                         <div className='modified-icon'></div>
                     </li>
-                    {_getAdditionalModules(props.modules).map(([ moduleName, { modified }]) => {
+                    {modules.map(([ moduleName, { modified }]) => {
                         return (
                     <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                         modified ? ' modified' : '' ) +  (
@@ -87,13 +100,5 @@ export default function(props: IModulesViewProps) {
 
         props.onCreateModule && props.onCreateModule(value);
         setValue('');
-    }
-
-    function _getAdditionalModules(modules: {
-        [key: string]: IModule;
-    }) {
-        return Object.entries(modules).filter(([name, { deleted }]) => {
-            return name !== MAIN_MODULE && !deleted;
-        });
     }
 }
