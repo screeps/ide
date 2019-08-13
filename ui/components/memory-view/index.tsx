@@ -55,6 +55,7 @@ export default function(props: IMemoryViewProps) {
     return (
         <div className='screeps-ide screeps-memory screeps-memory__view'>
             <MemoryControlsView
+                view={ props.view || MEMORY_MAIN_VIEW }
                 shard={ props.shard }
                 shards={ props.shards || [] }
 

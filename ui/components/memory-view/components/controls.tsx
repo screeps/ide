@@ -3,6 +3,7 @@ import * as React from 'react';
 // import { default as MemorySegmentVeiw } from '../components/segment';
 
 interface IMemoryControlsViewProps {
+    view: string;
     shard: string;
     shards: any;
 
@@ -29,11 +30,11 @@ export default function(props: IMemoryControlsViewProps) {
             </div>
             <div className='btn-group'>
                 <button id='screeps-memory__control-main'
-                    className='btn icon' onClick={ onMainMemory }>
+                    className={ ['btn icon', props.view === MEMORY_MAIN_VIEW ? 'selected' : '' ].join(' ') } onClick={ onMainMemory }>
                     <i className='sc-icon-dehaze' />
                 </button>
                 <button id='screeps-memory__control-segments'
-                    className='btn icon' onClick={ onSegments }>
+                    className={ ['btn icon', props.view === MEMORY_SEGMENTS_VIEW ? 'selected' : '' ].join(' ') } onClick={ onSegments }>
                     <i className='sc-icon-view' />
                 </button>
             </div>
