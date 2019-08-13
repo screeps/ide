@@ -422,11 +422,11 @@ export class MemoryPanel {
             let d;
             const subscriptions = this._tooltipsDisposables = new CompositeDisposable();
 
-            d = applyTooltip('#screeps-memory__control-main', 'Main memory');
+            d = applyTooltip('#screeps-memory__control-main', 'Main memory', this.element);
             d && subscriptions.add(d);
-            d = applyTooltip('#screeps-memory__control-segments', 'Segments');
+            d = applyTooltip('#screeps-memory__control-segments', 'Segments', this.element);
             d && subscriptions.add(d);
-            d = applyTooltip('#screeps-memory__control-close', 'Close panel');
+            d = applyTooltip('#screeps-memory__control-close', 'Close panel', this.element);
             d && subscriptions.add(d);
         });
     }

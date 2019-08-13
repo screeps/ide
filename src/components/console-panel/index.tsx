@@ -229,13 +229,13 @@ export class ConsolePanel implements ViewModel {
             let d;
             const subscriptions = this._tooltipsDisposables = new CompositeDisposable();
 
-            d = applyTooltip('#screeps-console__delete', 'Clear');
+            d = applyTooltip('#screeps-console__delete', 'Clear', this.element);
             d && subscriptions.add(d);
-            d = applyTooltip('#screeps-console__close', 'Close panel');
+            d = applyTooltip('#screeps-console__close', 'Close panel', this.element);
             d && subscriptions.add(d);
-            d = applyTooltip('#screeps-console__pause', 'Pause tracking');
+            d = applyTooltip('#screeps-console__pause', 'Pause tracking', this.element);
             d && subscriptions.add(d);
-            d = applyTooltip('#screeps-console__play', 'Resume tracking');
+            d = applyTooltip('#screeps-console__play', 'Resume tracking', this.element);
             d && subscriptions.add(d);
         });
     }

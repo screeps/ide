@@ -241,8 +241,12 @@ export function getScreepsProjectSrc(project: string, src: string = ''): string 
     return path.resolve(project, src);
 }
 
-export function applyTooltip(selector: string, title: string): DisposableLike | void {
-    const elementRef = document.querySelector(selector) as HTMLElement;
+export function applyTooltip(
+    selector: string,
+    title: string,
+    context: HTMLElement | Document = document
+): DisposableLike | void {
+    const elementRef = $(selector, context) as HTMLElement;
     let disposable;
 
     if (!elementRef) {
