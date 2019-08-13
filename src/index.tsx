@@ -86,7 +86,10 @@ export function activate(state: IState) {
         [`${ PACKAGE_NAME }:${ commitAll.name }`]: commitAll,
         [`${ PACKAGE_NAME }:${ fetch.name }`]: fetch,
         [`${ PACKAGE_NAME }:${ fetchAll.name }`]: fetchAll,
-        [`${ PACKAGE_NAME }:${ changeProjectBranch.name }`]: changeProjectBranch
+        [`${ PACKAGE_NAME }:${ changeProjectBranch.name }`]: changeProjectBranch,
+        [`${ PACKAGE_NAME }:branches`]: () => openUri(SCREEPS_URI),
+        [`${ PACKAGE_NAME }:console`]: () => openUri(MEMORY_URI),
+        [`${ PACKAGE_NAME }:memory`]: () => openUri(CONSOLE_URI)
     }));
 
     if (configGetter('showOnStartup')) {
@@ -120,4 +123,13 @@ export function deserializeScreepsPanel({ state }: { state: any }) {
 
 export function handleURI(parsedUri: any) {
     console.log(parsedUri)
+}
+
+function openUri(uri: string) {
+    atom.workspace.open(uri, {
+        activatePane: true,
+        activateItem: true,
+        // split: 'down',
+        location: 'bottom'
+    });
 }

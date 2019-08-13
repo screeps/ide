@@ -30,5 +30,19 @@
         ]
     },
 
-    "menu": [ ]
+    "menu": [
+        {
+            "label": "Packages",
+            "submenu": [
+                {
+                    "label": "Screeps",
+                    "submenu": [
+                        { "label": "Branches", "command": "screeps-ide:branches" },
+                        { "label": "Console", "command": "screeps-ide:console" },
+                        { "label": "Memory", "command": "screeps-ide:memory" }
+                    ]
+                }
+            ]
+        }
+    ]
 }
