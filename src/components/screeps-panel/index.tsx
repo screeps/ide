@@ -1,15 +1,20 @@
-import { ViewModel, TextEditor } from 'atom';
+import { ViewModel, TextEditor, CompositeDisposable } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 // import pako from 'pako';
 import { tap, distinctUntilChanged } from 'rxjs/operators';
 
 import {
-    getApi, getUser, getSocket
+    getApi, getUser, getSocket,
+    applyTooltip
 } from '../../utils';
 import { default as __state } from '../../state';
 import { Socket } from '../../socket';
 
+import {
+    BTN_BRANCHES_CLONE,
+    BTN_BRANCHES_DELETE
+} from '../../../ui';
 import { BranchesBlock } from '../branches-block';
 import { ModulesBlock } from '../modules-block';
 import { CONSOLE_URI } from '../console-panel';
@@ -27,6 +32,7 @@ import { CreateProjectAction } from '../../store/actions';
 export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const SCREEPS_URI = 'atom://screeps-ide/screeps';
 
+let subscriptions = new CompositeDisposable();
 export class ScreepsPanel implements ViewModel {
     public element: HTMLElement;
 
@@ -43,6 +49,18 @@ export class ScreepsPanel implements ViewModel {
         __state
             .pipe(distinctUntilChanged())
             .pipe(tap((state) => this.render(state)))
+            .pipe(tap(({ branches }) => {
+                subscriptions.dispose();
+                subscriptions = new CompositeDisposable();
+
+                for (let { _id } of branches) {
+                    let d;
+                    d = applyTooltip(`#${ BTN_BRANCHES_CLONE }-${ _id }`, 'Clone branch', this.element);
+                    d && subscriptions.add(d);
+                    d = applyTooltip(`#${ BTN_BRANCHES_DELETE }-${ _id }`, 'Delete branch', this.element);
+                    d && subscriptions.add(d);
+                }
+            }))
             .subscribe();
 
         (async () => {
