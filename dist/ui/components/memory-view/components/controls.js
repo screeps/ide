@@ -11,9 +11,9 @@ function default_1(props) {
             })),
             props.children),
         React.createElement("div", { className: 'btn-group' },
-            React.createElement("button", { id: 'screeps-memory__control-main', className: 'btn icon', onClick: onMainMemory },
+            React.createElement("button", { id: 'screeps-memory__control-main', className: ['btn icon', props.view === exports.MEMORY_MAIN_VIEW ? 'selected' : ''].join(' '), onClick: onMainMemory },
                 React.createElement("i", { className: 'sc-icon-dehaze' })),
-            React.createElement("button", { id: 'screeps-memory__control-segments', className: 'btn icon', onClick: onSegments },
+            React.createElement("button", { id: 'screeps-memory__control-segments', className: ['btn icon', props.view === exports.MEMORY_SEGMENTS_VIEW ? 'selected' : ''].join(' '), onClick: onSegments },
                 React.createElement("i", { className: 'sc-icon-view' })))));
     function onShard(event) {
         props.onShard && props.onShard(event.target.value);

@@ -22,7 +22,7 @@ function default_1(props) {
         memoryControls = (React.createElement(segment_controls_1.default, { segment: props.segment, hasChange: segmentHasChange, onSegment: onSegment, onUpdate: onSegmentUpdate }));
     }
     return (React.createElement("div", { className: 'screeps-ide screeps-memory screeps-memory__view' },
-        React.createElement(controls_1.default, { shard: props.shard, shards: props.shards || [], onShard: onShard, onClose: onClose, onToggleView: onToggleView }, memoryControls),
+        React.createElement(controls_1.default, { view: props.view || controls_1.MEMORY_MAIN_VIEW, shard: props.shard, shards: props.shards || [], onShard: onShard, onClose: onClose, onToggleView: onToggleView }, memoryControls),
         React.createElement("hr", { className: 'screeps-hr' + (props.isProgressing ? ' screeps-hr--inprogress' : '') }),
         memoryView));
     function onInput(path) {

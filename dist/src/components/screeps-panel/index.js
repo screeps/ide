@@ -7,6 +7,7 @@ const ReactDOM = require("react-dom");
 const operators_1 = require("rxjs/operators");
 const utils_1 = require("../../utils");
 const state_1 = require("../../state");
+const ui_1 = require("../../../ui");
 const branches_block_1 = require("../branches-block");
 const modules_block_1 = require("../modules-block");
 const console_panel_1 = require("../console-panel");
@@ -20,6 +21,7 @@ const store_1 = require("../../store");
 const actions_3 = require("../../store/actions");
 exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.SCREEPS_URI = 'atom://screeps-ide/screeps';
+let subscriptions = new atom_1.CompositeDisposable();
 class ScreepsPanel {
     constructor(state = state_1.default.getValue()) {
         this.state = state;
@@ -30,6 +32,17 @@ class ScreepsPanel {
         state_1.default
             .pipe(operators_1.distinctUntilChanged())
             .pipe(operators_1.tap((state) => this.render(state)))
+            .pipe(operators_1.tap(({ branches }) => {
+            subscriptions.dispose();
+            subscriptions = new atom_1.CompositeDisposable();
+            for (let { _id } of branches) {
+                let d;
+                d = utils_1.applyTooltip(`#${ui_1.BTN_BRANCHES_CLONE}-${_id}`, 'Clone branch', this.element);
+                d && subscriptions.add(d);
+                d = utils_1.applyTooltip(`#${ui_1.BTN_BRANCHES_DELETE}-${_id}`, 'Delete branch', this.element);
+                d && subscriptions.add(d);
+            }
+        }))
             .subscribe();
         (async () => {
             try {

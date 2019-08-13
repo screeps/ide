@@ -65,7 +65,10 @@ function activate(state) {
         [`${config_1.PACKAGE_NAME}:${commands_1.commitAll.name}`]: commands_1.commitAll,
         [`${config_1.PACKAGE_NAME}:${commands_1.fetch.name}`]: commands_1.fetch,
         [`${config_1.PACKAGE_NAME}:${commands_1.fetchAll.name}`]: commands_1.fetchAll,
-        [`${config_1.PACKAGE_NAME}:${commands_1.changeProjectBranch.name}`]: commands_1.changeProjectBranch
+        [`${config_1.PACKAGE_NAME}:${commands_1.changeProjectBranch.name}`]: commands_1.changeProjectBranch,
+        [`${config_1.PACKAGE_NAME}:branches`]: () => openUri(screeps_panel_1.SCREEPS_URI),
+        [`${config_1.PACKAGE_NAME}:console`]: () => openUri(memory_panel_1.MEMORY_URI),
+        [`${config_1.PACKAGE_NAME}:memory`]: () => openUri(console_panel_1.CONSOLE_URI)
     }));
     if (config_1.configGetter('showOnStartup')) {
         setTimeout(() => atom.workspace.open(welcome_pane_1.WELCOME_URI, {
@@ -100,4 +103,12 @@ function handleURI(parsedUri) {
     console.log(parsedUri);
 }
 exports.handleURI = handleURI;
+function openUri(uri) {
+    atom.workspace.open(uri, {
+        activatePane: true,
+        activateItem: true,
+        // split: 'down',
+        location: 'bottom'
+    });
+}
 //# sourceMappingURL=index.js.map

@@ -283,11 +283,11 @@ class MemoryPanel {
             }
             let d;
             const subscriptions = this._tooltipsDisposables = new atom_1.CompositeDisposable();
-            d = utils_2.applyTooltip('#screeps-memory__control-main', 'Main memory');
+            d = utils_2.applyTooltip('#screeps-memory__control-main', 'Main memory', this.element);
             d && subscriptions.add(d);
-            d = utils_2.applyTooltip('#screeps-memory__control-segments', 'Segments');
+            d = utils_2.applyTooltip('#screeps-memory__control-segments', 'Segments', this.element);
             d && subscriptions.add(d);
-            d = utils_2.applyTooltip('#screeps-memory__control-close', 'Close panel');
+            d = utils_2.applyTooltip('#screeps-memory__control-close', 'Close panel', this.element);
             d && subscriptions.add(d);
         });
     }

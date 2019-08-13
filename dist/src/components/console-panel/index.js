@@ -160,13 +160,13 @@ class ConsolePanel {
             }
             let d;
             const subscriptions = this._tooltipsDisposables = new atom_1.CompositeDisposable();
-            d = utils_1.applyTooltip('#screeps-console__delete', 'Clear');
+            d = utils_1.applyTooltip('#screeps-console__delete', 'Clear', this.element);
             d && subscriptions.add(d);
-            d = utils_1.applyTooltip('#screeps-console__close', 'Close panel');
+            d = utils_1.applyTooltip('#screeps-console__close', 'Close panel', this.element);
             d && subscriptions.add(d);
-            d = utils_1.applyTooltip('#screeps-console__pause', 'Pause tracking');
+            d = utils_1.applyTooltip('#screeps-console__pause', 'Pause tracking', this.element);
             d && subscriptions.add(d);
-            d = utils_1.applyTooltip('#screeps-console__play', 'Resume tracking');
+            d = utils_1.applyTooltip('#screeps-console__play', 'Resume tracking', this.element);
             d && subscriptions.add(d);
         });
     }

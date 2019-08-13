@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require('fs');
 const path = require('path');
-const atom_1 = require("atom");
 const React = require("react");
 const react_1 = require("react");
 const prompt_modal_1 = require("../prompt-modal");
@@ -12,7 +11,6 @@ const utils_1 = require("../../utils");
 const ui_1 = require("../../../ui");
 let progressStartTime = 0;
 const ANIMATION_MIN_TIME = 1500;
-let subscriptions = new atom_1.CompositeDisposable();
 function BranchesBlock({ branch, branches = [], active }) {
     const [inProgress, setInProgress] = react_1.useState(false);
     const [progress, setProgress] = react_1.useState(false);
@@ -26,19 +24,6 @@ function BranchesBlock({ branch, branches = [], active }) {
         const delay = ANIMATION_MIN_TIME - (now - progressStartTime);
         setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
     }, [progress]);
-    react_1.useEffect(() => {
-        setTimeout(() => {
-            subscriptions.dispose();
-            subscriptions = new atom_1.CompositeDisposable();
-            for (let { _id } of branches) {
-                let d;
-                d = utils_1.applyTooltip(`#${ui_1.BTN_BRANCHES_CLONE}-${_id}`, 'Clone branch');
-                d && subscriptions.add(d);
-                d = utils_1.applyTooltip(`#${ui_1.BTN_BRANCHES_DELETE}-${_id}`, 'Delete branch');
-                d && subscriptions.add(d);
-            }
-        });
-    }, [branches]);
     return (React.createElement(ui_1.BranchesView, { isProgressing: inProgress, branch: branch, branches: branches, active: active, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
     async function onCopyBranch(branch) {
         setProgress(true);

@@ -208,8 +208,8 @@ function getScreepsProjectSrc(project, src = '') {
     return path.resolve(project, src);
 }
 exports.getScreepsProjectSrc = getScreepsProjectSrc;
-function applyTooltip(selector, title) {
-    const elementRef = document.querySelector(selector);
+function applyTooltip(selector, title, context = document) {
+    const elementRef = $(selector, context);
     let disposable;
     if (!elementRef) {
         return;
