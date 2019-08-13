@@ -9,6 +9,7 @@ export default function(props: IModulesViewProps) {
     const [value, setValue] = useState('');
     const [isValid, setValid] = useState(true);
     const [modules, setModules] = useState<[string, IModule][]>([]); 
+    const [scrollTo, setScrollTo] = useState();
 
     useEffect(() => setValue(''), [props.branch]);
 
@@ -22,7 +23,21 @@ export default function(props: IModulesViewProps) {
         });
 
         setModules(_modules);
-    }, [props.modules])
+    }, [props.modules]);
+
+    useEffect(() => {
+        if (!scrollTo) {
+            return;
+        }
+
+        const pathRef = document.querySelector(`.screeps-modules-view__item[data-module='${ scrollTo }']`);
+
+        if (pathRef) {
+            pathRef.scrollIntoView();
+        }
+
+        setScrollTo(null);
+    }, [modules]);
 
     return (
         <div className='screeps-ide screeps-modules-view'>
@@ -36,7 +51,7 @@ export default function(props: IModulesViewProps) {
                     <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                         props.modules[MAIN_MODULE] && props.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
                         props.active  === `@${ props.branch }/${ MAIN_MODULE }.js` ? ' active' : ''
-                    )}>
+                    )} data-module={ MAIN_MODULE }>
                         <button className='btn btn--clear' onClick={() => onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
                         <div className='modified-icon'></div>
                     </li>
@@ -45,7 +60,7 @@ export default function(props: IModulesViewProps) {
                     <li className={ 'tab screeps-modules-view__item screeps-modules-view__module' + (
                         modified ? ' modified' : '' ) +  (
                         props.active === `@${ props.branch }/${ moduleName }.js` ? ' active' : ''
-                    )} key={moduleName}>
+                    )} key={moduleName} data-module={ moduleName }>
                         <button className='btn btn--clear' onClick={() => onSelectModule(moduleName)}>{ moduleName }</button>
                         <div className='close-icon' onClick={() => onDeleteModule(moduleName)}></div>
                     </li>
@@ -100,5 +115,6 @@ export default function(props: IModulesViewProps) {
 
         props.onCreateModule && props.onCreateModule(value);
         setValue('');
+        setScrollTo(value);
     }
 }
