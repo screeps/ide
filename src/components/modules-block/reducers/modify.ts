@@ -6,7 +6,11 @@ store.reducer((state: IState, { type, payload: { branch, module, modified} }: Ac
         return state;
     }
 
-    if (state.modules[branch][module].modified === modified) {
+    try {
+        if (state.modules[branch][module].modified === modified) {
+            return state;
+        }
+    } catch(err) {
         return state;
     }
 

@@ -6,15 +6,14 @@ store.reducer((state: IState, { type, payload: { branch, module } }: Action): IS
         return state;
     }
 
+    delete state.modules[branch][module];
+
     return {
         ...state,
         modules: {
             ...state.modules,
             [branch]: {
-                ...state.modules[branch],
-                [module]: {
-                    deleted: true
-                }
+                ...state.modules[branch]
             }
         }
     };
