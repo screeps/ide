@@ -203,7 +203,7 @@ export class ConsolePanel implements ViewModel {
                 }
 
                 this.state = {
-                    messages: [...this.state.messages, ...messages]
+                    messages: [...this.state.messages, ...messages].slice(-100)
                 };
 
             }))
