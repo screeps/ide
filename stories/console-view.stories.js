@@ -15,6 +15,12 @@ const log = {
     timeStamp: 1563204231657
 };
 
+const longLog = {
+    log: 'default main 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0',
+    shard: 'shard3',
+    timeStamp: 1563204231657
+};
+
 const input = {
     expression: 'console.log(234)'
 };
@@ -29,7 +35,7 @@ const error = {
     timeStamp: 1563204407549
 }
 
-const messages = [input, log, output, error];
+const messages = [input, log, output, error, longLog];
 
 let i = 0;
 let timeoutId;
