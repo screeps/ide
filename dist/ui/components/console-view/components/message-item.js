@@ -19,7 +19,7 @@ function default_1(props) {
             "]"));
     }
     if (props.message.log) {
-        message = (React.createElement("span", { className: '--log' }, unescapeHTML(props.message.log)));
+        message = (React.createElement("span", { className: '--log', dangerouslySetInnerHTML: { __html: unescapeHTML(props.message.log) } }));
     }
     if (props.message.expression) {
         message = (React.createElement("span", { className: '--input' }, unescapeHTML(props.message.expression)));

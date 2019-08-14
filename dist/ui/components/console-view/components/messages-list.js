@@ -8,11 +8,6 @@ function default_1({ messages }) {
     const messagesRef = react_1.useRef(null);
     const messagesBottomRef = react_1.useRef(null);
     react_1.useEffect(() => {
-        // @ts-ignore
-        const { offsetHeight, scrollHeight, scrollTop } = messagesRef.current;
-        console.log('offsetHeight', offsetHeight);
-        console.log('scrollHeight', scrollHeight);
-        console.log('scrollTop', scrollTop);
         if (!messagesBottomRef.current || !scrollToBottom) {
             return;
         }
