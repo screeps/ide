@@ -14,21 +14,15 @@ export default function(props: IConsoleMessageItemViewProps) {
     if (props.message.timeStamp) {
         timestamp = (
             <span className='--timestamp'>
-                <span className='brackets'>
-                    { new Date(props.message.timeStamp) .toLocaleTimeString() }
-                </span>
-                &nbsp;
+                [{ new Date(props.message.timeStamp) .toLocaleTimeString() }]
             </span>
         );
     }
 
     if (props.message.shard) {
         shard = (
-            <span>
-                <span className='brackets'>
-                    { props.message.shard }
-                </span>
-                &nbsp;
+            <span className='--shard'>
+                [{ props.message.shard }]
             </span>
         );
     }

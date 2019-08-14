@@ -42,13 +42,23 @@
     }
 
     &__message {
-        display: flex;
+        display: block;
         padding: 0 5px;
 
         line-height: 20px;
+
+        clear: both;
+
+        & > * {
+            float: left;
+        }
     }
 
+    .--shard,
     .--timestamp {
+        margin-right: 5px;
+
+        color: rgba(234, 237, 255, .3);
         white-space: nowrap;
     }
 
