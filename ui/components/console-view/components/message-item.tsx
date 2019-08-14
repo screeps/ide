@@ -29,7 +29,7 @@ export default function(props: IConsoleMessageItemViewProps) {
 
     if (props.message.log) {
         message = (
-            <span className='--log'>{ unescapeHTML(props.message.log) }</span>
+            <span className='--log' dangerouslySetInnerHTML={ { __html: unescapeHTML(props.message.log) } }></span>
         );
     }
 
