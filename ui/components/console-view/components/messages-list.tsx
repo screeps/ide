@@ -13,6 +13,12 @@ export default function({ messages }: IConsoleMessagesListViewProps) {
     const messagesBottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        // @ts-ignore
+        const { offsetHeight, scrollHeight, scrollTop } = messagesRef.current;
+        console.log('offsetHeight', offsetHeight);
+        console.log('scrollHeight', scrollHeight);
+        console.log('scrollTop', scrollTop);
+
         if (!messagesBottomRef.current || !scrollToBottom) {
             return;
         }
@@ -39,6 +45,6 @@ export default function({ messages }: IConsoleMessagesListViewProps) {
 
         const { offsetHeight, scrollHeight, scrollTop } = messagesRef.current;
 
-        scrollToBottom = scrollHeight === (scrollTop + offsetHeight);
+        scrollToBottom = (scrollTop + offsetHeight) >= scrollHeight;
     }
 }
