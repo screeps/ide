@@ -21,6 +21,12 @@ const longLog = {
     timeStamp: 1563204231657
 };
 
+const htmlLog = {
+    log: '<a href="https://ya.ru">Яндекс</a>',
+    shard: 'shard3',
+    timeStamp: 1563204231657
+}
+
 const input = {
     expression: 'console.log(234)'
 };
@@ -35,7 +41,7 @@ const error = {
     timeStamp: 1563204407549
 }
 
-const messages = [input, log, output, error, longLog];
+const messages = [input, log, output, error, longLog, htmlLog];
 
 let i = 0;
 let timeoutId;
