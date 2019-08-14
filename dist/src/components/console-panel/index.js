@@ -140,7 +140,7 @@ class ConsolePanel {
                 });
             }
             this.state = {
-                messages: [...this.state.messages, ...messages]
+                messages: [...this.state.messages, ...messages].slice(-100)
             };
         }))
             .subscribe(undefined, undefined, () => {

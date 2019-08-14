@@ -8,13 +8,15 @@ function default_1(props) {
     let timestamp, shard, message, error;
     if (props.message.timeStamp) {
         timestamp = (React.createElement("span", { className: '--timestamp' },
-            React.createElement("span", { className: 'brackets' }, new Date(props.message.timeStamp).toLocaleTimeString()),
-            "\u00A0"));
+            "[",
+            new Date(props.message.timeStamp).toLocaleTimeString(),
+            "]"));
     }
     if (props.message.shard) {
-        shard = (React.createElement("span", null,
-            React.createElement("span", { className: 'brackets' }, props.message.shard),
-            "\u00A0"));
+        shard = (React.createElement("span", { className: '--shard' },
+            "[",
+            props.message.shard,
+            "]"));
     }
     if (props.message.log) {
         message = (React.createElement("span", { className: '--log' }, unescapeHTML(props.message.log)));
