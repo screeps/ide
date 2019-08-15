@@ -6,6 +6,7 @@ import {
     OpenTextEditorAction
 } from './actions';
 
+import { default as confirm } from '../confirm-modal';
 import { default as store } from '../../store';
 
 import './reducers';
@@ -46,6 +47,16 @@ export function ModulesBlock(props: ModulesBlockProps) {
     }
 
     async function onDeleteModule(module: string): Promise<void> {
+        try {
+            await confirm({
+                submitBtn: 'Delete',
+                legend: 'This action cannot be undone! Are you sure?'
+            });
+
+        } catch(err) {
+            return;
+        }
+
         store.dispatch(DeleteModuleAction(props.branch, module));
     }
 }
