@@ -21,7 +21,13 @@ export default function(props: IMemoryControlsViewProps) {
     return (
         <div className='screeps-memory__controls'>
             <div className=''>
-                <select className='input-select' onChange={ onShard } value={ props.shard }>
+                <select className='native-key-bindings input-select'
+                    value={ props.shard }
+
+                    onChange={ onShard }
+
+                    tabIndex={ 1 }
+                    >
                     { props.shards.map(({ name }: { name: string }) => {
                         return (<option key={ name } value={ name }>{ name }</option>);
                     })}
@@ -30,11 +36,21 @@ export default function(props: IMemoryControlsViewProps) {
             </div>
             <div className='btn-group'>
                 <button id='screeps-memory__control-main'
-                    className={ ['btn icon', props.view === MEMORY_MAIN_VIEW ? 'selected' : '' ].join(' ') } onClick={ onMainMemory }>
+                    className={ ['native-key-bindings btn icon', props.view === MEMORY_MAIN_VIEW ? 'selected' : '' ].join(' ') }
+
+                    onClick={ onMainMemory }
+                    onKeyPress={ onEnter(onMainMemory) }
+
+                    tabIndex={ 5 }>
                     <i className='sc-icon-dehaze' />
                 </button>
                 <button id='screeps-memory__control-segments'
-                    className={ ['btn icon', props.view === MEMORY_SEGMENTS_VIEW ? 'selected' : '' ].join(' ') } onClick={ onSegments }>
+                    className={ ['native-key-bindings btn icon', props.view === MEMORY_SEGMENTS_VIEW ? 'selected' : '' ].join(' ') } 
+
+                    onClick={ onSegments }
+                    onKeyPress={ onEnter(onSegments) }
+
+                    tabIndex={ 6 }>
                     <i className='sc-icon-view' />
                 </button>
             </div>
@@ -51,5 +67,11 @@ export default function(props: IMemoryControlsViewProps) {
 
     function onSegments() {
         props.onToggleView && props.onToggleView(MEMORY_SEGMENTS_VIEW);
+    }
+
+    function onEnter(handler: Function) {
+        return function({ key }: React.KeyboardEvent) {
+            key === 'Enter' && handler();
+        }
     }
 }

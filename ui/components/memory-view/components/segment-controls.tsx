@@ -21,17 +21,39 @@ export default function(props: IMemorySegmentControlsViewProps) {
     return (
         <div className='screeps-memory__segment-controls'>
             Segment #:
-            <select className='input-select' onChange={ onSegment } value={ props.segment }>
+            <select className='native-key-bindings input-select'
+                value={ props.segment }
+
+                onChange={ onSegment }
+
+                tabIndex={ 2 }
+            >
                 { segments.map((name) => {
                     return (<option key={ name } value={ name }>{ name }</option>);
                 })}
             </select>
             <button id={ `${ BTN_RELOAD }` }
-                type='button' className='btn' onClick={ onRefresh }>
+                type='button'
+                className='native-key-bindings btn'
+
+                onClick={ onRefresh }
+                onKeyPress={ onEnter(onRefresh) }
+
+                tabIndex={ 3 }
+            >
                 <i className='sc-icon-cached' />
             </button>
             <button id={ `${ BTN_SAVE }` }
-                type='button' className='btn' onClick={ onUpdate } disabled={ !props.hasChange }>
+                type='button'
+                className='native-key-bindings btn'
+
+                onClick={ onUpdate }
+                onKeyPress={ onEnter(onUpdate) }
+
+                tabIndex={ 4 }
+
+                disabled={ !props.hasChange }
+            >
                 <i className='sc-icon-done' />
             </button>
         </div>
@@ -47,5 +69,11 @@ export default function(props: IMemorySegmentControlsViewProps) {
 
     function onUpdate(event: any) {
         props.onUpdate && props.onUpdate(event.target.value);
+    }
+
+    function onEnter(handler: Function) {
+        return function({ key }: React.KeyboardEvent) {
+            key === 'Enter' && handler();
+        }
     }
 }
