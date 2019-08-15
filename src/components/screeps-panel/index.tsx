@@ -33,22 +33,56 @@ export const ACTION_CLOSE = 'ACTION_CLOSE';
 export const SCREEPS_URI = 'atom://screeps-ide/screeps';
 
 let subscriptions = new CompositeDisposable();
+
+export interface IScreepsPanelState {
+    branch?: string;
+    branches?: IBranch[];
+    branchesBlockHeight?: number;
+
+    modules?: {
+        [key: string]: IModules;
+    },
+
+    activeBranchTextEditor?: string;
+    activeModuleTextEditor?: string;
+}
+
 export class ScreepsPanel implements ViewModel {
     public element: HTMLElement;
 
     _user: any = null;
     _socket: Socket | null = null;
 
+    private _state: IScreepsPanelState = {
+        branch: 'default',
+        branches: [],
+        modules: {}
+    };
+
+    public get state(): any {
+        return this._state;
+    }
+
+    public set state(state: any) {
+        this._state = {
+            ...this._state,
+            ...state
+        };
+
+        this.render(this.state);
+    }
+
     constructor(
-        public state: IState = __state.getValue()
+        state: IScreepsPanelState = {}
     ) {
         this.element = document.createElement('div');
+        this.state = state;
 
         Object.values(effects).forEach((effect) => effect.subscribe());
 
         __state
             .pipe(distinctUntilChanged())
-            .pipe(tap((state) => this.render(state)))
+            .pipe(tap((state) => this.state = state))
             .pipe(tap(({ branches }) => {
                 subscriptions.dispose();
                 subscriptions = new CompositeDisposable();
@@ -106,7 +140,14 @@ export class ScreepsPanel implements ViewModel {
         });
     }
 
-    render({ branch, branches, modules, activeBranchTextEditor, activeModuleTextEditor }: IState) {
+    render({
+        branch = 'default',
+        branches = [],
+        branchesBlockHeight,
+        modules = {},
+        activeBranchTextEditor,
+        activeModuleTextEditor
+    }: IScreepsPanelState) {
         const _modules = modules[branch];
 
         let modulesView;
@@ -121,7 +162,11 @@ export class ScreepsPanel implements ViewModel {
 
         ReactDOM.render(
             <div className='screeps-ide screeps-panel'>
-                <ResizablePanel>
+                <ResizablePanel
+                    height={ branchesBlockHeight }
+
+                    onChangeHeight={ (branchesBlockHeight) => this.state = { branchesBlockHeight } }
+                >
                     <BranchesBlock
                         branch={ branch }
                         branches={ branches }
@@ -184,7 +229,7 @@ export class ScreepsPanel implements ViewModel {
         }
     }
 
-    static deserialize({ state }: { state: IState }) {
+    static deserialize({ state }: { state: IScreepsPanelState }) {
         return new ScreepsPanel(state);
     }
 

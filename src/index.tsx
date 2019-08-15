@@ -17,7 +17,7 @@ import {
 import { WelcomePane, WELCOME_URI } from './components/welcome-pane';
 import { ConsolePanel, CONSOLE_URI } from './components/console-panel';
 import { MemoryPanel, MEMORY_URI } from './components/memory-panel';
-import { ScreepsPanel, SCREEPS_URI } from './components/screeps-panel';
+import { ScreepsPanel, SCREEPS_URI, IScreepsPanelState } from './components/screeps-panel';
 
 import { OpenTextEditorAction } from './components/modules-block/actions';
 
@@ -117,7 +117,7 @@ export function deserializeMemoryPanel({ state }: { state: any }) {
     return MemoryPanel.deserialize({ state });
 }
 
-export function deserializeScreepsPanel({ state }: { state: any }) {
+export function deserializeScreepsPanel({ state }: { state: IScreepsPanelState }) {
     return ScreepsPanel.deserialize({ state });
 }
 
