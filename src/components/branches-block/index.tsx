@@ -21,9 +21,16 @@ import {
 let progressStartTime: number = 0;
 const ANIMATION_MIN_TIME = 1500;
 
-export function BranchesBlock({ branch, branches = [], active }: any) {
+type BranchesBlockProps = {
+    branch: string;
+    branches: IBranch[];
+    active?: string;
+}
+
+export function BranchesBlock(props: BranchesBlockProps) {
     const [inProgress, setInProgress] = useState(false);
     const [progress, setProgress] = useState(false);
+    const [branch, setBranch] = useState(props.branch);
 
     useEffect(() => {
         const now = new Date() .getTime();
@@ -40,14 +47,22 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
         setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
     }, [progress]);
 
+    useEffect(() => {
+        if (!branch) {
+            const _branch = props.branches.find(({ activeWorld }) => activeWorld);
+            _branch && onSelectBranch(_branch.branch);
+            _branch && setBranch(_branch.branch);
+
+            return;
+        }
+    }, [branch]);
+
     return (
         <BranchesView
             isProgressing={ inProgress }
 
-            branch={ branch }
-            branches={ branches }
-
-            active={ active }
+            active={ props.active }
+            branches={ props.branches }
 
             onCopyBranch={ onCopyBranch }
             onSelectBranch={ onSelectBranch }
@@ -70,7 +85,7 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
             }
         
             let newName;
-            const _branches: IBranch[] = branches;
+            const _branches: IBranch[] = props.branches;
             try {
                 newName = await prompt({
                     legend: 'This branch will be cloned to the new branch. Please enter a new branch name:',
@@ -162,8 +177,8 @@ export function BranchesBlock({ branch, branches = [], active }: any) {
             let { branch: currentBranch } = state;
 
             if (branch === currentBranch) {
-                const ibranch = branches.find(({ activeWorld }) => activeWorld);
-                ibranch && onSelectBranch(ibranch.branch);
+                const _branch = branches.find(({ activeWorld }) => activeWorld);
+                _branch && onSelectBranch(_branch.branch);
             }
 
             const branchPath = getBranchPath(branch);

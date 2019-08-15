@@ -9,7 +9,6 @@ interface IBranchesViewProps {
     isProgressing?: boolean;
     active?: string;
 
-    branch: string;
     branches: IBranch[];
 
     onCopyBranch?(branch: string): Promise<void>;
