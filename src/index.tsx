@@ -88,8 +88,8 @@ export function activate(state: IState) {
         [`${ PACKAGE_NAME }:${ fetchAll.name }`]: fetchAll,
         [`${ PACKAGE_NAME }:${ changeProjectBranch.name }`]: changeProjectBranch,
         [`${ PACKAGE_NAME }:branches`]: () => openUri(SCREEPS_URI),
-        [`${ PACKAGE_NAME }:console`]: () => openUri(MEMORY_URI),
-        [`${ PACKAGE_NAME }:memory`]: () => openUri(CONSOLE_URI)
+        [`${ PACKAGE_NAME }:console`]: () => openUri(CONSOLE_URI),
+        [`${ PACKAGE_NAME }:memory`]: () => openUri(MEMORY_URI)
     }));
 
     if (configGetter('showOnStartup')) {

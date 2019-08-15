@@ -1,7 +1,7 @@
 {
     "atom-workspace": {
         "ctrl-1": "screeps-ide:branches",
-        "ctrl-3": "screeps-ide:console",
-        "ctrl-2": "screeps-ide:memory"
+        "ctrl-2": "screeps-ide:console",
+        "ctrl-3": "screeps-ide:memory"
     }
 }
