@@ -11,7 +11,10 @@ export default function(props: IModulesViewProps) {
     const [modules, setModules] = useState<[string, IModule][]>([]); 
     const [scrollTo, setScrollTo] = useState();
 
-    useEffect(() => setValue(''), [props.branch]);
+    useEffect(() => {
+        setValue('');
+        setValid(true);
+    }, [props.branch]);
 
     useEffect(() => {
         const _modules = Object.entries(props.modules).sort(([a], [b]) => {
