@@ -28,6 +28,49 @@ select {
     margin: 0;
 }
 
+label {
+    margin-bottom: 5px;
+}
+
+.input-radio {
+    vertical-align: middle;
+    -webkit-appearance: none;
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    font-size: inherit;
+    border-radius: 50%;
+    background-color: #3f444d;
+    transition: background-color 0.16s cubic-bezier(0.5, 0.15, 0.2, 1);
+
+    &:checked {
+        background-color: #568af2;
+    }
+
+    &:checked:before {
+        transform: scale(1);
+    }
+    
+    &:before {
+        background-color: #001133;
+        box-sizing: border-box;
+    }
+    
+    &:before {
+        content: "";
+        position: absolute;
+        width: inherit;
+        height: inherit;
+        border-radius: inherit;
+        border: 5.33333333px solid transparent;
+        background-clip: content-box;
+        background-color: #282c34;
+        transform: scale(0);
+        transition: transform 0.1s cubic-bezier(0.5, 0.15, 0.2, 1);
+    }
+}
+
 .input-checkbox {
     vertical-align: middle;
     -webkit-appearance: none;
