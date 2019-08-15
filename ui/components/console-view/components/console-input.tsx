@@ -113,6 +113,10 @@ export default function({
     }
 
     function onSubmit(event: React.FormEvent) {
+        if (!value) {
+            return;
+        }
+
         onInput && onInput(value);
         setValue('');
 
