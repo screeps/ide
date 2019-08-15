@@ -61,7 +61,7 @@ export default function(props: CreateProjectProps) {
                     <div className='underline' />
                 </fieldset>
                 <fieldset className='screeps-field'>
-                    <legend>Select branch</legend>
+                    <legend>Select branch:</legend>
                     <select className='native-key-bindings input-select'
                         name='branch-name'
                         value={ branch }
@@ -75,6 +75,31 @@ export default function(props: CreateProjectProps) {
                         })}
                     </select>
                 </fieldset>
+                <fieldset className='screeps-field' style={ { marginBottom: 0 } }>
+                    <legend>Select language:</legend>
+                    <label>
+                        <input className='native-key-bindings input-radio' type='radio'
+                            name='javascript'
+                            checked={ true }
+                            onChange={() => {}}
+
+                            tabIndex={ 3 }
+                        />
+                        JavaScript - Native language for Screeps, no requirements
+                    </label>
+                    <label>
+                        <input className='native-key-bindings input-radio' type='radio'
+                            name='typescript'
+                            checked={ false }
+                            onChange={() => {}}
+
+                            disabled={ true }
+
+                            tabIndex={ 4 }
+                        />
+                        TypeScript (UNDER DEVELOPMENT) - Advanced language with types support, requires TypeScript compilator package to run.
+                    </label>
+                </fieldset>
                 <fieldset className='screeps-field'>
                     <label>
                         <input className='native-key-bindings input-checkbox' type='checkbox'
@@ -84,7 +109,7 @@ export default function(props: CreateProjectProps) {
 
                             readOnly={ downloadReadonly }
 
-                            tabIndex={ 3 }
+                            tabIndex={ 5 }
                         />
                         Download modules from screeps to this folder
                     </label>
@@ -95,7 +120,7 @@ export default function(props: CreateProjectProps) {
                     className='btn btn--big btn--transparent'
                     onClick={onCancel}
 
-                    tabIndex={ 4 }
+                    tabIndex={ 6 }
                 >Cancel</button>
                 <button
                     className='btn btn--big btn--primary' type='submit'
@@ -103,7 +128,7 @@ export default function(props: CreateProjectProps) {
 
                     onClick={onSubmit}
 
-                    tabIndex={ 5 }
+                    tabIndex={ 7 }
                 >{ submitBtn }</button>
             </footer>
         </div>
