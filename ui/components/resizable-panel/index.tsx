@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRef } from 'react';
 
 import { fromEvent } from 'rxjs';
 import { tap, takeUntil } from 'rxjs/operators';
@@ -9,37 +10,30 @@ interface IResizablePanelProps {
     children?: any;
 }
 
-export default class ResizablePanel extends React.Component<IResizablePanelProps> {
-    //@ts-ignore
-    props: IResizablePanelProps;
+export default function(props: IResizablePanelProps) {
+    const elementRef = useRef<HTMLDivElement>(null);
 
-    clientY: number = 0;
-    elementRef = React.createRef<any>();
+    return (
+        <div ref={ elementRef } className='screeps-ide screeps-resizable-panel'>
+            { props.children }
+            <div className='panel-divider' onMouseDown={ onResizeStart }/>
+        </div>
+    );
 
-    constructor(props: IResizablePanelProps) {
-        super(props);
-    }
-
-    public render() {
-        return (
-            <div ref={ this.elementRef } className='screeps-ide screeps-resizable-panel'>
-                { this.props.children }
-                <div className='panel-divider' onMouseDown={ this.onResizeStart }/>
-            </div>
-        );
-    }
-
-    onResizeStart = () => {
+    function onResizeStart() {
         const up$ = fromEvent(document.body, 'mouseup');
         const move$ = fromEvent(document.body, 'mousemove');
 
         move$.pipe(takeUntil(up$))
             // @ts-ignore
             .pipe(tap(({ movementY }) => {
-                const element = this.elementRef.current;
-                const height = parseInt(element.offsetHeight, 10);
-        
-                element.style.height = `${ height + movementY }px`;
+                const element = elementRef.current;
+
+                if (!element) {
+                    return;
+                }
+
+                element.style.height = `${ element.offsetHeight + movementY }px`;
             }))
             .subscribe();
     }
