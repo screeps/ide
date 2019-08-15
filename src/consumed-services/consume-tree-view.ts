@@ -1,5 +1,7 @@
 import { Directory } from 'atom';
 
+import { PACKAGE_NAME } from '../config';
+
 import {
     $,
     isScreepsProject,
@@ -38,8 +40,8 @@ export function consumeTreeView(treeView: any) {
 
             const projectConfig = await getScreepsProjectConfig(projectPath);
 
+            assignScreepsIdeRc(treeProjectNodeRef);
             assignScreepsBranch(treeProjectNodeRef, projectConfig);
-
             assignScreepsSrcIcon(treeView, projectPath, projectConfig);
 
             treeProjectNodeRef.removeEventListener('click', updateIcon);
@@ -60,6 +62,8 @@ export function consumeTreeView(treeView: any) {
 
         store.dispatch({ type: 'REMOVE_PROJECT', payload: {}});
     });
+
+    atom.config.observe(`${ PACKAGE_NAME }.showProjectConfig`, updateIcon);
 
     const projects = atom.project.getPaths();
     if (projects.length) {
@@ -159,4 +163,14 @@ function toggleFolderEmptyBtn(projectRef: HTMLElement, projectDir: Directory) {
 
     div.appendChild(btn);
     projectRef.appendChild(div);
+}
+
+function assignScreepsIdeRc(projectRef: HTMLElement) {
+    const option = atom.config.get(`${ PACKAGE_NAME }.showProjectConfig`);
+
+    if (option) {
+        projectRef.classList.remove('hide-screepsiderc');
+    } else {
+        projectRef.classList.add('hide-screepsiderc');
+    }
 }

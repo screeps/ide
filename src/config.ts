@@ -3,6 +3,7 @@ const path = require('path');
 
 interface IAtomConfig {
     showOnStartup: any;
+    showProjectConfig: any;
     global: any;
     local?: any;
 }
@@ -127,6 +128,12 @@ let config: IAtomConfig = {
         type: 'boolean',
         default: true,
         description: 'Show welcome panes with useful information when opening a new Atom window.'
+    },
+
+    showProjectConfig: {
+        type: 'boolean',
+        default: false,
+        description: 'Show config .screepsiderc in local projects.'
     },
 
     global: _global
