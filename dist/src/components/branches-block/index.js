@@ -11,9 +11,10 @@ const utils_1 = require("../../utils");
 const ui_1 = require("../../../ui");
 let progressStartTime = 0;
 const ANIMATION_MIN_TIME = 1500;
-function BranchesBlock({ branch, branches = [], active }) {
+function BranchesBlock(props) {
     const [inProgress, setInProgress] = react_1.useState(false);
     const [progress, setProgress] = react_1.useState(false);
+    const [branch, setBranch] = react_1.useState(props.branch);
     react_1.useEffect(() => {
         const now = new Date().getTime();
         if (progress) {
@@ -24,7 +25,15 @@ function BranchesBlock({ branch, branches = [], active }) {
         const delay = ANIMATION_MIN_TIME - (now - progressStartTime);
         setTimeout(() => setInProgress(false), delay > 0 ? delay : 0);
     }, [progress]);
-    return (React.createElement(ui_1.BranchesView, { isProgressing: inProgress, branch: branch, branches: branches, active: active, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
+    react_1.useEffect(() => {
+        if (!branch) {
+            const _branch = props.branches.find(({ activeWorld }) => activeWorld);
+            _branch && onSelectBranch(_branch.branch);
+            _branch && setBranch(_branch.branch);
+            return;
+        }
+    }, [branch]);
+    return (React.createElement(ui_1.BranchesView, { isProgressing: inProgress, active: props.active, branches: props.branches, onCopyBranch: onCopyBranch, onSelectBranch: onSelectBranch, onDeleteBranch: onDeleteBranch, onSetActiveSim: onSetActiveSim, onSetActiveWorld: onSetActiveWorld }));
     async function onCopyBranch(branch) {
         setProgress(true);
         try {
@@ -36,7 +45,7 @@ function BranchesBlock({ branch, branches = [], active }) {
                 throw err;
             }
             let newName;
-            const _branches = branches;
+            const _branches = props.branches;
             try {
                 newName = await prompt_modal_1.default({
                     legend: 'This branch will be cloned to the new branch. Please enter a new branch name:',
@@ -95,8 +104,8 @@ function BranchesBlock({ branch, branches = [], active }) {
             state_1.default.next(Object.assign({}, state, { branches }));
             let { branch: currentBranch } = state;
             if (branch === currentBranch) {
-                const ibranch = branches.find(({ activeWorld }) => activeWorld);
-                ibranch && onSelectBranch(ibranch.branch);
+                const _branch = branches.find(({ activeWorld }) => activeWorld);
+                _branch && onSelectBranch(_branch.branch);
             }
             const branchPath = utils_1.getBranchPath(branch);
             try {

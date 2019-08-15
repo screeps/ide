@@ -84,6 +84,9 @@ function default_1({ onInput }) {
         setValue(value);
     }
     function onSubmit(event) {
+        if (!value) {
+            return;
+        }
         onInput && onInput(value);
         setValue('');
         setHistory([value, ...history]);

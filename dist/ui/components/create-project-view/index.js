@@ -23,17 +23,25 @@ function default_1(props) {
                 React.createElement("input", { className: 'native-key-bindings', type: 'text', name: 'project-path', value: projectPath, onChange: onInput, onClick: props.onClick, required: true, readOnly: projectPathReadonly, autoFocus: true, tabIndex: 1 }),
                 React.createElement("div", { className: 'underline' })),
             React.createElement("fieldset", { className: 'screeps-field' },
-                React.createElement("legend", null, "Select branch"),
+                React.createElement("legend", null, "Select branch:"),
                 React.createElement("select", { className: 'native-key-bindings input-select', name: 'branch-name', value: branch, onChange: (event) => onBranch(event), tabIndex: 2 }, props.branches.map(({ _id, branch }) => {
                     return (React.createElement("option", { key: _id, value: branch }, branch));
                 }))),
+            React.createElement("fieldset", { className: 'screeps-field', style: { marginBottom: 0 } },
+                React.createElement("legend", null, "Select language:"),
+                React.createElement("label", null,
+                    React.createElement("input", { className: 'native-key-bindings input-radio', type: 'radio', name: 'javascript', checked: true, onChange: () => { }, tabIndex: 3 }),
+                    "JavaScript - Native language for Screeps, no requirements"),
+                React.createElement("label", null,
+                    React.createElement("input", { className: 'native-key-bindings input-radio', type: 'radio', name: 'typescript', checked: false, onChange: () => { }, disabled: true, tabIndex: 4 }),
+                    "TypeScript (UNDER DEVELOPMENT) - Advanced language with types support, requires TypeScript compilator package to run.")),
             React.createElement("fieldset", { className: 'screeps-field' },
                 React.createElement("label", null,
-                    React.createElement("input", { className: 'native-key-bindings input-checkbox', type: 'checkbox', name: 'download', checked: download, onChange: () => !downloadReadonly && setDownloadValue(!download), readOnly: downloadReadonly, tabIndex: 3 }),
+                    React.createElement("input", { className: 'native-key-bindings input-checkbox', type: 'checkbox', name: 'download', checked: download, onChange: () => !downloadReadonly && setDownloadValue(!download), readOnly: downloadReadonly, tabIndex: 5 }),
                     "Download modules from screeps to this folder"))),
         React.createElement("footer", null,
-            React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: onCancel, tabIndex: 4 }, "Cancel"),
-            React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', disabled: !projectPath, onClick: onSubmit, tabIndex: 5 }, submitBtn))));
+            React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: onCancel, tabIndex: 6 }, "Cancel"),
+            React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', disabled: !projectPath, onClick: onSubmit, tabIndex: 7 }, submitBtn))));
     // Private component actions.
     function onInput(event) {
         const target = event.target;

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 const actions_1 = require("./actions");
+const confirm_modal_1 = require("../confirm-modal");
 const store_1 = require("../../store");
 require("./reducers");
 const effects = require("./effects");
@@ -17,6 +18,15 @@ function ModulesBlock(props) {
         store_1.default.dispatch(actions_1.OpenTextEditorAction(props.branch, module));
     }
     async function onDeleteModule(module) {
+        try {
+            await confirm_modal_1.default({
+                submitBtn: 'Delete',
+                legend: 'This action cannot be undone! Are you sure?'
+            });
+        }
+        catch (err) {
+            return;
+        }
         store_1.default.dispatch(actions_1.DeleteModuleAction(props.branch, module));
     }
 }

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const atom_1 = require("atom");
+const config_1 = require("../config");
 const utils_1 = require("../utils");
 const store_1 = require("../store");
 const actions_1 = require("../components/screeps-panel/actions");
@@ -22,6 +23,7 @@ function consumeTreeView(treeView) {
                 return;
             }
             const projectConfig = await utils_1.getScreepsProjectConfig(projectPath);
+            assignScreepsIdeRc(treeProjectNodeRef);
             assignScreepsBranch(treeProjectNodeRef, projectConfig);
             assignScreepsSrcIcon(treeView, projectPath, projectConfig);
             treeProjectNodeRef.removeEventListener('click', updateIcon);
@@ -37,6 +39,7 @@ function consumeTreeView(treeView) {
         }
         store_1.default.dispatch({ type: 'REMOVE_PROJECT', payload: {} });
     });
+    atom.config.observe(`${config_1.PACKAGE_NAME}.showProjectConfig`, updateIcon);
     const projects = atom.project.getPaths();
     if (projects.length) {
         IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION = true;
@@ -111,5 +114,14 @@ function toggleFolderEmptyBtn(projectRef, projectDir) {
     });
     div.appendChild(btn);
     projectRef.appendChild(div);
+}
+function assignScreepsIdeRc(projectRef) {
+    const option = atom.config.get(`${config_1.PACKAGE_NAME}.showProjectConfig`);
+    if (option) {
+        projectRef.classList.remove('hide-screepsiderc');
+    }
+    else {
+        projectRef.classList.add('hide-screepsiderc');
+    }
 }
 //# sourceMappingURL=consume-tree-view.js.map

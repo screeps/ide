@@ -67,8 +67,8 @@ function activate(state) {
         [`${config_1.PACKAGE_NAME}:${commands_1.fetchAll.name}`]: commands_1.fetchAll,
         [`${config_1.PACKAGE_NAME}:${commands_1.changeProjectBranch.name}`]: commands_1.changeProjectBranch,
         [`${config_1.PACKAGE_NAME}:branches`]: () => openUri(screeps_panel_1.SCREEPS_URI),
-        [`${config_1.PACKAGE_NAME}:console`]: () => openUri(memory_panel_1.MEMORY_URI),
-        [`${config_1.PACKAGE_NAME}:memory`]: () => openUri(console_panel_1.CONSOLE_URI)
+        [`${config_1.PACKAGE_NAME}:console`]: () => openUri(console_panel_1.CONSOLE_URI),
+        [`${config_1.PACKAGE_NAME}:memory`]: () => openUri(memory_panel_1.MEMORY_URI)
     }));
     if (config_1.configGetter('showOnStartup')) {
         setTimeout(() => atom.workspace.open(welcome_pane_1.WELCOME_URI, {

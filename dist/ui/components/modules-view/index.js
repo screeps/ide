@@ -9,7 +9,10 @@ function default_1(props) {
     const [isValid, setValid] = react_1.useState(true);
     const [modules, setModules] = react_1.useState([]);
     const [scrollTo, setScrollTo] = react_1.useState();
-    react_1.useEffect(() => setValue(''), [props.branch]);
+    react_1.useEffect(() => {
+        setValue('');
+        setValid(true);
+    }, [props.branch]);
     react_1.useEffect(() => {
         const _modules = Object.entries(props.modules).sort(([a], [b]) => {
             if (a > b)
@@ -69,7 +72,7 @@ function default_1(props) {
     }
     function onSubmit(event) {
         event.preventDefault();
-        if (!isValid) {
+        if (!isValid || !value) {
             return;
         }
         props.onCreateModule && props.onCreateModule(value);

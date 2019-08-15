@@ -23,15 +23,20 @@ exports.ACTION_CLOSE = 'ACTION_CLOSE';
 exports.SCREEPS_URI = 'atom://screeps-ide/screeps';
 let subscriptions = new atom_1.CompositeDisposable();
 class ScreepsPanel {
-    constructor(state = state_1.default.getValue()) {
-        this.state = state;
+    constructor(state = {}) {
         this._user = null;
         this._socket = null;
+        this._state = {
+            branch: 'default',
+            branches: [],
+            modules: {}
+        };
         this.element = document.createElement('div');
+        this.state = state;
         Object.values(effects).forEach((effect) => effect.subscribe());
         state_1.default
             .pipe(operators_1.distinctUntilChanged())
-            .pipe(operators_1.tap((state) => this.render(state)))
+            .pipe(operators_1.tap((state) => this.state = state))
             .pipe(operators_1.tap(({ branches }) => {
             subscriptions.dispose();
             subscriptions = new atom_1.CompositeDisposable();
@@ -77,14 +82,21 @@ class ScreepsPanel {
             store_1.default.dispatch(actions_2.SetActiveModule(branch, module));
         });
     }
-    render({ branch, branches, modules, activeBranchTextEditor, activeModuleTextEditor }) {
+    get state() {
+        return this._state;
+    }
+    set state(state) {
+        this._state = Object.assign({}, this._state, state);
+        this.render(this.state);
+    }
+    render({ branch = 'default', branches = [], branchesBlockHeight, modules = {}, activeBranchTextEditor, activeModuleTextEditor }) {
         const _modules = modules[branch];
         let modulesView;
         if (_modules) {
             modulesView = (React.createElement(modules_block_1.ModulesBlock, { branch: branch, modules: _modules, active: `@${activeBranchTextEditor}/${activeModuleTextEditor}.js` }));
         }
         ReactDOM.render(React.createElement("div", { className: 'screeps-ide screeps-panel' },
-            React.createElement(resizable_panel_1.default, null,
+            React.createElement(resizable_panel_1.default, { height: branchesBlockHeight, onChangeHeight: (branchesBlockHeight) => this.state = { branchesBlockHeight } },
                 React.createElement(branches_block_1.BranchesBlock, { branch: branch, branches: branches, active: activeBranchTextEditor })),
             modulesView,
             React.createElement("footer", null,
