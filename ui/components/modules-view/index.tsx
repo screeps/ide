@@ -109,7 +109,7 @@ export default function(props: IModulesViewProps) {
     function onSubmit(event: React.FormEvent) {
         event.preventDefault();
 
-        if (!isValid) {
+        if (!isValid || !value) {
             return;
         }
 
