@@ -20,7 +20,10 @@ export class AtomModal {
     private _eventsSbj: Subject<IAction> = new Subject();
     public events$: Observable<IAction>;
 
-    public ref: any = React.createRef();
+    public _ref: any = React.createRef();
+    get ref() {
+        return this._ref.current;
+    }
 
     constructor(Component: any, props: any = {}) {
         this._element = document.createElement('div');
@@ -34,7 +37,7 @@ export class AtomModal {
         document.body.addEventListener('keyup', this.onEscape);
 
         ReactDOM.render(
-            <Component ref={ this.ref }
+            <Component ref={ this._ref }
                 { ...props }
 
                 onCancel={this.onCancel}

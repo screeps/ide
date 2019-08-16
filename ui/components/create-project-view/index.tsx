@@ -1,6 +1,6 @@
 // import * as React from 'react';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 
 type CreateProjectProps = {
     branch: string;
@@ -21,7 +21,7 @@ type CreateProjectProps = {
     }): void;
 }
 
-export default function(props: CreateProjectProps) {
+export default forwardRef(function(props: CreateProjectProps, ref) {
     const [branch, setBranchValue] = useState(props.branch);
 
     const [projectPath, setProjectPathValue] = useState(props.projectPath || '');
@@ -32,6 +32,12 @@ export default function(props: CreateProjectProps) {
     const [downloadReadonly] = useState(props.downloadReadonly || false);
 
     const [submitBtn] = useState(props.submitBtn || 'Create');
+
+    useImperativeHandle(ref, () => ({
+        setProjectPathValue(path: string) {
+            setProjectPathValue(path);
+        }
+    }));
 
     return (
         <div className='screeps-ide screeps-modal screeps-create-project'>
@@ -161,4 +167,4 @@ export default function(props: CreateProjectProps) {
             branch
         });
     }
-}
+})
