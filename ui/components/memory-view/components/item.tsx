@@ -44,6 +44,7 @@ export default function(props: IMemoryItemViewProps) {
                 <button className='btn btn--clear' type='button'
 
                     onClick={ onEdit }
+                    onKeyPress={ onEnter(onEdit) }
 
                     tabIndex={ 7 }
                 >
@@ -56,6 +57,7 @@ export default function(props: IMemoryItemViewProps) {
         if (props.path) {
             deleteBtn = (
                 <button id={ `${ BTN_DELETE }${ props.id }` }
+                    tabIndex={ 7 }
                     type='button' className='btn btn--clear' onClick={ onRemovePath } title='Delete from memory'>
                     <i className='sc-icon-delete' />
                 </button>
@@ -66,14 +68,17 @@ export default function(props: IMemoryItemViewProps) {
             <div className='screeps-memory__json-editor'>
                 <div className='screeps-memory__json-editor-controlls'>
                     <button id={ `${ BTN_UPDATE }${ props.id }` }
+                        tabIndex={ 7 }
                         type='button' className='btn btn--clear' onClick={ onSave }>
                         <i className='sc-icon-done' />
                     </button>
                     <button id={ `${ BTN_RELOAD }${ props.id }` }
+                        tabIndex={ 7 }
                         type='button' className='btn btn--clear' onClick={ onReload }>
                         <i className='sc-icon-cached' />
                     </button>
                     <button id={ `${ BTN_CANCEL }${ props.id }` }
+                        tabIndex={ 7 }
                         type='button' className='btn btn--clear' onClick={ onCancel }>
                         <i className='sc-icon-clear' />
                     </button>
@@ -147,5 +152,11 @@ export default function(props: IMemoryItemViewProps) {
         onCancel();
 
         props.onRemovePath && props.onRemovePath();
+    }
+
+    function onEnter(handler: Function) {
+        return function({ key }: React.KeyboardEvent) {
+            key === 'Enter' && handler();
+        }
     }
 }
