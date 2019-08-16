@@ -41,7 +41,12 @@ export default function(props: IMemoryItemViewProps) {
 
         value = (
             <div className='screeps-memory__value'>
-                <button className='btn btn--clear' type='button' onClick={ onEdit }>
+                <button className='btn btn--clear' type='button'
+
+                    onClick={ onEdit }
+
+                    tabIndex={ 7 }
+                >
                     { short }
                 </button>
             </div>

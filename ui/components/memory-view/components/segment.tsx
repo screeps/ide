@@ -14,7 +14,9 @@ export default function(props: IMemorySegmentViewProps) {
             placeholder='NO DATA'
             value={ props.segment } 
 
-            onChange={ onChange }/>
+            onChange={ onChange }
+            
+            tabIndex={ 7 }/>
         </div>
     );
 
