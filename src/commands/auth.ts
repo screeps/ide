@@ -49,7 +49,7 @@ export function authCommand(): Promise<any> {
                         return createTokenCommand(api);
                     }))
                     .pipe(catchError(() => {
-                        authModalRef.setState({
+                        authModalRef.ref.setState({
                             isInvalid: true,
                             isBlocking: true
                         });
