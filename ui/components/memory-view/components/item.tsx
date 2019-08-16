@@ -53,6 +53,7 @@ export default function(props: IMemoryItemViewProps) {
             </div>
         );
     } else {
+        let size;
         let deleteBtn;
         if (props.path) {
             deleteBtn = (
@@ -63,6 +64,10 @@ export default function(props: IMemoryItemViewProps) {
                 </button>
             );
         }
+
+        size = (
+            <span>{ (JSON.stringify(props.value).length / 1024).toFixed(1) } KB</span>
+        );
 
         jsonEditor = (
             <div className='screeps-memory__json-editor'>
@@ -83,6 +88,7 @@ export default function(props: IMemoryItemViewProps) {
                         <i className='sc-icon-clear' />
                     </button>
                     { deleteBtn }
+                    { size }
                 </div>
                 <MemoryJSONEditorView ref={ editorRef }
                     name={ props.path }
