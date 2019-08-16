@@ -1,4 +1,8 @@
 /// <reference path='./index.d.ts' />
+
+// @ts-ignore
+import * as packageDeps from 'atom-package-deps';
+
 import { CompositeDisposable } from 'atom';
 
 import { default as store } from './store';
@@ -42,6 +46,8 @@ export function initialize(state: IState) {
 
 export function activate(state: IState) {
     console.log('Screeps-IDE:activate', state);
+
+    packageDeps.install('screeps-ide');
 
     atom.workspace.getTextEditors()
         .forEach((textEditor) => {

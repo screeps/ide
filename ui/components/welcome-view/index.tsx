@@ -26,10 +26,10 @@ export default function(props: IWelcomeViewProps) {
                             Visit our <a href='https://screeps.com' target='_blank'>website</a> to create an account.
                         </li>
                         <li>
-                            <a onClick={ onSignin }>Log into your account</a> using your email and password. Your password is not stored in Atom, we only use it to create an auth token.
+                            <button className='btn' onClick={ onSignin }>Log into your account</button> using your email and password. Your password is not stored in Atom, we only use it to create an auth token.
                         </li>
                         <li>
-                            Browse your code branches and modules, or <a onClick={ onCreateNewProject }>Create a new project</a> to sync local files.
+                            Browse your code branches and modules, or <button className='btn' onClick={ onCreateNewProject }>Create a new project</button> to sync local files.
                         </li>
                         <li>
                             Use any other third-party packages to work with your local project files.
