@@ -56,10 +56,6 @@ export class AtomModal {
         document.body.removeEventListener('keyup', this.onEscape);
     }
 
-    setState(state: any) {
-        this.ref.current.setState(state);
-    }
-
     onEscape = (event: KeyboardEvent) => {
         if (event.code !== 'Escape') {
             return;
