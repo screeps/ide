@@ -31,6 +31,10 @@ const input = {
     expression: 'console.log(234)'
 };
 
+const longInput = {
+    expression: 'console.log("default main 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0")'
+};
+
 const output = {
     result: 'undefined'
 };
@@ -41,7 +45,7 @@ const error = {
     timeStamp: 1563204407549
 }
 
-const messages = [input, log, output, error, longLog, htmlLog];
+const messages = [input, log, output, error, longLog, htmlLog, longInput];
 
 let i = 0;
 let timeoutId;
