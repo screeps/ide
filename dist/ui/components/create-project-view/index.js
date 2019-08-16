@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // import * as React from 'react';
 const React = require("react");
 const react_1 = require("react");
-function default_1(props) {
+exports.default = react_1.forwardRef(function (props, ref) {
     const [branch, setBranchValue] = react_1.useState(props.branch);
     const [projectPath, setProjectPathValue] = react_1.useState(props.projectPath || '');
     const [projectPathLabel] = react_1.useState(props.projectPathLabel || 'Please enter a new project folder path');
@@ -11,6 +11,11 @@ function default_1(props) {
     const [download, setDownloadValue] = react_1.useState(true);
     const [downloadReadonly] = react_1.useState(props.downloadReadonly || false);
     const [submitBtn] = react_1.useState(props.submitBtn || 'Create');
+    react_1.useImperativeHandle(ref, () => ({
+        setProjectPathValue(path) {
+            setProjectPathValue(path);
+        }
+    }));
     return (React.createElement("div", { className: 'screeps-ide screeps-modal screeps-create-project' },
         React.createElement("header", null,
             React.createElement("div", { className: 'logotype' }),
@@ -64,6 +69,5 @@ function default_1(props) {
             branch
         });
     }
-}
-exports.default = default_1;
+});
 //# sourceMappingURL=index.js.map

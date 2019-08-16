@@ -6,7 +6,7 @@ const rxjs_1 = require("rxjs");
 class AtomModal {
     constructor(Component, props = {}) {
         this._eventsSbj = new rxjs_1.Subject();
-        this.ref = React.createRef();
+        this._ref = React.createRef();
         this.onEscape = (event) => {
             if (event.code !== 'Escape') {
                 return;
@@ -27,7 +27,10 @@ class AtomModal {
             visible: true
         });
         document.body.addEventListener('keyup', this.onEscape);
-        ReactDOM.render(React.createElement(Component, Object.assign({ ref: this.ref }, props, { onCancel: this.onCancel, onSubmit: this.onSubmit })), this._element);
+        ReactDOM.render(React.createElement(Component, Object.assign({ ref: this._ref }, props, { onCancel: this.onCancel, onSubmit: this.onSubmit })), this._element);
+    }
+    get ref() {
+        return this._ref.current;
     }
     hide() {
         this._atomModalPanelRef.hide();
@@ -35,9 +38,6 @@ class AtomModal {
     destroy() {
         this._atomModalPanelRef.destroy();
         document.body.removeEventListener('keyup', this.onEscape);
-    }
-    setState(state) {
-        this.ref.current.setState(state);
     }
 }
 exports.AtomModal = AtomModal;

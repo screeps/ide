@@ -44,7 +44,7 @@ function authCommand() {
                 return createTokenCommand(api);
             }))
                 .pipe(operators_1.catchError(() => {
-                authModalRef.setState({
+                authModalRef.ref.setState({
                     isInvalid: true,
                     isBlocking: true
                 });

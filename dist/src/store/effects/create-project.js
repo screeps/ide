@@ -16,9 +16,21 @@ exports.createProjectEffect = __1.default
     if (actions_1.CREATE_PROJECT !== type) {
         return;
     }
+    let subscriptions;
     try {
-        const { projectPath, download, branch } = await new Promise((resolve, reject) => {
-            const createProjectModal = new atom_modal_1.AtomModal(create_project_view_1.default, Object.assign({ branch: state.branch, branches: state.branches }, payload));
+        const settings = await new Promise((resolve, reject) => {
+            let projectPath;
+            const createProjectModal = new atom_modal_1.AtomModal(create_project_view_1.default, Object.assign({ branch: state.branch, branches: state.branches, projectPathReadonly: true }, payload, { onClick() {
+                    // @ts-ignore
+                    atom.commands.dispatch(atom.workspace.element, 'application:add-project-folder');
+                    subscriptions && subscriptions.dispose();
+                    subscriptions = new atom_1.CompositeDisposable();
+                    const disposable = atom.project.onDidChangePaths((paths) => {
+                        projectPath = paths[paths.length - 1];
+                        createProjectModal.ref.setProjectPathValue(projectPath);
+                    });
+                    subscriptions.add(disposable);
+                } }));
             createProjectModal.events$
                 .pipe(operators_1.filter(({ type }) => type === 'MODAL_SUBMIT'))
                 .pipe(operators_1.tap(() => createProjectModal.hide()))
@@ -26,9 +38,17 @@ exports.createProjectEffect = __1.default
                 .subscribe();
             createProjectModal.events$
                 .pipe(operators_1.filter(({ type }) => type === 'MODAL_CANCEL'))
+                .pipe(operators_1.tap(() => atom.project.removePath(projectPath)))
                 .pipe(operators_1.tap(() => reject(null)))
                 .subscribe();
+            createProjectModal.events$
+                .pipe(operators_1.tap(() => {
+                // @ts-ignore
+                subscriptions && subscriptions.dispose();
+            }))
+                .subscribe();
         });
+        const { projectPath, download, branch } = settings;
         const projectDir = mkdir(projectPath);
         const configFile = await utils_1.createScreepsProjectConfig(projectPath, {
             branch
