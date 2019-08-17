@@ -141,7 +141,7 @@ export class ScreepsPanel implements ViewModel {
     }
 
     render({
-        branch = 'default',
+        branch = '',
         branches = [],
         branchesBlockHeight,
         modules = {},
