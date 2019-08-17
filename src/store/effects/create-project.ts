@@ -18,7 +18,6 @@ import {
 
 export const createProjectEffect = store
 .effect(async (state: IState, { type, payload }: Action): Promise<void> => {
-    state;
     if (CREATE_PROJECT !== type) {
         return;
     }
@@ -26,6 +25,9 @@ export const createProjectEffect = store
     let subscriptions: CompositeDisposable;
 
     try {
+        // Check auth.
+        const api = await getApi();
+
         const settings: any = await new Promise((resolve, reject) => {
             let projectPath: string;
 
@@ -49,6 +51,19 @@ export const createProjectEffect = store
                 }
             });
 
+            // Update branches.
+            api.getUserBranches().then(({ list: branches }) => {
+                if (createProjectModal) {
+                    createProjectModal.ref.setBranches(branches);
+                }
+
+                // Save to store.
+                __state.next({
+                    ...__state.getValue(),
+                    branches
+                });
+            });
+
             createProjectModal.events$
                 .pipe(filter(({ type }) => type === 'MODAL_SUBMIT'))
                 .pipe(tap(() => createProjectModal.hide()))
@@ -57,7 +72,7 @@ export const createProjectEffect = store
 
             createProjectModal.events$
                 .pipe(filter(({ type }) => type === 'MODAL_CANCEL'))
-                .pipe(tap(() => atom.project.removePath(projectPath)))
+                .pipe(tap(() => projectPath && atom.project.removePath(projectPath)))
                 .pipe(tap(() => reject(null)))
                 .subscribe();
             
@@ -90,7 +105,6 @@ export const createProjectEffect = store
                     }
                 }
 
-                const api = await getApi();
                 const { modules } = await api.getUserCode(branch);
 
                 for (const moduleName in modules) {

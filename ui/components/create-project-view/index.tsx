@@ -22,7 +22,8 @@ type CreateProjectProps = {
 }
 
 export default forwardRef(function(props: CreateProjectProps, ref) {
-    const [branch, setBranchValue] = useState(props.branch);
+    const [branch, setBranch] = useState(props.branch);
+    const [branches, setBranches] = useState(props.branches || [])
 
     const [projectPath, setProjectPathValue] = useState(props.projectPath || '');
     const [projectPathLabel] = useState(props.projectPathLabel || 'Please enter a new project folder path');
@@ -36,6 +37,9 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
     useImperativeHandle(ref, () => ({
         setProjectPathValue(path: string) {
             setProjectPathValue(path);
+        },
+        setBranches(_: IBranch[]) {
+            setBranches(_)
         }
     }));
 
@@ -76,7 +80,7 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
 
                         tabIndex={ 2 }
                     >
-                        { props.branches.map(({ _id, branch }) => {
+                        { branches.map(({ _id, branch }) => {
                             return (<option key={ _id } value={ branch }>{ branch }</option>);
                         })}
                     </select>
@@ -152,7 +156,7 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
         const target = event.target as HTMLSelectElement;
         const value = target.value;
 
-        setBranchValue(value);
+        setBranch(value);
     }
 
     // Public component output actions.
