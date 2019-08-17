@@ -13,6 +13,9 @@ import { CREATE_PROJECT } from '../actions';
 
 import {
     getApi,
+    LOCAL_PROJECT_CONFIG,
+    TERN_CONFIG,
+    createScreepsTernConfig,
     createScreepsProjectConfig
 } from '../../utils';
 
@@ -87,18 +90,17 @@ export const createProjectEffect = store
         const { projectPath, download, branch } = settings;
         const projectDir = mkdir(projectPath);
 
-        const configFile = await createScreepsProjectConfig(projectPath, {
-            branch
-        });
+        await createScreepsTernConfig(projectPath, { libs: ['screeps'] });
+        await createScreepsProjectConfig(projectPath, { branch });
 
         if (download) {
             try {
-                const projectEntries = await projectDir.getEntriesSync();
-
                 if (!payload.downloadForce) {
-                    if ((projectEntries.length > 1) ||
-                        (projectEntries.length === 1 && projectEntries[0].getPath() !== configFile.getPath())
-                    ) {
+                    let projectEntries = await projectDir.getEntriesSync();
+                    const filter = new RegExp(`((${ LOCAL_PROJECT_CONFIG })|(${ TERN_CONFIG }))$`);
+                    projectEntries = projectEntries.filter((entry) => !filter.test(entry.getPath()));
+
+                    if (projectEntries.length) {
                         await confirm({
                             legend: 'Folder is not empty! Would you like to continue?'
                         });

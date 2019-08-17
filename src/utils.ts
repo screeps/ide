@@ -11,7 +11,8 @@ import { authCommand } from './commands/auth';
 let api: Api;
 let socket: Socket;
 
-const LOCAL_PROJECT_CONFIG = '.screepsiderc';
+export const LOCAL_PROJECT_CONFIG = '.screepsiderc';
+export const TERN_CONFIG = '.tern-project';
 
 export function guid() {
     return parseInt(Math.random().toString().substr(2)).toString(16);
@@ -217,6 +218,21 @@ export async function createScreepsProjectConfig(project: string, settings: any)
         throw err;
     }
 }
+
+export async function createScreepsTernConfig(project: string, settings: any): Promise<File> {
+    try {
+        const configPath = path.resolve(project, TERN_CONFIG);
+        const configFile: File = new File(configPath);
+        const settingsStr = JSON.stringify(settings, null, '\t');
+
+        await configFile.write(settingsStr);
+
+        return configFile;
+    } catch (err) {
+        throw err;
+    }
+}
+
 
 export async function getScreepsProjectConfig(project: string): Promise<any> {
     try {

@@ -1,6 +1,6 @@
 // import * as React from 'react';
 import * as React from 'react';
-import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 
 type CreateProjectProps = {
     branch: string;
@@ -22,6 +22,8 @@ type CreateProjectProps = {
 }
 
 export default forwardRef(function(props: CreateProjectProps, ref) {
+    const [valid, setValid] = useState(false);
+
     const [branch, setBranch] = useState(props.branch);
     const [branches, setBranches] = useState(props.branches || [])
 
@@ -42,6 +44,15 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
             setBranches(_)
         }
     }));
+
+    useEffect(() => {
+        let valid = false;
+        if (branch && projectPath) {
+            valid = true;
+        }
+
+        setValid(valid);
+    }, [branch, projectPath])
 
     return (
         <div className='screeps-ide screeps-modal screeps-create-project'>
@@ -77,9 +88,11 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
                         value={ branch }
 
                         onChange={(event) => onBranch(event)}
+                        required={ true }
 
                         tabIndex={ 2 }
                     >
+                        { !branch && (<option value={ branch }></option>) }
                         { branches.map(({ _id, branch }) => {
                             return (<option key={ _id } value={ branch }>{ branch }</option>);
                         })}
@@ -134,7 +147,7 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
                 >Cancel</button>
                 <button
                     className='btn btn--big btn--primary' type='submit'
-                    disabled={ !projectPath }
+                    disabled={ !valid }
 
                     onClick={onSubmit}
 
