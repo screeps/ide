@@ -2,6 +2,7 @@
     "atom-workspace": {
         "ctrl-1": "screeps-ide:branches",
         "ctrl-2": "screeps-ide:console",
-        "ctrl-3": "screeps-ide:memory"
+        "ctrl-3": "screeps-ide:memory",
+        "ctrl-alt-enter": "screeps-ide:commit"
     }
 }

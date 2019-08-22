@@ -39,7 +39,11 @@
                     "submenu": [
                         { "label": "Branches", "command": "screeps-ide:branches" },
                         { "label": "Console", "command": "screeps-ide:console" },
-                        { "label": "Memory", "command": "screeps-ide:memory" }
+                        { "label": "Memory", "command": "screeps-ide:memory" },
+
+                        { "type": "separator" },
+
+                        { "label": "Commit", "command": "screeps-ide:commit" }
                     ]
                 }
             ]

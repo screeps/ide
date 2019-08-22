@@ -47,4 +47,6 @@ export async function commitAll(event: CustomEvent) {
     } catch(err) {
         throw new Error('Error update user code');
     }
+
+    atom.notifications.addSuccess('Commit All Success');
 }
