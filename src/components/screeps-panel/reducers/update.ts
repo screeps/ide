@@ -13,7 +13,6 @@ store.reducer((state: IState, { type, payload: { branch, modules } }: Action): I
             [branch]: Object.entries(modules)
                 .filter(([, content]) => !!content)
                 .reduce((modules, [module, content]) => {
-                    console.log(module);
                     modules[module] = {
                         content,
                         modified: false
