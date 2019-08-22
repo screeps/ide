@@ -21,13 +21,22 @@ exports.openTExtEditorEffect = store_1.default
     if (!textEditor) {
         const isExist = await file.exists();
         const { content = '', modified } = modules[module];
+        isNew = !!modified;
         if (!isExist && content) {
-            await file.create();
+            try {
+                await file.create();
+            }
+            catch (err) {
+                atom.notifications.addError(err.toString());
+                if (isNew) {
+                    store_1.default.dispatch(actions_1.DeleteModuleAction(branch, module));
+                }
+                return;
+            }
         }
         if (!modified && content) {
             await file.write(content);
         }
-        isNew = !!modified;
         textEditor = atom.workspace.buildTextEditor({
             autoHeight: false
         });

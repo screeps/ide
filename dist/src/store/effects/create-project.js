@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const atom_1 = require("atom");
 const operators_1 = require("rxjs/operators");
+const state_1 = require("../../state");
 const __1 = require("..");
 const atom_modal_1 = require("../../components/atom-modal");
 const confirm_modal_1 = require("../../components/confirm-modal");
@@ -12,12 +13,13 @@ const actions_1 = require("../actions");
 const utils_1 = require("../../utils");
 exports.createProjectEffect = __1.default
     .effect(async (state, { type, payload }) => {
-    state;
     if (actions_1.CREATE_PROJECT !== type) {
         return;
     }
     let subscriptions;
     try {
+        // Check auth.
+        const api = await utils_1.getApi();
         const settings = await new Promise((resolve, reject) => {
             let projectPath;
             const createProjectModal = new atom_modal_1.AtomModal(create_project_view_1.default, Object.assign({ branch: state.branch, branches: state.branches, projectPathReadonly: true }, payload, { onClick() {
@@ -31,6 +33,14 @@ exports.createProjectEffect = __1.default
                     });
                     subscriptions.add(disposable);
                 } }));
+            // Update branches.
+            api.getUserBranches().then(({ list: branches }) => {
+                if (createProjectModal) {
+                    createProjectModal.ref.setBranches(branches);
+                }
+                // Save to store.
+                state_1.default.next(Object.assign({}, state_1.default.getValue(), { branches }));
+            });
             createProjectModal.events$
                 .pipe(operators_1.filter(({ type }) => type === 'MODAL_SUBMIT'))
                 .pipe(operators_1.tap(() => createProjectModal.hide()))
@@ -38,7 +48,7 @@ exports.createProjectEffect = __1.default
                 .subscribe();
             createProjectModal.events$
                 .pipe(operators_1.filter(({ type }) => type === 'MODAL_CANCEL'))
-                .pipe(operators_1.tap(() => atom.project.removePath(projectPath)))
+                .pipe(operators_1.tap(() => projectPath && atom.project.removePath(projectPath)))
                 .pipe(operators_1.tap(() => reject(null)))
                 .subscribe();
             createProjectModal.events$
@@ -50,21 +60,20 @@ exports.createProjectEffect = __1.default
         });
         const { projectPath, download, branch } = settings;
         const projectDir = mkdir(projectPath);
-        const configFile = await utils_1.createScreepsProjectConfig(projectPath, {
-            branch
-        });
+        await utils_1.createScreepsTernConfig(projectPath, { libs: ['screeps'] });
+        await utils_1.createScreepsProjectConfig(projectPath, { branch });
         if (download) {
             try {
-                const projectEntries = await projectDir.getEntriesSync();
                 if (!payload.downloadForce) {
-                    if ((projectEntries.length > 1) ||
-                        (projectEntries.length === 1 && projectEntries[0].getPath() !== configFile.getPath())) {
+                    let projectEntries = await projectDir.getEntriesSync();
+                    const filter = new RegExp(`((${utils_1.LOCAL_PROJECT_CONFIG})|(${utils_1.TERN_CONFIG}))$`);
+                    projectEntries = projectEntries.filter((entry) => !filter.test(entry.getPath()));
+                    if (projectEntries.length) {
                         await confirm_modal_1.default({
                             legend: 'Folder is not empty! Would you like to continue?'
                         });
                     }
                 }
-                const api = await utils_1.getApi();
                 const { modules } = await api.getUserCode(branch);
                 for (const moduleName in modules) {
                     const content = modules[moduleName];
@@ -74,10 +83,10 @@ exports.createProjectEffect = __1.default
                 }
             }
             catch (err) {
+                projectPath && atom.project.removePath(projectPath);
                 // Noop.
             }
         }
-        atom.project.addPath(projectPath);
         __1.default.dispatch({ type: 'CHANGE_PROJECT', payload: {} });
     }
     catch (err) {

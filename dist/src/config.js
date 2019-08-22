@@ -45,7 +45,7 @@ let config = {
     showProjectConfig: {
         type: 'boolean',
         default: false,
-        description: 'Show config .screepsiderc in local projects.'
+        description: 'Show configs .screepsiderc and .tern-project in local projects.'
     },
     global
 };

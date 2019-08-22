@@ -9,7 +9,8 @@ const user_1 = require("./services/user");
 const auth_1 = require("./commands/auth");
 let api;
 let socket;
-const LOCAL_PROJECT_CONFIG = '.screepsiderc';
+exports.LOCAL_PROJECT_CONFIG = '.screepsiderc';
+exports.TERN_CONFIG = '.tern-project';
 function guid() {
     return parseInt(Math.random().toString().substr(2)).toString(16);
 }
@@ -165,7 +166,7 @@ function combineModules(origin, changes = {}) {
 }
 exports.combineModules = combineModules;
 async function isScreepsProject(project) {
-    const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+    const configPath = path.resolve(project, exports.LOCAL_PROJECT_CONFIG);
     const configFile = new atom_1.File(configPath);
     if (await configFile.exists()) {
         return true;
@@ -175,7 +176,7 @@ async function isScreepsProject(project) {
 exports.isScreepsProject = isScreepsProject;
 async function createScreepsProjectConfig(project, settings) {
     try {
-        const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+        const configPath = path.resolve(project, exports.LOCAL_PROJECT_CONFIG);
         const configFile = new atom_1.File(configPath);
         const settingsStr = JSON.stringify(settings, null, '\t');
         await configFile.write(settingsStr);
@@ -186,9 +187,22 @@ async function createScreepsProjectConfig(project, settings) {
     }
 }
 exports.createScreepsProjectConfig = createScreepsProjectConfig;
+async function createScreepsTernConfig(project, settings) {
+    try {
+        const configPath = path.resolve(project, exports.TERN_CONFIG);
+        const configFile = new atom_1.File(configPath);
+        const settingsStr = JSON.stringify(settings, null, '\t');
+        await configFile.write(settingsStr);
+        return configFile;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+exports.createScreepsTernConfig = createScreepsTernConfig;
 async function getScreepsProjectConfig(project) {
     try {
-        const configPath = path.resolve(project, LOCAL_PROJECT_CONFIG);
+        const configPath = path.resolve(project, exports.LOCAL_PROJECT_CONFIG);
         const configFile = new atom_1.File(configPath);
         const configStr = await configFile.read(true);
         let config = {};

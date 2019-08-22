@@ -89,7 +89,7 @@ class ScreepsPanel {
         this._state = Object.assign({}, this._state, state);
         this.render(this.state);
     }
-    render({ branch = 'default', branches = [], branchesBlockHeight, modules = {}, activeBranchTextEditor, activeModuleTextEditor }) {
+    render({ branch = '', branches = [], branchesBlockHeight, modules = {}, activeBranchTextEditor, activeModuleTextEditor }) {
         const _modules = modules[branch];
         let modulesView;
         if (_modules) {

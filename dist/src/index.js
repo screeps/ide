@@ -1,7 +1,9 @@
 "use strict";
+/// <reference path='./index.d.ts' />
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
-/// <reference path='./index.d.ts' />
+// @ts-ignore
+const packageDeps = require("atom-package-deps");
 const atom_1 = require("atom");
 const store_1 = require("./store");
 const effects = require("./store/effects");
@@ -30,6 +32,7 @@ function initialize(state) {
 exports.initialize = initialize;
 function activate(state) {
     console.log('Screeps-IDE:activate', state);
+    packageDeps.install('screeps-ide');
     atom.workspace.getTextEditors()
         .forEach((textEditor) => {
         const path = textEditor.getPath();

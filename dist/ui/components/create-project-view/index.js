@@ -4,7 +4,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 const react_1 = require("react");
 exports.default = react_1.forwardRef(function (props, ref) {
-    const [branch, setBranchValue] = react_1.useState(props.branch);
+    const [valid, setValid] = react_1.useState(false);
+    const [branch, setBranch] = react_1.useState(props.branch);
+    const [branches, setBranches] = react_1.useState(props.branches || []);
     const [projectPath, setProjectPathValue] = react_1.useState(props.projectPath || '');
     const [projectPathLabel] = react_1.useState(props.projectPathLabel || 'Please enter a new project folder path');
     const [projectPathReadonly] = react_1.useState(props.projectPathReadonly || false);
@@ -14,8 +16,18 @@ exports.default = react_1.forwardRef(function (props, ref) {
     react_1.useImperativeHandle(ref, () => ({
         setProjectPathValue(path) {
             setProjectPathValue(path);
+        },
+        setBranches(_) {
+            setBranches(_);
         }
     }));
+    react_1.useEffect(() => {
+        let valid = false;
+        if (branch && projectPath) {
+            valid = true;
+        }
+        setValid(valid);
+    }, [branch, projectPath]);
     return (React.createElement("div", { className: 'screeps-ide screeps-modal screeps-create-project' },
         React.createElement("header", null,
             React.createElement("div", { className: 'logotype' }),
@@ -29,9 +41,11 @@ exports.default = react_1.forwardRef(function (props, ref) {
                 React.createElement("div", { className: 'underline' })),
             React.createElement("fieldset", { className: 'screeps-field' },
                 React.createElement("legend", null, "Select branch:"),
-                React.createElement("select", { className: 'native-key-bindings input-select', name: 'branch-name', value: branch, onChange: (event) => onBranch(event), tabIndex: 2 }, props.branches.map(({ _id, branch }) => {
-                    return (React.createElement("option", { key: _id, value: branch }, branch));
-                }))),
+                React.createElement("select", { className: 'native-key-bindings input-select', name: 'branch-name', value: branch, onChange: (event) => onBranch(event), required: true, tabIndex: 2 },
+                    !branch && (React.createElement("option", { value: branch })),
+                    branches.map(({ _id, branch }) => {
+                        return (React.createElement("option", { key: _id, value: branch }, branch));
+                    }))),
             React.createElement("fieldset", { className: 'screeps-field', style: { marginBottom: 0 } },
                 React.createElement("legend", null, "Select language:"),
                 React.createElement("label", null,
@@ -46,7 +60,7 @@ exports.default = react_1.forwardRef(function (props, ref) {
                     "Download modules from screeps to this folder"))),
         React.createElement("footer", null,
             React.createElement("button", { className: 'btn btn--big btn--transparent', onClick: onCancel, tabIndex: 6 }, "Cancel"),
-            React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', disabled: !projectPath, onClick: onSubmit, tabIndex: 7 }, submitBtn))));
+            React.createElement("button", { className: 'btn btn--big btn--primary', type: 'submit', disabled: !valid, onClick: onSubmit, tabIndex: 7 }, submitBtn))));
     // Private component actions.
     function onInput(event) {
         const target = event.target;
@@ -56,7 +70,7 @@ exports.default = react_1.forwardRef(function (props, ref) {
     function onBranch(event) {
         const target = event.target;
         const value = target.value;
-        setBranchValue(value);
+        setBranch(value);
     }
     // Public component output actions.
     function onCancel() {
