@@ -70,7 +70,6 @@ export const createProjectEffect = store
             createProjectModal.events$
                 .pipe(filter(({ type }) => type === 'MODAL_SUBMIT'))
                 .pipe(tap(() => createProjectModal.hide()))
-                .pipe(tap(() => projectPath && atom.project.removePath(projectPath)))
                 .pipe(tap(({ payload }) => resolve(payload)))
                 .subscribe();
 
@@ -119,11 +118,11 @@ export const createProjectEffect = store
                 }
 
             } catch(err) {
+                projectPath && atom.project.removePath(projectPath);
                 // Noop.
             }
         }
 
-        atom.project.addPath(projectPath);
         store.dispatch({ type: 'CHANGE_PROJECT', payload: {} })
     } catch(err) {
         throw err;
