@@ -1,4 +1,4 @@
-import { File, TextEditor } from 'atom';
+import { File, TextEditor, TextBuffer } from 'atom';
 import { merge } from 'rxjs';
 import { map, tap, distinctUntilChanged, filter } from 'rxjs/operators';
 
@@ -62,11 +62,11 @@ export const openTExtEditorEffect = store
             textEditor.setText(content);
         }
 
-        const buffer = textEditor.getBuffer();
+        const buffer: TextBuffer = textEditor.getBuffer();
 
         buffer.setPath(path);
         // @ts-ignore
-        buffer.loadSync();
+        buffer.loadSync({ internal: true });
     }
 
     if (textEditor.getTitle() !== `@${ branch }/${ module }.js`) {
@@ -84,7 +84,7 @@ export const openTExtEditorEffect = store
                     }
 
                     // @ts-ignore
-                    textEditor.buffer.loadSync();
+                    textEditor.buffer.loadSync({ internal: true });
                 })),
 
             __state.pipe(map(({ modules }) => modules[branch][module]))
@@ -94,7 +94,7 @@ export const openTExtEditorEffect = store
                     isNew = true;
 
                     // @ts-ignore
-                    textEditor.buffer.loadSync();
+                    textEditor.buffer.loadSync({ internal: true });
                 }))
         ).subscribe();
 
