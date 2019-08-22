@@ -70,6 +70,7 @@ export const createProjectEffect = store
             createProjectModal.events$
                 .pipe(filter(({ type }) => type === 'MODAL_SUBMIT'))
                 .pipe(tap(() => createProjectModal.hide()))
+                .pipe(tap(() => projectPath && atom.project.removePath(projectPath)))
                 .pipe(tap(({ payload }) => resolve(payload)))
                 .subscribe();
 
