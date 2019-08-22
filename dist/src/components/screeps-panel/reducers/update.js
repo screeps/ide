@@ -6,7 +6,9 @@ store_1.default.reducer((state, { type, payload: { branch, modules } }) => {
     if (type !== actions_1.UPDATE_MODULES) {
         return state;
     }
-    return Object.assign({}, state, { modules: Object.assign({}, state.modules, { [branch]: Object.entries(modules).reduce((modules, [module, content]) => {
+    return Object.assign({}, state, { modules: Object.assign({}, state.modules, { [branch]: Object.entries(modules)
+                .filter(([, content]) => !!content)
+                .reduce((modules, [module, content]) => {
                 modules[module] = {
                     content,
                     modified: false

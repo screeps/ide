@@ -46,7 +46,7 @@ exports.openTExtEditorEffect = store_1.default
         const buffer = textEditor.getBuffer();
         buffer.setPath(path);
         // @ts-ignore
-        buffer.loadSync();
+        buffer.loadSync({ internal: true });
     }
     if (textEditor.getTitle() !== `@${branch}/${module}.js`) {
         textEditor.getTitle = () => `@${branch}/${module}.js`;
@@ -59,14 +59,14 @@ exports.openTExtEditorEffect = store_1.default
                 return;
             }
             // @ts-ignore
-            textEditor.buffer.loadSync();
+            textEditor.buffer.loadSync({ internal: true });
         })), state_1.default.pipe(operators_1.map(({ modules }) => modules[branch][module]))
             .pipe(operators_1.distinctUntilChanged())
             .pipe(operators_1.filter((_) => !_))
             .pipe(operators_1.tap(() => {
             isNew = true;
             // @ts-ignore
-            textEditor.buffer.loadSync();
+            textEditor.buffer.loadSync({ internal: true });
         }))).subscribe();
         textEditor.onDidSave(() => {
             isNew = false;

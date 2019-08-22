@@ -35,6 +35,7 @@ async function commitAll(event) {
     catch (err) {
         throw new Error('Error update user code');
     }
+    atom.notifications.addSuccess('Commit All Success');
 }
 exports.commitAll = commitAll;
 //# sourceMappingURL=commit-all.js.map

@@ -4,19 +4,20 @@ const path = require('path');
 const atom_1 = require("atom");
 const utils_1 = require("../utils");
 async function commit(event) {
-    let api;
-    try {
-        api = await utils_1.getApi();
-        await utils_1.getUser();
+    console.log(event);
+    let path;
+    if (event.target) {
+        let target = event.target;
+        if (target.nodeName === 'LI') {
+            target = target.firstChild;
+        }
+        path = target.getAttribute('data-path');
     }
-    catch (err) {
-        throw new Error(err);
+    if (!path) {
+        console.log(1);
+        // @ts-ignore
+        path = atom.workspace.getCenter().getActivePaneItem().getPath();
     }
-    let target = event.target;
-    if (target.nodeName === 'LI') {
-        target = target.firstChild;
-    }
-    const path = target.getAttribute('data-path');
     if (!path) {
         throw new Error('No data-path');
     }
@@ -28,7 +29,11 @@ async function commit(event) {
     catch (err) {
         throw new Error('Error read file');
     }
-    const projectPath = await getProjectPathByEvent(event);
+    // @ts-ignore
+    const fileRef = atom.packages.getActivePackage('tree-view').mainModule
+        .getTreeViewInstance()
+        .entryForPath(path);
+    const projectPath = await getProjectPathByEvent(fileRef);
     const { branch, src } = await utils_1.getScreepsProjectConfig(projectPath);
     if (!branch) {
         throw new Error('Need check branch');
@@ -36,6 +41,14 @@ async function commit(event) {
     const module = getModuleByPath(path, projectPath, src);
     if (!module) {
         throw new Error('Error get module');
+    }
+    let api;
+    try {
+        api = await utils_1.getApi();
+        await utils_1.getUser();
+    }
+    catch (err) {
+        throw new Error(err);
     }
     let { modules } = await api.getUserCode(branch);
     modules = Object.assign({}, modules, { [module]: content });
@@ -45,11 +58,10 @@ async function commit(event) {
     catch (err) {
         throw new Error('Error update user code');
     }
+    atom.notifications.addSuccess(`Success commit ${module}.js`);
 }
 exports.commit = commit;
-async function getProjectPathByEvent(event) {
-    const target = event.target;
-    let projectRef = target.parentElement;
+async function getProjectPathByEvent(projectRef) {
     while (projectRef && !projectRef.classList.contains('project-root')) {
         projectRef = projectRef.parentElement;
         if (projectRef === document.body) {
