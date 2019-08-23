@@ -13,8 +13,8 @@ import {
 
 import { getModulePath } from '../../../utils';
 
-export const openTExtEditorEffect = store
-.effect(async ({ modules: _modules }: IState, { type, payload: { module, branch }}: Action) => {
+export const openTextEditorEffect = store
+.effect(async ({ modules: _modules }: IState, { type, payload: { module, branch, textEditorPending }}: Action) => {
     if (type !== OPEN_TEXT_EDITOR) {
         return;
     }
@@ -132,6 +132,8 @@ export const openTExtEditorEffect = store
     }
 
     atom.workspace.open(textEditor, {
+        pending: textEditorPending,
+        activatePane: false,
         searchAllPanes: true
     });
 });

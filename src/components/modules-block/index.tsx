@@ -42,8 +42,8 @@ export function ModulesBlock(props: ModulesBlockProps) {
         store.dispatch(OpenTextEditorAction(props.branch, module));
     }
 
-    async function onSelectModule(module: string): Promise<void> {
-        store.dispatch(OpenTextEditorAction(props.branch, module));
+    async function onSelectModule(module: string, textEditorPending: boolean): Promise<void> {
+        store.dispatch(OpenTextEditorAction(props.branch, module, textEditorPending));
     }
 
     async function onDeleteModule(module: string): Promise<void> {

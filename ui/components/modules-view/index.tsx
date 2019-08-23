@@ -55,7 +55,10 @@ export default function(props: IModulesViewProps) {
                         props.modules[MAIN_MODULE] && props.modules[MAIN_MODULE].modified ? ' modified' : '' ) +  (
                         props.active  === `@${ props.branch }/${ MAIN_MODULE }.js` ? ' active' : ''
                     )} data-module={ MAIN_MODULE }>
-                        <button className='btn btn--clear' onClick={() => onSelectModule(MAIN_MODULE)}>{ MAIN_MODULE }</button>
+                        <button className='btn btn--clear'
+                            onClick={() => onSelectModule(MAIN_MODULE)}
+                            onDoubleClick={() => onSelectModule(MAIN_MODULE, false)}
+                        >{ MAIN_MODULE }</button>
                         <div className='modified-icon'></div>
                     </li>
                     {modules.map(([ moduleName, { modified }]) => {
@@ -64,7 +67,10 @@ export default function(props: IModulesViewProps) {
                         modified ? ' modified' : '' ) +  (
                         props.active === `@${ props.branch }/${ moduleName }.js` ? ' active' : ''
                     )} key={moduleName} data-module={ moduleName }>
-                        <button className='btn btn--clear' onClick={() => onSelectModule(moduleName)}>{ moduleName }</button>
+                        <button className='btn btn--clear'
+                            onClick={() => onSelectModule(moduleName)}
+                            onDoubleClick={() => onSelectModule(moduleName, false)}
+                        >{ moduleName }</button>
                         <div className='close-icon' onClick={() => onDeleteModule(moduleName)}></div>
                     </li>
                         );
@@ -90,8 +96,8 @@ export default function(props: IModulesViewProps) {
         </div>
     );
 
-    function onSelectModule(module: string) {
-        props.onSelectModule && props.onSelectModule(module);
+    function onSelectModule(module: string, textEditorPending: boolean = true) {
+        props.onSelectModule && props.onSelectModule(module, textEditorPending);
     }
 
     function onDeleteModule(module: string) {
