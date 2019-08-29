@@ -1,149 +1,123 @@
 /// <reference path='./index.d.ts' />
 
 import * as React from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 
 export const MODAL_CLOSE = 'MODAL_CLOSE';
 
-// @ts-ignore
-export function validate(target: any, name: any, descriptor: any) {
-    const original = descriptor.value;
-
-    descriptor.value = async function(...args: any[]) {
-        let result;
-        try {
-            result = await original.apply(this, args);
-        } catch (err) {
-            // Noop.
-        }
-
-        let isBlocking = true;
-        if (this._data.email && this._data.password) {
-            isBlocking = false;
-        }
-
-        this.setState({
-            ...this.state,
-            isInvalid: false,
-            isBlocking
-        });
-
-        return result;
-    };
-
-    return descriptor;
+interface IState {
+    isInvalid?: boolean;
+    isBlocking?: boolean;
 }
 
-export default class AuthView extends React.Component<IAuthModalProps> {
-    //@ts-ignore
-    props: IAuthModalProps;
-    state: IAuthModalState;
+export default forwardRef(function(props: IAuthModalProps, ref) {
+    const [state, setState] = useState<IState>({ });
+    const [email, setEmailValue] = useState('');
+    const [password, setPassValue] = useState('');
 
-    private _data: ICredentials = {};
+    useImperativeHandle(ref, () => ({
+        setState(state: IState) {
+            setState(state);
+        }
+    }));
 
-    private _emailRef: any;
-    private _passwordRef: any;
+    return (
+        <div className='screeps-ide screeps-modal screeps-auth-modal'>
+            <header>
+                <div className='logotype' />
+                <button className='btn _cross' onClick={onCancel}/>
+            </header>
+            <div>Your credentials are only used to create an auth token, password will not be stored.</div>
+            <form onSubmit={onSubmit}
+                className={ ['--indented', state.isInvalid ? '--invalid' : ''].join(' ') }>
+                <fieldset className='screeps-field'>
+                    <input
+                        className='native-key-bindings'
 
-    constructor(props: IAuthModalProps) {
-        super(props);
+                        type='text'
+                        name='email'
+                        placeholder=' '
 
-        this.state = {
-            isInvalid: false,
-            isBlocking: true
-        };
+                        value={ email }
+                        onChange={onInputEmail}
 
-        this._emailRef = React.createRef();
-        this._passwordRef = React.createRef();
-    }
+                        required={ true }
 
-    public render() {
-        return (
-            <div className='screeps-ide screeps-modal screeps-auth-modal'>
-                <header>
-                    <div className='logotype' />
-                    <button className='btn _cross' onClick={this.onCancel}/>
-                </header>
-                <div>Your credentials are only used to create an auth token, password will not be stored.</div>
-                <form className={ ['--indented', this.state.isInvalid ? '--invalid' : ''].join(' ') }>
-                    <fieldset className='screeps-field'>
-                        <input ref={ this._emailRef }
-                            className='native-key-bindings'
+                        autoComplete='off'
+                        tabIndex={ 1 }/>
+                    <label>E-mail or username</label>
+                    <div className='underline' />
+                </fieldset>
+                <fieldset className='screeps-field'>
+                    <input
+                        className='native-key-bindings'
 
-                            type='text'
-                            name='email'
-                            placeholder=' '
+                        type='password'
+                        name='password'
+                        placeholder=' '
 
-                            onChange={(event: React.ChangeEvent) => this.onInput(event)}
+                        value={ password }
+                        onChange={onInputPass}
 
-                            required={ true }
+                        required={ true }
 
-                            autoComplete='off'
-                            tabIndex={ 1 }/>
-                        <label>E-mail or username</label>
-                        <div className='underline' />
-                    </fieldset>
-                    <fieldset className='screeps-field'>
-                        <input ref={ this._passwordRef }
-                            className='native-key-bindings'
+                        autoComplete='off'
+                        tabIndex={ 2 }/>
+                    <label>Password</label>
+                    <div className='underline' />
+                </fieldset>
+                <div className='error'>Account credentials are invalid</div>
+            </form>
+            <footer>
+                <div>
+                    <a href='https://screeps.com/a/#!/register' target='_blank' tabIndex={ 3 }>Create a new account</a>
+                    <a href='https://screeps.com/a/#!/register/ask-recover' target='_blank' tabIndex={ 4 }>I forgot my password</a>
+                </div>
+                <button
+                    className='btn btn--big btn--transparent' type='button'
+                    onClick={onCancel}
 
-                            type='password'
-                            name='password'
-                            placeholder=' '
+                    tabIndex={ 5 }
+                >Cancel</button>
+                <button
+                    className='btn btn--big btn--primary' type='button'
+                    onClick={onSubmit}
 
-                            onChange={(event: React.ChangeEvent) => this.onInput(event)}
+                    disabled={ state.isBlocking || !email || !password }
 
-                            required={ true }
+                    tabIndex={ 6 }
+                >Sign In</button>
+            </footer>
+        </div>
+    );
 
-                            autoComplete='off'
-                            tabIndex={ 2 }/>
-                        <label>Password</label>
-                        <div className='underline' />
-                    </fieldset>
-                    <div className='error'>Account credentials are invalid</div>
-                </form>
-                <footer>
-                    <div>
-                        <a href='https://screeps.com/a/#!/register' target='_blank'>Create a new account</a>
-                        <a href='https://screeps.com/a/#!/register/ask-recover' target='_blank'>I forgot my password</a>
-                    </div>
-                    <button
-                        className='btn btn--big btn--transparent'
-                        onClick={this.onCancel}
-
-                        tabIndex={ 3 }
-                    >Cancel</button>
-                    <button
-                        className='btn btn--big btn--primary' type='submit' onClick={this.onSubmit}
-                        disabled={ this.state.isBlocking }
-
-                        tabIndex={ 4 }
-                    >Sign In</button>
-                </footer>
-            </div>
-        );
-    }
-
-    // Private component actions.
-    @validate
-    async onInput(event: React.ChangeEvent) {
+    function onInputEmail(event: React.ChangeEvent) {
         const target = event.target as HTMLInputElement;
-
-        const name = target.name;
         const value = target.value;
 
-        // @ts-ignore
-        this._data[name] = value;
+        setEmailValue(value);
+        setState({ isBlocking: false });
     }
 
-    // Public component output actions.
-    onCancel = () => {
-        this.props.onCancel && this.props.onCancel();
-    };
+    function onInputPass(event: React.ChangeEvent) {
+        const target = event.target as HTMLInputElement;
+        const value = target.value;
 
-    onSubmit = () => {
-        this.setState({
-            isBlocking: true
+        setPassValue(value);
+        setState({ isBlocking: false });
+    }
+
+    function onCancel() {
+        props.onCancel && props.onCancel();
+    }
+
+    function onSubmit() {
+        setState({ isBlocking: true });
+
+        props.onSubmit && props.onSubmit({
+            email,
+            password
         });
-
-        this.props.onSubmit && this.props.onSubmit(this._data);
     }
-}
+})
+
