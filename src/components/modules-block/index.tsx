@@ -8,6 +8,7 @@ import {
 
 import { default as confirm } from '../confirm-modal';
 import { default as store } from '../../store';
+import { selectModules } from '../../state';
 
 import './reducers';
 import * as effects from './effects';
@@ -15,6 +16,7 @@ import * as effects from './effects';
 Object.values(effects).forEach((effect) => effect.subscribe());
 
 import ModulesView from '../../../ui/components/modules-view';
+import { updateUserCode } from '../../actions';
 
 type ModulesBlockProps  = {
     branch: string;
@@ -56,6 +58,11 @@ export function ModulesBlock(props: ModulesBlockProps) {
         } catch(err) {
             return;
         }
+
+        const modules = selectModules(props.branch);
+        delete modules[module];
+
+        await updateUserCode(props.branch, modules);
 
         store.dispatch(DeleteModuleAction(props.branch, module));
     }

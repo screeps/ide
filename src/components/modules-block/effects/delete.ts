@@ -11,7 +11,9 @@ import {
 } from '../../../utils';
 
 export const deleteEffect = store
-.effect(({ branch }: IState, { type, payload: { module } }: Action): void => {
+.effect((state: IState, { type, payload: { branch, module } }: Action): void => {
+    state;
+
     if (type !== DELETE_MODULE) {
         return;
     }

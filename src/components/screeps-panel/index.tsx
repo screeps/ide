@@ -24,7 +24,6 @@ import { default as ResizablePanel } from '../../../ui/components/resizable-pane
 import { UpdateModulesAction } from './actions';
 
 import './reducers';
-import * as effects from './effects';
 import { SetActiveModule } from './actions';
 import { default as store } from '../../store';
 import { CreateProjectAction } from '../../store/actions';
@@ -77,8 +76,6 @@ export class ScreepsPanel implements ViewModel {
     ) {
         this.element = document.createElement('div');
         this.state = state;
-
-        Object.values(effects).forEach((effect) => effect.subscribe());
 
         __state
             .pipe(distinctUntilChanged())

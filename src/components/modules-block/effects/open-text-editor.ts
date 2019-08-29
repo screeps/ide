@@ -3,13 +3,15 @@ import { merge } from 'rxjs';
 import { map, tap, distinctUntilChanged, filter } from 'rxjs/operators';
 
 import { default as store, Action } from '../../../store';
-import { default as __state } from '../../../state';
+import { default as __state, selectModules } from '../../../state';
 import {
     OPEN_TEXT_EDITOR,
-    UpdateModuleAction,
     DeleteModuleAction,
     ModifyModuleAction
 } from '../actions';
+import {
+    updateUserCode
+} from '../../../actions';
 
 import { getModulePath } from '../../../utils';
 
@@ -30,25 +32,9 @@ export const openTextEditorEffect = store
     const modules = _modules[branch];
 
     if (!textEditor) {
-        const isExist = await file.exists();
-
         const { content = '', modified } = modules[module];
 
         isNew = !!modified;
-
-        if (!isExist && content) {
-            try {
-                await file.create();
-            } catch(err) {
-                atom.notifications.addError(err .toString());
-
-                if (isNew) {
-                    store.dispatch(DeleteModuleAction(branch, module));
-                }
-
-                return;
-            }
-        }
 
         if (!modified && content) {
             await file.write(content);
@@ -98,16 +84,19 @@ export const openTextEditorEffect = store
                 }))
         ).subscribe();
 
+        const textBuffer: TextBuffer = textEditor.getBuffer();
+
+        textBuffer.onWillSave(() => {
+            const modules: IModulesData = {
+                ...selectModules(branch),
+                [module]: textBuffer.getText()
+            };
+
+            return updateUserCode(branch, modules);
+        });
+
         textEditor.onDidSave(() => {
             isNew = false;
-
-            if (!textEditor) {
-                return;
-            }
-
-            const content = textEditor.getText();
-
-            store.dispatch(UpdateModuleAction(branch, module, content));
         });
 
         textEditor.onDidDestroy(() => {
