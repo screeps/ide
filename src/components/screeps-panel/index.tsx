@@ -2,7 +2,7 @@ import { ViewModel, TextEditor, CompositeDisposable } from 'atom';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 // import pako from 'pako';
-import { tap, distinctUntilChanged } from 'rxjs/operators';
+import { tap, filter, distinctUntilChanged } from 'rxjs/operators';
 
 import {
     getApi, getUser, getSocket,
@@ -80,6 +80,7 @@ export class ScreepsPanel implements ViewModel {
         __state
             .pipe(distinctUntilChanged())
             .pipe(tap((state) => this.state = state))
+            .pipe(filter(({ branches }) => !!(branches && branches.length)))
             .pipe(tap(({ branches }) => {
                 subscriptions.dispose();
                 subscriptions = new CompositeDisposable();
