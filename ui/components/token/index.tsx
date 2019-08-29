@@ -18,7 +18,7 @@ export default function(props: ITokenModalProps) {
             </header>
             <form className='--indented' onSubmit={ onSubmit }>
                 <fieldset className='screeps-field'>
-                    <legend>It'll be save to global config</legend>
+                    <legend>This auth token will be saved to your preferences:</legend>
                     <input
                         className='native-key-bindings'
 

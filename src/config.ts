@@ -20,19 +20,19 @@ const global = {
         },
 
         apiUrl: {
-            title: 'Screep API Url',
+            title: 'Server API URL',
             description: '',
             type: 'string',
             default: 'https://screeps.com/api',
-            order: 1
+            order: 2
         },
 
         websocketUrl: {
-            title: 'Screep socket Url',
+            title: 'Server socket URL',
             description: '',
             type: 'string',
             default: 'https://screeps.com/socket',
-            order: 1
+            order: 3
         },
 
         src: {
@@ -40,7 +40,7 @@ const global = {
             description: '',
             type: 'string',
             default: './dist',
-            order: 1
+            order: 4
         }
     }
 };
@@ -55,7 +55,7 @@ let config: IAtomConfig = {
     showProjectConfig: {
         type: 'boolean',
         default: false,
-        description: 'Show configs .screepsiderc and .tern-project in local projects.'
+        description: 'Show hidden config files in local projects.'
     },
 
     global

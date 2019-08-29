@@ -44,40 +44,40 @@
     "showProjectConfig": {
       "type": "boolean",
       "default": false,
-      "description": "Show configs .screepsiderc and .tern-project in local projects."
+      "description": "Show hidden config files in local projects."
     },
     "global": {
       "title": "Common",
       "type": "object",
       "order": 1,
       "properties": {
-        "authToken": {
-          "title": "Auth token",
-          "description": "",
-          "type": "string",
-          "default": "",
-          "order": 1
-        },
         "apiUrl": {
-          "title": "Screep API Url",
+          "title": "Server API URL",
           "description": "",
           "type": "string",
           "default": "https://screeps.com/api",
           "order": 1
         },
         "websocketUrl": {
-          "title": "Screep socket Url",
+          "title": "Server socket URL",
           "description": "",
           "type": "string",
           "default": "https://screeps.com/socket",
-          "order": 1
+          "order": 2
+        },
+        "authToken": {
+          "title": "Auth token",
+          "description": "",
+          "type": "string",
+          "default": "",
+          "order": 3
         },
         "src": {
           "title": "Project folder",
           "description": "",
           "type": "string",
           "default": "./",
-          "order": 1
+          "order": 4
         }
       }
     }
