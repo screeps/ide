@@ -18,3 +18,16 @@ __state.next = function(...args) {
 }
 
 export default __state;
+
+export function selectModules(branch: string): IModulesData {
+    const { modules } = __state.getValue();
+
+    return Object.entries(modules[branch])
+        .reduce((modules, [module, { content, deleted, isNew }]) => {
+            if (!deleted && !isNew) {
+                modules[module] = content;
+            }
+
+            return modules;
+        }, {} as IModulesData);
+}
