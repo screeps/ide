@@ -5,7 +5,8 @@ import { File } from 'atom';
 import {
     $,
     getApi, getUser,
-    getScreepsProjectConfig
+    getScreepsProjectConfig,
+    getScreepsProjectSrc,
 } from '../utils';
 
 import { default as confirm } from '../components/confirm-modal';
@@ -15,6 +16,34 @@ export async function fetch(event: CustomEvent) {
         legend: 'Local changes will be overwritten.'
     });
 
+    let dataPath; 
+    if (event.target) {
+        let target: HTMLElement = event.target as HTMLElement;
+
+        if (target.nodeName === 'LI') {
+            target = target.firstChild as HTMLElement;
+        }
+
+        dataPath = target.getAttribute('data-path');
+    }
+
+    if (!dataPath) {
+        // @ts-ignore
+        dataPath = atom.workspace.getCenter().getActivePaneItem().getPath() as string;
+    }
+
+    if (!dataPath) {
+        throw new Error('No data-path');
+    }
+
+    // @ts-ignore
+    const fileRef = atom.packages.getActivePackage('tree-view').mainModule
+        .getTreeViewInstance()
+        .entryForPath(dataPath);
+
+    const projectPath = await getProjectPathByEvent(fileRef);
+
+    const { branch, src } = await getScreepsProjectConfig(projectPath);
     let api;
     try {
         api = await getApi();
@@ -23,40 +52,19 @@ export async function fetch(event: CustomEvent) {
         throw new Error(err);
     }
 
-    let target: HTMLElement = event.target as HTMLElement;
-
-    if (target.nodeName === 'LI') {
-        target = target.firstChild as HTMLElement;
-    }
-
-    const path = target.getAttribute('data-path');
-
-    if (!path) {
-        throw new Error('No data-path');
-    }
-
-    const projectPath = await getProjectPathByEvent(event);
-    const { branch, src } = await getScreepsProjectConfig(projectPath);
-    if (!branch) {
-        throw new Error('Need check branch');
-    }
-
-    const module = getModuleByPath(path, projectPath, src);
-    if (!module) {
-        throw new Error('Error get module');
-    }
-
+    const srcPath = getScreepsProjectSrc(projectPath, src);
     const { modules } = await api.getUserCode(branch);
-    const content = modules[module];
 
-    const moduleFile = new File(`${ path }`);
-    await moduleFile.write(content || '');
+    for (const moduleName in modules) {
+        const content = modules[moduleName];
+        const modulePath = path.resolve(srcPath, moduleName);
+
+        const moduleFile = new File(`${ modulePath }.js`);
+        await moduleFile.write(content || '');
+    }
 }
 
-async function getProjectPathByEvent(event: CustomEvent): Promise<any> {
-    const target = event.target as HTMLElement;
-    let projectRef = target.parentElement;
-
+async function getProjectPathByEvent(projectRef: HTMLElement | null): Promise<any> {
     while(projectRef && !projectRef.classList.contains('project-root')) {
         projectRef = projectRef.parentElement;
 
@@ -76,25 +84,4 @@ async function getProjectPathByEvent(event: CustomEvent): Promise<any> {
     }
 
     return dataPathNodeRef.getAttribute('data-path') as string;
-}
-
-function getModuleByPath(
-    modulePath: string,
-    projectPath: string,
-    srcDir: string = ''
-): string | null {
-    const fullPath = path.resolve(projectPath, srcDir);
-
-    if (!modulePath.includes(fullPath) || modulePath === fullPath) {
-        return null;
-    }
-
-    const matches = modulePath.match(/([^\\]+)$/gm);
-
-    if (matches && matches[0]) {
-        const match = matches[0];
-        return match.replace(/\.js$/, '');
-    }
-
-    return null;
 }

@@ -1,33 +1,20 @@
 {
     "context-menu": {
-        ".tree-view [screeps-dist] > div": [
-            { "type": "separator" },
-
-            {
-                "label": "Screeps",
-                "submenu": [
-                    { "label": "Fetch All", "command": "screeps-ide:fetchAll" },
-                    { "label": "Commit All", "command": "screeps-ide:commitAll" },
-                    { "label": "Change Branch", "command": "screeps-ide:changeProjectBranch" }
-                ]
-            },
-
-            { "type": "separator" }
-        ],
-
-        ".tree-view [screeps-dist] .file": [
+        ".tree-view [screeps-dist]": [
             { "type": "separator" },
 
             {
                 "label": "Screeps",
                 "submenu": [
                     { "label": "Fetch", "command": "screeps-ide:fetch" },
-                    { "label": "Commit", "command": "screeps-ide:commit" }
+                    { "label": "Commit", "command": "screeps-ide:commit" },
+                    { "label": "Change Branch", "command": "screeps-ide:changeProjectBranch" }
                 ]
             },
 
             { "type": "separator" }
         ]
+
     },
 
     "menu": [
@@ -43,6 +30,7 @@
 
                         { "type": "separator" },
 
+                        { "label": "Fetch", "command": "screeps-ide:fetch" },
                         { "label": "Commit", "command": "screeps-ide:commit" }
                     ]
                 }

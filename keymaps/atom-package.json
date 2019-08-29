@@ -3,6 +3,7 @@
         "ctrl-1": "screeps-ide:branches",
         "ctrl-2": "screeps-ide:console",
         "ctrl-3": "screeps-ide:memory",
-        "ctrl-alt-enter": "screeps-ide:commit"
+        "ctrl-alt-enter": "screeps-ide:commit",
+        "ctrl-alt-f": "screeps-ide:fetch"
     }
 }
