@@ -1,5 +1,6 @@
 interface IModule {
     content: string | null;
+    isNew?: boolean;
     modified?: boolean;
     deleted?: boolean;
     active?: boolean;

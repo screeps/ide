@@ -1,12 +1,8 @@
 import { default as store, Action } from '../../../store';
 import { CREATE_MODULE } from '../actions';
 
-store.reducer((state: IState, { type, payload: { branch, module } }: Action): IState => {
-    if (type !== CREATE_MODULE) {
-        return state;
-    }
-
-    const content = `/*
+function generateContent(module: string) {
+    return `/*
 * Module code goes here. Use 'module.exports' to export things:
 * module.exports.thing = 'a thing';
 *
@@ -19,6 +15,14 @@ module.exports = {
 
 };
 `
+}
+
+store.reducer((state: IState, { type, payload: { branch, module } }: Action): IState => {
+    if (type !== CREATE_MODULE) {
+        return state;
+    }
+
+    const content = generateContent(module);
 
     return {
         ...state,
@@ -28,6 +32,7 @@ module.exports = {
                 ...state.modules[branch],
                 [module]: {
                     content,
+                    isNew: true,
                     modified: true
                 }
             }
