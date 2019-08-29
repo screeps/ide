@@ -33,11 +33,16 @@ export function createTokenCommand(api: Api) {
         }));
 }
 
+let auth: Promise<any> | null;
 export function authCommand(): Promise<any> {
     const apiUrl = configGetter('apiUrl') as string;
     const api = new Api({ url: apiUrl });
 
-    return new Promise((resolve, reject) => {
+    if (auth) {
+        return auth;
+    }
+
+    auth = new Promise((resolve, reject) => {
         const authModalRef = new AtomModal(AuthView);
 
         authModalRef.events$
@@ -68,5 +73,13 @@ export function authCommand(): Promise<any> {
                 reject();
             }))
             .subscribe();
+        
+        authModalRef.events$
+            .pipe(tap(() => {
+                auth = null;
+            }))
+            .subscribe()
     })
-  }
+
+    return auth;
+}

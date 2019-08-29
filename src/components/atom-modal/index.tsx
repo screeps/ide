@@ -29,22 +29,24 @@ export class AtomModal {
         this._element = document.createElement('div');
         this.events$ = this._eventsSbj.asObservable();
 
-        this._atomModalPanelRef = atom.workspace.addModalPanel({
-            item: this._element,
-            visible: true
+        setTimeout(() => {
+            this._atomModalPanelRef = atom.workspace.addModalPanel({
+                item: this._element,
+                visible: true
+            });
+
+            document.body.addEventListener('keyup', this.onEscape);
+
+            ReactDOM.render(
+                <Component ref={ this._ref }
+                    { ...props }
+
+                    onCancel={this.onCancel}
+                    onSubmit={this.onSubmit}
+                />,
+                this._element as HTMLElement
+            );
         });
-
-        document.body.addEventListener('keyup', this.onEscape);
-
-        ReactDOM.render(
-            <Component ref={ this._ref }
-                { ...props }
-
-                onCancel={this.onCancel}
-                onSubmit={this.onSubmit}
-            />,
-            this._element as HTMLElement
-        );
     }
 
     hide() {
