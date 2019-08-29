@@ -6,19 +6,36 @@ store.reducer((state: IState, { type, payload: { branch, modules } }: Action): I
         return state;
     }
 
+    const modules1 = Object.entries(state.modules[branch])
+        .filter(([, { isNew }]) => isNew)
+        .reduce((modules, [module, { isNew, modified }]) => {
+            modules[module] = {
+                isNew,
+                modified
+            };
+
+            return modules;
+        }, {} as any)
+
+    const modules2 = Object.entries(modules)
+        .filter(([, content]) => !!content)
+        .reduce((modules, [module, content]) => {
+            modules[module] = {
+                content,
+                modified: false
+            };
+
+            return modules;
+        }, {} as any)
+
     return {
         ...state,
         modules: {
             ...state.modules,
-            [branch]: Object.entries(modules)
-                .filter(([, content]) => !!content)
-                .reduce((modules, [module, content]) => {
-                    modules[module] = {
-                        content,
-                        modified: false
-                    }
-                    return modules;
-                }, {} as any)
+            [branch]: {
+                ...modules1,
+                ...modules2
+            }
         }
     };
 });
