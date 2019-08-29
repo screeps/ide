@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-import { File, Directory, CompositeDisposable } from 'atom';
+import { File, Directory } from 'atom';
 import { filter, tap } from 'rxjs/operators';
 
 import __state from '../../state';
@@ -25,32 +25,24 @@ export const createProjectEffect = store
         return;
     }
 
-    let subscriptions: CompositeDisposable;
-
     try {
         // Check auth.
         const api = await getApi();
 
         const settings: any = await new Promise((resolve, reject) => {
-            let projectPath: string;
-
             const createProjectModal = new AtomModal(CreateProjectView, {
                 branch: state.branch,
                 branches: state.branches,
                 projectPathReadonly: true,
                 ...payload,
                 onClick() {
-                    // @ts-ignore
-                    atom.commands.dispatch(atom.workspace.element, 'application:add-project-folder');
+                    atom.pickFolder((paths) => {
+                        if (!paths || !paths.length) {
+                            return;
+                        }
 
-                    subscriptions && subscriptions.dispose();
-                    subscriptions = new CompositeDisposable(); 
-                    const disposable = atom.project.onDidChangePaths((paths) => {
-                        projectPath = paths[paths.length - 1];
-
-                        createProjectModal.ref.setProjectPathValue(projectPath);
+                        createProjectModal.ref.setProjectPathValue(paths[0]);
                     });
-                    subscriptions.add(disposable);
                 }
             });
 
@@ -75,15 +67,7 @@ export const createProjectEffect = store
 
             createProjectModal.events$
                 .pipe(filter(({ type }) => type === 'MODAL_CANCEL'))
-                .pipe(tap(() => projectPath && atom.project.removePath(projectPath)))
                 .pipe(tap(() => reject(null)))
-                .subscribe();
-            
-            createProjectModal.events$
-                .pipe(tap(() => {
-                    // @ts-ignore
-                    subscriptions && subscriptions.dispose();
-                }))
                 .subscribe();
         });
 
@@ -123,6 +107,7 @@ export const createProjectEffect = store
             }
         }
 
+        atom.project.addPath(projectPath);
         store.dispatch({ type: 'CHANGE_PROJECT', payload: {} })
     } catch(err) {
         throw err;
