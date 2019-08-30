@@ -11,6 +11,13 @@ interface IState {
         // Projet Path
         [key: string]: {
             branch: string;
+            files: {
+                // File Path
+                [key: string]: {
+                    hash: number;
+                    modified: boolean;
+                };
+            };
         };
     }
 

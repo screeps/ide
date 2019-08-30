@@ -19,7 +19,8 @@ import {
     LOCAL_PROJECT_CONFIG,
     TERN_CONFIG,
     createScreepsTernConfig,
-    createScreepsProjectConfig
+    createScreepsProjectConfig,
+    hashCode
 } from '../../utils';
 
 export const createProjectEffect = store
@@ -75,6 +76,7 @@ export const createProjectEffect = store
         });
 
         const { projectPath, download, branch } = settings;
+        const files: { [key: string]: { hash: number } } = {};
         const projectDir = mkdir(projectPath);
 
         await createScreepsTernConfig(projectPath, { libs: ['screeps'] });
@@ -102,6 +104,10 @@ export const createProjectEffect = store
 
                     const moduleFile = new File(`${ modulePath }.js`);
                     await moduleFile.write(content || '');
+
+                    const hash = hashCode(content || '');
+
+                    files[`${ modulePath }.js`] = { hash };
                 }
 
             } catch(err) {
@@ -111,7 +117,7 @@ export const createProjectEffect = store
         }
 
         atom.project.addPath(projectPath);
-        store.dispatch(AddProjectAction(projectPath, branch));
+        store.dispatch(AddProjectAction(projectPath, branch, files));
     } catch(err) {
         throw err;
     }

@@ -54,17 +54,19 @@ export function consumeTreeView(treeView: any) {
     .subscribe();
 
     __state
-        .pipe(map(({ files }) => files))
+        .pipe(map(({ projects }) => projects))
         .pipe(distinctUntilChanged())
-        .pipe(tap((files) => {
-            if (!files) {
+        .pipe(tap((projects) => {
+            if (!projects) {
                 return;
             }
 
             try {
-                Object.entries(files).forEach(([, files]) => {
-                    Object.entries(files).forEach(([filePath, modified]) => {
+                Object.entries(projects).forEach(([, { files }]) => {
+                    Object.entries(files).forEach(([filePath, { modified }]) => {
                         const treeFileNodeRef = treeView.entryForPath(filePath) as HTMLElement;
+
+                        console.log(filePath, modified);
 
                         if (modified) {
                             treeFileNodeRef.classList.add('status-modified');

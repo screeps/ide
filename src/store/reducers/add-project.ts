@@ -2,11 +2,12 @@ import { default as store, Action } from '../index';
 import { ADD_PROJECT } from '../actions';
 import { default as __state } from '../../state';
 
-store.reducer((state: IState, { type, payload: { projectPath, branch } }: Action): IState => {
+store.reducer((state: IState, { type, payload: { projectPath, branch, files } }: Action): IState => {
     if (type !== ADD_PROJECT) {
         return state;
     }
 
+    files = files || {};
     const projects = state.projects || {};
 
     return {
@@ -14,7 +15,8 @@ store.reducer((state: IState, { type, payload: { projectPath, branch } }: Action
         projects: {
             ...projects,
             [projectPath]: {
-                branch
+                branch,
+                files
             }
         }
     };
