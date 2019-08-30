@@ -45,7 +45,7 @@ export default function(props: IModulesViewProps) {
     return (
         <div className='screeps-ide screeps-modules-view'>
             <div className='screeps-modules-view__header'>
-                <span>Branch</span>
+                <span>Modules in branch</span>
                 <span>{ props.branch }</span>
             </div>
             <hr className={ 'screeps-hr' } />

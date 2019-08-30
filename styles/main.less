@@ -46,14 +46,14 @@
   }
 }
 
-.directory[screeps-dist] > .header > .icon-file-directory::before {
-    content: "\e900";
-
-    position: relative;
-    top: 1px;
-
-    font-family: 'screepsicons' !important;
-}
+//.directory[screeps-dist] > .header > .icon-file-directory::before {
+//    content: "\e900";
+//
+//    position: relative;
+//    top: 1px;
+//
+//    font-family: 'screepsicons' !important;
+//}
 
 .icon-screeps {
   &::before {
@@ -114,10 +114,11 @@
     pointer-events: none;
 
     &:before {
-        content: '•';
-
-        display: inline-block;
-        margin: 0 5px;
+        font-size: 16px;
+        top: -1px;
+        margin: 0 3px 0 15px;
+        vertical-align: middle;
+        position: relative;
     }
 }
 

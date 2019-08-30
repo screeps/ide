@@ -140,6 +140,7 @@ function assignScreepsBranch(projectRef: HTMLElement, cfg: any)  {
     if (!branchRef) {
         branchRef = document.createElement('span');
         branchRef.classList.add('project-branch');
+        branchRef.classList.add('icon-screeps');
 
         headerRef.appendChild(branchRef);
     }
@@ -169,7 +170,7 @@ function toggleFolderEmptyBtn(projectRef: HTMLElement, projectDir: Directory) {
     div.classList.add(PROJECT_EMPTY_BTN);
 
     const btn = document.createElement('button');
-    btn.innerText = 'Folder is empty you can download modules from screeps';
+    btn.innerText = 'Fetch';
     btn.classList.add('btn');
     btn.style.whiteSpace = 'initial';
     btn.addEventListener('click', (e) => {

@@ -55,8 +55,8 @@ export const openTextEditorEffect = store
         buffer.loadSync({ internal: true });
     }
 
-    if (textEditor.getTitle() !== `@${ branch }/${ module }.js`) {
-        textEditor.getTitle = () => `@${ branch }/${ module }.js`;
+    if (textEditor.getTitle() !== `@${ branch }/${ module }`) {
+        textEditor.getTitle = () => `@${ branch }/${ module }`;
 
         const subscriber = merge(
             __state.pipe(map(({ modules }) => modules[branch][module]))

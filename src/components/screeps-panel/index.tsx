@@ -154,7 +154,7 @@ export class ScreepsPanel implements ViewModel {
                 branch={ branch }
                 modules={ _modules }
 
-                active={ `@${ activeBranchTextEditor }/${ activeModuleTextEditor }.js`}
+                active={ `@${ activeBranchTextEditor }/${ activeModuleTextEditor }`}
             />);
         }
 

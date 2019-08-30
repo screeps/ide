@@ -108,7 +108,7 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
 
                             tabIndex={ 3 }
                         />
-                        JavaScript - Native language for Screeps, no requirements
+                        <span>JavaScript &mdash; Native language for Screeps, no requirements</span>
                     </label>
                     <label>
                         <input className='native-key-bindings input-radio' type='radio'
@@ -120,7 +120,7 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
 
                             tabIndex={ 4 }
                         />
-                        TypeScript (UNDER DEVELOPMENT) - Advanced language with types support, requires TypeScript compilator package to run.
+                        <span>TypeScript &mdash; Advanced language with types support, requires TypeScript compilator package to run. <em>(UNDER DEVELOPMENT)</em></span>
                     </label>
                 </fieldset>
                 <fieldset className='screeps-field'>
@@ -134,7 +134,7 @@ export default forwardRef(function(props: CreateProjectProps, ref) {
 
                             tabIndex={ 5 }
                         />
-                        Download modules from screeps to this folder
+                        Fetch to this folder now
                     </label>
                 </fieldset>
             </form>

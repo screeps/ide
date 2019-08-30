@@ -25,5 +25,5 @@ export function consumeStatusBar(statusBar: any) {
         item: consoleStatusBar.element,
         priority
     });
-    subscriptions.add(atom.tooltips.add(consoleStatusBar.element, { title: 'Show screeps panel'}));
+    subscriptions.add(atom.tooltips.add(consoleStatusBar.element, { title: 'Show Screeps panel'}));
 }

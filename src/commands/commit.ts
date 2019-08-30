@@ -50,7 +50,7 @@ export async function commit(event: CustomEvent) {
         throw new Error('Error update user code');
     }
 
-    atom.notifications.addSuccess('Commit Success');
+    atom.notifications.addSuccess('Committed successfully to branch "'+branch+'"');
     store.dispatch(UpdateUserCodeSuccessAction(branch));
 }
 
