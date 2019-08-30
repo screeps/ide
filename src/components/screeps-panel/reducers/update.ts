@@ -28,6 +28,10 @@ store.reducer((state: IState, { type, payload: { branch, modules } }: Action): I
             return modules;
         }, {} as any)
 
+    // Object.entries(modules2).forEach(() => {
+
+    // })
+
     return {
         ...state,
         modules: {

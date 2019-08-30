@@ -3,9 +3,11 @@
 // @ts-ignore
 import * as packageDeps from 'atom-package-deps';
 
-import { CompositeDisposable } from 'atom';
+import { CompositeDisposable, TextEditor } from 'atom';
 
 import { default as store } from './store';
+import { LocalFileChangeAction } from './store/actions';
+import './store/reducers';
 import * as effects from './store/effects';
 
 import { default as __state, INITIAL_STATE } from './state';
@@ -29,6 +31,11 @@ export { default as config } from './config';
 export * from './consumed-services';
 
 export function initialize(state: IState) {
+    // @ts-ignore
+    atom.screeps = {
+        state: __state
+    };
+
     if (!state) {
         state = INITIAL_STATE;
     }
@@ -47,8 +54,23 @@ export function activate(state: IState) {
 
     packageDeps.install('screeps-ide');
 
+    function textEditorDidChange(textEditor: TextEditor) {
+        return function() {
+            const path = textEditor.getPath();
+            if (!path) {
+                return;
+            }
+
+            const content = textEditor.getText();
+
+            store.dispatch(LocalFileChangeAction(path, content));
+        }
+    }
+
     atom.workspace.getTextEditors()
         .forEach((textEditor) => {
+            textEditor.onDidChange(textEditorDidChange(textEditor));
+
             const path = textEditor.getPath() as string;
             const matches = /[\\\/]\.branches[\\\/]([^\\]+)[\\\/]([^\\]+)\.js/.exec(path);
 
@@ -60,6 +82,9 @@ export function activate(state: IState) {
             store.dispatch(OpenTextEditorAction(branch, module));
         });
 
+    atom.workspace.getCenter().onDidAddTextEditor(({ textEditor }) => {
+        textEditor.onDidChange(textEditorDidChange(textEditor));
+    });
 
     subscriptions.add(atom.workspace.addOpener((uri): any => {
         if (uri === SCREEPS_URI) {

@@ -9,6 +9,9 @@ import {
     updateUserCode
 } from '../actions';
 
+import { default as store } from '../store';
+import { UpdateUserCodeSuccessAction } from '../store/actions';
+
 export async function commit(event: CustomEvent) {
     let dataPath; 
     if (event.target) {
@@ -48,6 +51,7 @@ export async function commit(event: CustomEvent) {
     }
 
     atom.notifications.addSuccess('Commit Success');
+    store.dispatch(UpdateUserCodeSuccessAction(branch));
 }
 
 async function getProjectPathByEvent(projectRef: HTMLElement | null): Promise<any> {

@@ -9,7 +9,10 @@ import { default as store, Action } from '..';
 import { AtomModal } from '../../components/atom-modal';
 import { default as confirm } from '../../components/confirm-modal';
 import { default as CreateProjectView } from '../../../ui/components/create-project-view';
-import { CREATE_PROJECT } from '../actions';
+import {
+    AddProjectAction,
+    CREATE_PROJECT
+} from '../actions';
 
 import {
     getApi,
@@ -108,7 +111,7 @@ export const createProjectEffect = store
         }
 
         atom.project.addPath(projectPath);
-        store.dispatch({ type: 'CHANGE_PROJECT', payload: {} })
+        store.dispatch(AddProjectAction(projectPath, branch));
     } catch(err) {
         throw err;
     }

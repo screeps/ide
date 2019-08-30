@@ -1,4 +1,5 @@
 import { Directory } from 'atom';
+import { tap, map, distinctUntilChanged } from 'rxjs/operators';
 
 import { PACKAGE_NAME } from '../config';
 
@@ -10,6 +11,7 @@ import {
 } from '../utils';
 
 import { default as store, Action } from '../store';
+import { default as __state } from '../state';
 import {
     ADD_PROJECT
 } from '../components/screeps-panel/actions';
@@ -51,9 +53,35 @@ export function consumeTreeView(treeView: any) {
     })
     .subscribe();
 
+    __state
+        .pipe(map(({ files }) => files))
+        .pipe(distinctUntilChanged())
+        .pipe(tap((files) => {
+            if (!files) {
+                return;
+            }
+
+            try {
+                Object.entries(files).forEach(([, files]) => {
+                    Object.entries(files).forEach(([filePath, modified]) => {
+                        const treeFileNodeRef = treeView.entryForPath(filePath) as HTMLElement;
+
+                        if (modified) {
+                            treeFileNodeRef.classList.add('status-modified');
+                        } else {
+                            treeFileNodeRef.classList.remove('status-modified');
+                        }
+                    });
+                });
+            } catch(err) {
+                // Noop.
+            }
+        }))
+        .subscribe();
+
     atom.project.onDidChangePaths((paths) => {
         if (paths.length) {
-            store.dispatch({ type: 'ADD_PROJECT', payload: {}});
+            // store.dispatch({ type: 'ADD_PROJECT', payload: {}});
 
             !IS_APPLIED_EXPAND_ITEM_SUBSCRIPTION && applyExpandItemSubscription();
 

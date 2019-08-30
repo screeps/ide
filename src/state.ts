@@ -6,7 +6,9 @@ export const INITIAL_STATE = {
     modules: {
         default: {
         }
-    }
+    },
+    projects: {},
+    files: {}
 };
 
 const __state = new BehaviorSubject<IState>(INITIAL_STATE);
