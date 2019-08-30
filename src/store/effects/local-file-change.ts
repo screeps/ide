@@ -36,6 +36,10 @@ export const locaFileChangeEffect = store
 function selectProjectPath(filePath: string): string | undefined {
     const { projects } = __state.getValue();
 
+    if (!projects) {
+        return;
+    }
+
     const projectPath = Object.keys(projects).find((projectPath) => {
         return filePath.includes(projectPath);
     });
