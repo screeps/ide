@@ -64,7 +64,6 @@ export async function commit(event: CustomEvent) {
     }
 
     if (hasUnsaved) {
-        console.log(123);
         try {
             await confirm({
                 legend: 'Would you want to save opened files before commit.'
@@ -74,7 +73,6 @@ export async function commit(event: CustomEvent) {
                 await textEditor.save();
             }
         } catch(err) {
-            console.log(err);
             // Noop.
         }
     }
