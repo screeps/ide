@@ -9,7 +9,9 @@ store.reducer((state: IState, { type, payload: { filePath } }: Action): IState =
         return state;
     }
 
-    console.log(123);
+    if (!filePath) {
+        return state;
+    }
 
     const projectPath = selectProjectPath(filePath);
     if (!projectPath) {
