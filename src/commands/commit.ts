@@ -50,8 +50,8 @@ export async function commit(event: CustomEvent) {
         throw new Error('Error update user code');
     }
 
-    atom.notifications.addSuccess('Committed successfully to branch "'+branch+'"');
-    store.dispatch(UpdateUserCodeSuccessAction(branch));
+    atom.notifications.addSuccess(`Committed successfully to branch "${ branch }"`);
+    store.dispatch(UpdateUserCodeSuccessAction(projectPath, branch, modules));
 }
 
 async function getProjectPathByEvent(projectRef: HTMLElement | null): Promise<any> {

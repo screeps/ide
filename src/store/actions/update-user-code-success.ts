@@ -1,11 +1,13 @@
 import { Action } from '..';
 
 export const UPDATE_USER_CODE_SUCCESS = 'UPDATE_USER_CODE_SUCCESS';
-export function UpdateUserCodeSuccessAction(branch: string): Action {
+export function UpdateUserCodeSuccessAction(projectPath: string, branch: string, modules: any): Action {
     return {
         type: UPDATE_USER_CODE_SUCCESS,
         payload: {
-            branch
+            projectPath,
+            branch,
+            modules
         }
     }
 }

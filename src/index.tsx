@@ -6,7 +6,10 @@ import * as packageDeps from 'atom-package-deps';
 import { CompositeDisposable, TextEditor } from 'atom';
 
 import { default as store } from './store';
-import { LocalFileChangeAction } from './store/actions';
+import {
+    AddTextEditorAction,
+    LocalFileChangeAction
+} from './store/actions';
 import './store/reducers';
 import * as effects from './store/effects';
 
@@ -55,8 +58,10 @@ export function activate(state: IState) {
     packageDeps.install('screeps-ide');
 
     function textEditorDidChange(textEditor: TextEditor) {
+        const path = textEditor.getPath();
+        store.dispatch(AddTextEditorAction(path))
+
         return function() {
-            const path = textEditor.getPath();
             if (!path) {
                 return;
             }

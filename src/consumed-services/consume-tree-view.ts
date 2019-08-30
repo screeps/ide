@@ -63,10 +63,19 @@ export function consumeTreeView(treeView: any) {
 
             try {
                 Object.entries(projects).forEach(([, { files }]) => {
-                    Object.entries(files).forEach(([filePath, { modified }]) => {
+                    Object.entries(files).forEach(([filePath, { hash, modified }]) => {
                         const treeFileNodeRef = treeView.entryForPath(filePath) as HTMLElement;
 
-                        console.log(filePath, modified);
+                        if (!treeFileNodeRef.classList.contains('file')) {
+                            return;
+                        }
+
+                        if (!hash) {
+                            treeFileNodeRef.classList.add('status-added');
+                            return;
+                        } else {
+                            treeFileNodeRef.classList.remove('status-added');
+                        }
 
                         if (modified) {
                             treeFileNodeRef.classList.add('status-modified');

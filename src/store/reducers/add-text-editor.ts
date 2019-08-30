@@ -1,19 +1,15 @@
 import { default as store, Action } from '../index';
 import {
-    LOCAL_FILE_CHANGE
+    ADD_TEXT_EDITOR
 } from '../actions';
 import { default as __state } from '../../state';
-import {
-    hashCode
-} from '../../utils';
 
-store.reducer((state: IState, { type, payload: {
-    filePath,
-    content
-} }: Action): IState => {
-    if (type !== LOCAL_FILE_CHANGE) {
+store.reducer((state: IState, { type, payload: { filePath } }: Action): IState => {
+    if (type !== ADD_TEXT_EDITOR) {
         return state;
     }
+
+    console.log(123);
 
     const projectPath = selectProjectPath(filePath);
     if (!projectPath) {
@@ -21,10 +17,11 @@ store.reducer((state: IState, { type, payload: {
     }
 
     const project = state.projects[projectPath];
-    const file = project.files[filePath] || {};
+    const file = project.files[filePath];
 
-    const hash = hashCode(content);
-    const modified = file.hash !== hash;
+    if (file) {
+        return state;
+    }
 
     return {
         ...state,
@@ -35,8 +32,6 @@ store.reducer((state: IState, { type, payload: {
                 files: {
                     ...project.files,
                     [filePath]: {
-                        ...file,
-                        modified
                     }
                 }
             }
