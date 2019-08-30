@@ -33,3 +33,17 @@ export function selectModules(branch: string): IModulesData {
             return modules;
         }, {} as IModulesData);
 }
+
+export function selectProjectPath(filePath: string): string | undefined {
+    const { projects } = __state.getValue();
+
+    if (!projects) {
+        return;
+    }
+
+    const projectPath = Object.keys(projects).find((projectPath) => {
+        return filePath.includes(projectPath);
+    });
+
+    return projectPath;
+}

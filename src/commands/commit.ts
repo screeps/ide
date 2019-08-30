@@ -9,6 +9,9 @@ import {
     updateUserCode
 } from '../actions';
 
+import { selectProjectPath } from '../state';
+import { default as confirm } from '../components/confirm-modal';
+
 import { default as store } from '../store';
 import { UpdateUserCodeSuccessAction } from '../store/actions';
 
@@ -39,6 +42,43 @@ export async function commit(event: CustomEvent) {
         .entryForPath(dataPath);
 
     const projectPath = await getProjectPathByEvent(fileRef);
+
+    let hasUnsaved = false;
+    const textEditors = atom.workspace.getTextEditors();
+    const unsavedTextEditors = [];
+
+    for (const textEditor of textEditors) {
+        const filePath = textEditor.getPath() as string;
+
+        if (!textEditor.isModified()) {
+            continue;
+        }
+
+        const _projectPath = selectProjectPath(filePath);
+        if (projectPath !== _projectPath) {
+            continue;
+        }
+
+        hasUnsaved = true;
+        unsavedTextEditors.push(textEditor);
+    }
+
+    if (hasUnsaved) {
+        console.log(123);
+        try {
+            await confirm({
+                legend: 'Would you want to save opened files before commit.'
+            });
+
+            for(const textEditor of unsavedTextEditors) {
+                await textEditor.save();
+            }
+        } catch(err) {
+            console.log(err);
+            // Noop.
+        }
+    }
+
     const { branch, src } = await getScreepsProjectConfig(projectPath);
 
     const srcPath = getScreepsProjectSrc(projectPath, src);
