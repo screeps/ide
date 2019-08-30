@@ -66,14 +66,15 @@ export async function commit(event: CustomEvent) {
     if (hasUnsaved) {
         try {
             await confirm({
-                legend: 'Would you want to save opened files before commit.'
+                legend: 'There are unsaved changes in your local files. Do you want to save them before commit?',
+                submitBtn: 'Save & Commit'
             });
 
             for(const textEditor of unsavedTextEditors) {
                 await textEditor.save();
             }
         } catch(err) {
-            // Noop.
+            return;
         }
     }
 
