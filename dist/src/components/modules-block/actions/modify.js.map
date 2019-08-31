@@ -1,0 +1,1 @@
+{"version":3,"file":"modify.js","sourceRoot":"","sources":["../../../../../src/components/modules-block/actions/modify.ts"],"names":[],"mappings":";;AAEa,QAAA,aAAa,GAAG,eAAe,CAAC;AAC7C,SAAgB,kBAAkB,CAAC,MAAc,EAAE,MAAc,EAAE,QAAiB;IAChF,OAAO;QACH,IAAI,EAAE,qBAAa;QACnB,OAAO,EAAE;YACL,MAAM;YACN,MAAM;YACN,QAAQ;SACX;KACJ,CAAA;AACL,CAAC;AATD,gDASC"}

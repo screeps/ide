@@ -1,0 +1,1 @@
+{"version":3,"file":"create-project.js","sourceRoot":"","sources":["../../../../src/store/actions/create-project.ts"],"names":[],"mappings":";;AAEa,QAAA,cAAc,GAAG,gBAAgB,CAAC;AAC/C,SAAgB,mBAAmB;IAC/B,OAAO;QACH,IAAI,EAAE,sBAAc;QACpB,OAAO,EAAE,EAAE;KACd,CAAA;AACL,CAAC;AALD,kDAKC"}

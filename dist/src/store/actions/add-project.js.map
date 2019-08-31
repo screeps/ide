@@ -1,0 +1,1 @@
+{"version":3,"file":"add-project.js","sourceRoot":"","sources":["../../../../src/store/actions/add-project.ts"],"names":[],"mappings":";;AAEa,QAAA,WAAW,GAAG,aAAa,CAAC;AACzC,SAAgB,gBAAgB,CAAC,WAAmB,EAAE,MAAc,EAAE,KAAU;IAC5E,OAAO;QACH,IAAI,EAAE,mBAAW;QACjB,OAAO,EAAE;YACL,WAAW;YACX,MAAM;YACN,KAAK;SACR;KACJ,CAAA;AACL,CAAC;AATD,4CASC"}
