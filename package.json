@@ -1,7 +1,7 @@
 {
   "_location": "/screeps-ide",
   "name": "screeps-ide",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "IDE for Screeps - MMO RTS sandbox game for programmers",
   "keywords": [],
   "main": "./dist/src/index",
