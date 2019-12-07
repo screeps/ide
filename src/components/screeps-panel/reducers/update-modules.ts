@@ -6,7 +6,7 @@ store.reducer((state: IState, { type, payload: { branch, modules } }: Action): I
         return state;
     }
 
-    const modules1 = Object.entries(state.modules[branch])
+    const modules1 = Object.entries(state.modules[branch] || {})
         .filter(([, { isNew }]) => isNew)
         .reduce((modules, [module, { isNew, modified }]) => {
             modules[module] = {
@@ -27,10 +27,6 @@ store.reducer((state: IState, { type, payload: { branch, modules } }: Action): I
 
             return modules;
         }, {} as any)
-
-    // Object.entries(modules2).forEach(() => {
-
-    // })
 
     return {
         ...state,
