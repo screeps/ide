@@ -11,7 +11,8 @@ import {
     getBranchPath,
     readUserCode,
     getApi,
-    combineModules
+    combineModules,
+    createScreepsTernConfig
 } from '../../utils';
 
 import {
@@ -126,8 +127,11 @@ export function BranchesBlock(props: BranchesBlockProps) {
             const _api = await getApi();
             const { branch, modules: _modules } = await _api.getUserCode(_branch);
 
+            const branchPath = getBranchPath(branch);
+            await createScreepsTernConfig(branchPath);
+
             // по идее тут вообще никаких changes быть не может, можно просто сразу все выводить как есть
-            const changes = await readUserCode(getBranchPath(branch));
+            const changes = await readUserCode(branchPath);
 
             const files = Object.entries(changes)
                 .reduce((acc, [name]) => ({ ...acc, [name]: null }), {});
