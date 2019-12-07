@@ -12,7 +12,8 @@ let api: Api;
 let socket: Socket;
 
 export const LOCAL_PROJECT_CONFIG = '.screepsiderc';
-export const TERN_CONFIG = '.tern-project';
+export const TERN_CONFIG_PATH = '.tern-project';
+export const TERN_CONFIG_DEFAULT = { libs: ['screeps'] };
 
 export function guid() {
     return parseInt(Math.random().toString().substr(2)).toString(16);
@@ -219,9 +220,9 @@ export async function createScreepsProjectConfig(project: string, settings: any)
     }
 }
 
-export async function createScreepsTernConfig(project: string, settings: any): Promise<File> {
+export async function createScreepsTernConfig(project: string, settings: any = TERN_CONFIG_DEFAULT): Promise<File> {
     try {
-        const configPath = path.resolve(project, TERN_CONFIG);
+        const configPath = path.resolve(project, TERN_CONFIG_PATH);
         const configFile: File = new File(configPath);
         const settingsStr = JSON.stringify(settings, null, '\t');
 

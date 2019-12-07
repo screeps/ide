@@ -17,7 +17,7 @@ import {
 import {
     getApi,
     LOCAL_PROJECT_CONFIG,
-    TERN_CONFIG,
+    TERN_CONFIG_PATH,
     createScreepsTernConfig,
     createScreepsProjectConfig,
     hashCode
@@ -79,14 +79,14 @@ export const createProjectEffect = store
         const files: { [key: string]: { hash: number } } = {};
         const projectDir = mkdir(projectPath);
 
-        await createScreepsTernConfig(projectPath, { libs: ['screeps'] });
+        await createScreepsTernConfig(projectPath);
         await createScreepsProjectConfig(projectPath, { branch });
 
         if (download) {
             try {
                 if (!payload.downloadForce) {
                     let projectEntries = await projectDir.getEntriesSync();
-                    const filter = new RegExp(`((${ LOCAL_PROJECT_CONFIG })|(${ TERN_CONFIG }))$`);
+                    const filter = new RegExp(`((${ LOCAL_PROJECT_CONFIG })|(${ TERN_CONFIG_PATH }))$`);
                     projectEntries = projectEntries.filter((entry) => !filter.test(entry.getPath()));
 
                     if (projectEntries.length) {
