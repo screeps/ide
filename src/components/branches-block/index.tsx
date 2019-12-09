@@ -128,7 +128,10 @@ export function BranchesBlock(props: BranchesBlockProps) {
             const { branch, modules: _modules } = await _api.getUserCode(_branch);
 
             const branchPath = getBranchPath(branch);
-            await createScreepsTernConfig(branchPath);
+            try {
+                await createScreepsTernConfig(branchPath);
+            } catch(err) {
+            }
 
             // по идее тут вообще никаких changes быть не может, можно просто сразу все выводить как есть
             const changes = await readUserCode(branchPath);
