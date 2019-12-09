@@ -21,10 +21,12 @@ import { CONSOLE_URI } from '../console-panel';
 import { MEMORY_URI } from '../memory-panel';
 import { default as ResizablePanel } from '../../../ui/components/resizable-panel';
 
-import { UpdateModulesAction } from './actions';
-
 import './reducers';
-import { SetActiveModule } from './actions';
+import {
+    SetActiveModule,
+    UpdateModulesAction,
+    UpdateBranchesAction
+} from './actions';
 import { default as store } from '../../store';
 import { CreateProjectAction } from '../../store/actions';
 
@@ -104,6 +106,23 @@ export class ScreepsPanel implements ViewModel {
                 this._socket.on(`user:${ this._user.id }/code`)
                     .pipe(tap(({ data: [, { branch, modules }] }) => {
                         store.dispatch(UpdateModulesAction(branch, modules));
+                    }))
+                    .pipe(filter(({ data: [, { branch }]}) => {
+                        const state = __state.getValue();
+                        if (!state || !state.branches) {
+                            return false;
+                        }
+
+                        const _branch = state.branches.find(({ branch: _ }) => _ === branch);
+                        if (_branch) {
+                            return false;
+                        }
+
+                        return true;
+                    }))
+                    .pipe(tap(async () => {
+                        const { list } = await _api.getUserBranches();
+                        store.dispatch(UpdateBranchesAction(list))
                     }))
                     .subscribe();
 
